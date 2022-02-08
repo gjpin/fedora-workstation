@@ -15,34 +15,34 @@ ${HOME}/src
 
 ##### FLATPAK
 # Add Flathub and Flathub Beta repos
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 flatpak update --appstream
 
 # Allow Flatpaks to access themes and icons
-flatpak override --filesystem=xdg-data/themes:ro
-flatpak override --filesystem=xdg-data/icons:ro
+sudo flatpak override --filesystem=xdg-data/themes:ro
+sudo flatpak override --filesystem=xdg-data/icons:ro
 
 # Install TOTP and password manager flatpaks
-flatpak install -y flathub org.gnome.World.Secrets
-flatpak install -y flathub com.belmoussaoui.Authenticator
-flatpak override --unshare=network com.belmoussaoui.Authenticator
+sudo flatpak install -y flathub org.gnome.World.Secrets
+sudo flatpak install -y flathub com.belmoussaoui.Authenticator
+sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 
 # Install applications
-flatpak install -y flathub dev.alextren.Spot
-flatpak install -y flathub com.usebottles.bottles
-flatpak install -y flathub org.gimp.GIMP
-flatpak install -y flathub org.blender.Blender
-flatpak install -y flathub com.github.tchx84.Flatseal
-flatpak install -y flathub org.chromium.Chromium
-flatpak install -y flathub-beta com.google.Chrome
-flatpak install -y flathub org.libreoffice.LibreOffice
+sudo flatpak install -y flathub dev.alextren.Spot
+sudo flatpak install -y flathub com.usebottles.bottles
+sudo flatpak install -y flathub org.gimp.GIMP
+sudo flatpak install -y flathub org.blender.Blender
+sudo flatpak install -y flathub com.github.tchx84.Flatseal
+sudo flatpak install -y flathub org.chromium.Chromium
+sudo flatpak install -y flathub-beta com.google.Chrome
+sudo flatpak install -y flathub org.libreoffice.LibreOffice
 
-# flatpak install -y flathub com.valvesoftware.Steam
-# flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton
-# flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
-# flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-Exp
-# flatpak override --filesystem=/media/${USER}/data/games/steam com.valvesoftware.Steam
+# sudo flatpak install -y flathub com.valvesoftware.Steam
+# sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton
+# sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
+# sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-Exp
+# sudo flatpak override --filesystem=/media/${USER}/data/games/steam com.valvesoftware.Steam
 
 # Chrome - Enable GPU acceleration
 mkdir -p ~/.var/app/com.google.Chrome/config
@@ -64,11 +64,11 @@ EOF
 
 ##### FIREFOX
 # Uninstall Firefox RPM
-sudo dnf remove firefox
+sudo dnf remove -y firefox
 
 # Install Firefox Flatpak
-flatpak install -y flathub org.mozilla.firefox
-flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
+sudo flatpak install -y flathub org.mozilla.firefox
+sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
 
 # Open Firefox in headless mode and then close it to create profile folder
 timeout 5 flatpak run org.mozilla.firefox --headless
@@ -81,6 +81,7 @@ cd .. && rm -rf firefox-gnome-theme/
 
 # Import Firefox user settings
 cd ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release
+rm user.js
 tee -a user.js << EOF
 // Required by Firefox theme
 user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
@@ -96,7 +97,7 @@ cd
 
 ##### APPLICATIONS
 # Common software
-sudo dnf install -y git ninja-build meson sassc autoconf automake make
+sudo dnf install -y ninja-build meson sassc autoconf automake make
 
 # Podman
 sudo dnf install -y podman
@@ -163,6 +164,7 @@ meson build
 DESTDIR=${HOME}/.local/share/themes ninja -C build install
 mv ${HOME}/.local/share/themes/usr/share/themes/* ${HOME}/.local/share/themes
 rm -r ${HOME}/.local/share/themes/usr
+cd .. && rm -rf adw-gtk3
 
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3
 
@@ -182,13 +184,7 @@ GNOME_TERMINAL_PROFILE=`gsettings get org.gnome.Terminal.ProfilesList default | 
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ default-size-columns 110
 
 # Noto Fonts
-sudo dnf install -y google-noto-sans-vf-fonts google-noto-serif-vf-fonts google-noto-sans-mono-vf-fonts \ 
-google-noto-sans-arabic-vf-fonts google-noto-sans-cherokee-vf-fonts google-noto-sans-thaana-vf-fonts \
-google-noto-sans-hebrew-vf-fonts google-noto-rashi-hebrew-vf-fonts google-noto-sans-math-vf-fonts \
-google-noto-sans-armenian-vf-fonts google-noto-serif-armenian-vf-fonts google-noto-sans-canadian-aboriginal-vf-fonts \
-google-noto-sans-georgian-vf-fonts google-noto-serif-georgian-vf-fonts google-noto-sans-lao-vf-fonts \
-google-noto-serif-lao-vf-fonts google-noto-serif-gurmukhi-vf-fonts google-noto-serif-sinhala-vf-fonts \
-google-noto-sans-ethiopic-vf-fonts google-noto-serif-ethiopic-vf-fonts
+sudo dnf install -y google-noto-sans-vf-fonts google-noto-serif-vf-fonts google-noto-sans-mono-vf-fonts
 
 # Update font cache
 fc-cache -v
