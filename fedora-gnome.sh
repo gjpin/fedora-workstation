@@ -63,6 +63,9 @@ tee -a ~/.var/app/org.chromium.Chromium/config/chromium-flags.conf << EOF
 EOF
 
 ##### FIREFOX
+# Uninstall Firefox RPM
+sudo dnf remove firefox
+
 # Install Firefox Flatpak
 flatpak install -y flathub org.mozilla.firefox
 flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
@@ -240,3 +243,16 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 
 # Screenshots
 gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip "['<Super><Shift>s']"
+
+##### GNOME EXTENSIONS
+sudo dnf install -y gnome-extensions-app
+
+# Just Perfection
+wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v16.shell-extension.zip
+gnome-extensions install just-perfection-desktopjust-perfection.v16.shell-extension.zip
+rm just-perfection-desktopjust-perfection.v16.shell-extension.zip
+
+# Blur My Shel
+wget https://extensions.gnome.org/extension-data/blur-my-shellaunetx.v27.shell-extension.zip
+gnome-extensions install blur-my-shellaunetx.v27.shell-extension.zip
+rm blur-my-shellaunetx.v27.shell-extension.zip
