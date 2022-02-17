@@ -1,6 +1,6 @@
 ##### Versions
-GOLANG_VERSION=1.17.6
-NOMAD_VERSION=1.2.5
+GOLANG_VERSION=1.17.7
+NOMAD_VERSION=1.2.6
 CONSUL_VERSION=1.11.2
 VAULT_VERSION=1.9.3
 TERRAFORM_VERSION=1.1.4
@@ -22,29 +22,29 @@ flatpak update --appstream
 # Allow Flatpaks to access themes and icons
 sudo flatpak override --filesystem=xdg-data/themes:ro
 sudo flatpak override --filesystem=xdg-data/icons:ro
+sudo flatpak override --filesystem=xdg-config/gtk-3.0:ro
+sudo flatpak override --filesystem=xdg-config/gtk-4.0:ro
 
 # Install TOTP and password manager flatpaks
 sudo flatpak install -y flathub org.gnome.World.Secrets
 sudo flatpak install -y flathub com.belmoussaoui.Authenticator
 sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 
-# Install applications
-sudo flatpak install -y flathub dev.alextren.Spot
-sudo flatpak install -y flathub com.usebottles.bottles
-sudo flatpak install -y flathub org.gimp.GIMP
-sudo flatpak install -y flathub org.blender.Blender
-sudo flatpak install -y flathub com.github.tchx84.Flatseal
-sudo flatpak install -y flathub org.chromium.Chromium
-sudo flatpak install -y flathub-beta com.google.Chrome
-sudo flatpak install -y flathub org.libreoffice.LibreOffice
-
+# Install Steam
 # sudo flatpak install -y flathub com.valvesoftware.Steam
 # sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton
 # sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 # sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-Exp
-# sudo flatpak override --filesystem=/media/${USER}/data/games/steam com.valvesoftware.Steam
+# sudo flatpak override --filesystem=/run/media/${USER}/data/games/steam com.valvesoftware.Steam
 
-# Chrome - Enable GPU acceleration
+# Install applications
+sudo flatpak install -y flathub com.spotify.Client
+sudo flatpak install -y flathub com.usebottles.bottles
+sudo flatpak install -y flathub org.blender.Blender
+sudo flatpak install -y flathub com.github.tchx84.Flatseal
+
+# Install Chrome and enable GPU acceleration
+sudo flatpak install -y flathub-beta com.google.Chrome
 mkdir -p ~/.var/app/com.google.Chrome/config
 tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 --ignore-gpu-blacklist
@@ -53,7 +53,8 @@ tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 --enable-features=VaapiVideoDecoder
 EOF
 
-# Chromium - Enable GPU acceleration
+# Install Chromium and enable GPU acceleration
+sudo flatpak install -y flathub org.chromium.Chromium
 mkdir -p ~/.var/app/org.chromium.Chromium/config
 tee -a ~/.var/app/org.chromium.Chromium/config/chromium-flags.conf << EOF
 --ignore-gpu-blacklist
@@ -61,6 +62,85 @@ tee -a ~/.var/app/org.chromium.Chromium/config/chromium-flags.conf << EOF
 --enable-zero-copy
 --enable-features=VaapiVideoDecoder
 EOF
+
+##### APPLICATIONS
+# Common software
+sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop
+
+# Git
+sudo dnf install -y git-core
+git config --global init.defaultBranch main
+
+# Podman
+sudo dnf install -y podman
+tee -a ${HOME}/.bashrc.d/aliases << EOF
+alias docker="podman"
+EOF
+
+# SELinux tools and udica
+sudo dnf install -y setools-console udica
+
+# Syncthing
+sudo dnf install -y syncthing
+sudo systemctl enable --now syncthing@${USER}.service
+
+# Visual Studio Code
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
+dnf check-update
+sudo dnf install -y code
+
+mkdir -p ${HOME}/.config/Code/User
+tee -a ${HOME}/.config/Code/User/settings.json << EOF
+{
+    "telemetry.telemetryLevel": "off",
+    "window.menuBarVisibility": "toggle",
+    "workbench.startupEditor": "none",
+    "editor.fontFamily": "'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "workbench.enableExperiments": false,
+    "workbench.settings.enableNaturalLanguageSearch": false,
+    "workbench.iconTheme": "material-icon-theme",
+    "editor.fontWeight": "500",
+    "redhat.telemetry.enabled": false,
+    "files.associations": {
+        "*.j2": "terraform",
+        "*.hcl": "terraform",
+        "*.bu": "yaml"
+    },
+    "workbench.colorTheme": "GitHub Dark"
+}
+EOF
+
+code --install-extension PKief.material-icon-theme
+code --install-extension golang.Go
+code --install-extension HashiCorp.terraform
+code --install-extension redhat.ansible
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension editorconfig.editorconfig
+code --install-extension octref.vetur
+code --install-extension github.github-vscode-theme
+
+# Hashistack
+curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o hashistack-nomad.zip
+curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip -o hashistack-consul.zip
+curl -sSL https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip -o hashistack-vault.zip
+curl -sSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o hashistack-terraform.zip
+unzip 'hashistack-*.zip' -d  ${HOME}/.local/bin
+rm hashistack-*.zip
+
+# Install hey
+curl -sSL https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 -o ${HOME}/.local/bin/hey
+chmod +x ${HOME}/.local/bin/hey
+
+# Golang
+wget https://golang.org/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz
+rm -rf ${HOME}/.local/go
+tar -C ${HOME}/.local -xzf go${GOLANG_VERSION}.linux-amd64.tar.gz
+grep -qxF 'export PATH=$PATH:${HOME}/.local/go/bin' ${HOME}/.bashrc.d/exports || echo 'export PATH=$PATH:${HOME}/.local/go/bin' >> ${HOME}/.bashrc.d/exports
+rm go${GOLANG_VERSION}.linux-amd64.tar.gz
+
+# Node.js 16
+sudo dnf module install -y nodejs:16/default
 
 ##### FIREFOX
 # Uninstall Firefox RPM
@@ -94,67 +174,6 @@ user_pref("media.ffmpeg.vaapi.enabled", true);
 user_pref("media.rdd-ffmpeg.enabled", true);
 EOF
 cd
-
-##### APPLICATIONS
-# Common software
-sudo dnf install -y ninja-build meson sassc autoconf automake make
-
-# Podman
-sudo dnf install -y podman
-
-tee -a ${HOME}/.bashrc.d/aliases << EOF
-alias docker="podman"
-EOF
-
-# Syncthing
-sudo dnf install -y syncthing
-sudo systemctl enable --now syncthing@${USER}.service
-
-# Ansible
-sudo dnf install -y ansible-core
-
-# Visual Studio Code
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-dnf check-update
-sudo dnf install -y code
-
-mkdir -p ${HOME}/.config/Code/User
-tee -a ${HOME}/.config/Code/User/settings.json << EOF
-{
-    "telemetry.telemetryLevel": "off",
-    "window.menuBarVisibility": "toggle",
-    "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
-    "workbench.enableExperiments": false,
-    "workbench.settings.enableNaturalLanguageSearch": false,
-    "workbench.iconTheme": "material-icon-theme",
-    "editor.fontWeight": "500"
-}
-EOF
-
-code --install-extension PKief.material-icon-theme
-code --install-extension golang.Go
-code --install-extension HashiCorp.terraform
-code --install-extension redhat.ansible
-
-# Hashistack
-curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o hashistack-nomad.zip
-curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip -o hashistack-consul.zip
-curl -sSL https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip -o hashistack-vault.zip
-curl -sSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o hashistack-terraform.zip
-unzip 'hashistack-*.zip' -d  ${HOME}/.local/bin
-rm hashistack-*.zip
-
-# Golang
-wget https://golang.org/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz
-rm -rf ${HOME}/.local/go
-tar -C ${HOME}/.local -xzf go${GOLANG_VERSION}.linux-amd64.tar.gz
-grep -qxF 'export PATH=$PATH:${HOME}/.local/go/bin' ${HOME}/.bashrc.d/exports || echo 'export PATH=$PATH:${HOME}/.local/go/bin' >> ${HOME}/.bashrc.d/exports
-rm go${GOLANG_VERSION}.linux-amd64.tar.gz
-
-# Node.js 16
-sudo dnf module install -y nodejs:16/default
 
 ##### THEMING
 # adw-gtk3 theme (libadwaita ported to GTK3)
@@ -244,9 +263,9 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys area-screenshot-clip 
 sudo dnf install -y gnome-extensions-app
 
 # Just Perfection
-wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v16.shell-extension.zip
-gnome-extensions install just-perfection-desktopjust-perfection.v16.shell-extension.zip
-rm just-perfection-desktopjust-perfection.v16.shell-extension.zip
+wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v18.shell-extension.zip
+gnome-extensions install just-perfection-desktopjust-perfection.v18.shell-extension.zip
+rm just-perfection-desktopjust-perfection.v18.shell-extension.zip
 
 # Blur My Shel
 wget https://extensions.gnome.org/extension-data/blur-my-shellaunetx.v27.shell-extension.zip
