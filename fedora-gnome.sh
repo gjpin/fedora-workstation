@@ -107,7 +107,7 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
         "*.hcl": "terraform",
         "*.bu": "yaml"
     },
-    "workbench.colorTheme": "GitHub Dark"
+    "workbench.colorTheme": "GNOME dark"
 }
 EOF
 
@@ -118,7 +118,8 @@ code --install-extension redhat.ansible
 code --install-extension dbaeumer.vscode-eslint
 code --install-extension editorconfig.editorconfig
 code --install-extension octref.vetur
-code --install-extension github.github-vscode-theme
+code --install-extension rafaelmardojai.vscode-gnome-theme
+code --install-extension fkrull.gtk-dark-titlebar
 
 # Hashistack
 curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o hashistack-nomad.zip
