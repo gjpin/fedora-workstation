@@ -228,7 +228,6 @@ gsettings set org.gnome.nautilus.preferences click-policy 'single'
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'standard'
 
 # Text editor
-dconf write /org/gnome/gedit/preferences/ui/side-panel-visible true
 dconf write /org/gnome/gedit/preferences/editor/wrap-mode "'none'"
 dconf write /org/gnome/gedit/preferences/editor/highlight-current-line false
 
