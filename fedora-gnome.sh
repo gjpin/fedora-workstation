@@ -30,13 +30,6 @@ sudo flatpak install -y flathub org.gnome.World.Secrets
 sudo flatpak install -y flathub com.belmoussaoui.Authenticator
 sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 
-# Install Steam
-# sudo flatpak install -y flathub com.valvesoftware.Steam
-# sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton
-# sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
-# sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-Exp
-# sudo flatpak override --filesystem=/run/media/${USER}/data/games/steam com.valvesoftware.Steam
-
 # Install applications
 sudo flatpak install -y flathub com.spotify.Client
 sudo flatpak install -y flathub com.usebottles.bottles
@@ -105,7 +98,8 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     "files.associations": {
         "*.j2": "terraform",
         "*.hcl": "terraform",
-        "*.bu": "yaml"
+        "*.bu": "yaml",
+        "*.ign": "json"
     },
     "workbench.colorTheme": "GNOME dark"
 }
@@ -224,7 +218,7 @@ gsettings set org.gnome.desktop.calendar show-weekdate true
 
 # Nautilus
 gsettings set org.gtk.Settings.FileChooser sort-directories-first true
-gsettings set org.gnome.nautilus.preferences click-policy 'single'
+# gsettings set org.gnome.nautilus.preferences click-policy 'single'
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'standard'
 
 # Text editor
