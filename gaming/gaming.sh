@@ -1,15 +1,10 @@
 ##### GNOME EXTENSIONS
-# AppIndicator and KStatusNotifierItem Support
-wget https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v41.shell-extension.zip
-gnome-extensions install appindicatorsupportrgcjonas.gmail.com.v41.shell-extension.zip
-rm appindicatorsupportrgcjonas.gmail.com.v41.shell-extension.zip
-
 # Tray Icons: Reloaded
 wget https://extensions.gnome.org/extension-data/trayIconsReloadedselfmade.pl.v21.shell-extension.zip
 gnome-extensions install trayIconsReloadedselfmade.pl.v21.shell-extension.zip
 rm trayIconsReloadedselfmade.pl.v21.shell-extension.zip
 
-###### Steam
+###### STEAM
 sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak override --filesystem=/mnt/data/games/steam com.valvesoftware.Steam
 
@@ -24,28 +19,34 @@ sudo tee -a /etc/modules-load.d/uinput.conf << EOF
 uinput
 EOF
 
-###### CoreCtrl
-sudo dnf install -y corectrl
-
-# Launch CoreCtrl on session startup
-mkdir -p ~/.config/autostart
-cp /usr/share/applications/org.corectrl.corectrl.desktop ~/.config/autostart/org.corectrl.corectrl.desktop
-
-# Don't ask for user password
-sudo tee -a /etc/polkit-1/rules.d/90-corectrl.rules << EOF
-polkit.addRule(function(action, subject) {
-    if ((action.id == "org.corectrl.helper.init" ||
-         action.id == "org.corectrl.helperkiller.init") &&
-        subject.local == true &&
-        subject.active == true &&
-        subject.isInGroup("${USER}")) {
-            return polkit.Result.YES;
-    }
-});
-EOF
-
+###### AMDGPU-CLOCKS
 # Full AMD GPU controls
 sudo grubby --update-kernel=ALL --args=amdgpu.ppfeaturemask=0xffffffff
 
-# Download CoreCtrl profile
-curl -sSL https://raw.githubusercontent.com/gjpin/fedora-gnome/main/gaming/_global_.ccpro -o ~/Downloads/_global_.ccpro
+# Download amdgpu-clocks
+sudo curl -sSL https://raw.githubusercontent.com/gjpin/amdgpu-clocks/master/amdgpu-clocks -o /usr/local/bin/amdgpu-clocks
+sudo chmod +x /usr/local/bin/amdgpu-clocks
+
+# Systemd unit for amdgpu-clocks
+sudo curl -sSL https://raw.githubusercontent.com/gjpin/amdgpu-clocks/master/amdgpu-clocks.service -o /lib/systemd/system/amdgpu-clocks.service
+sudo curl -sSL https://raw.githubusercontent.com/gjpin/amdgpu-clocks/master/amdgpu-clocks-resume -o /usr/lib/systemd/system-sleep/amdgpu-clocks-resume
+sudo chmod +x /usr/lib/systemd/system-sleep/amdgpu-clocks-resume
+
+# Import custom profile
+sudo tee -a /etc/default/amdgpu-custom-state.card0 << EOF
+OD_SCLK:
+0: 800Mhz
+1: 1900Mhz
+OD_MCLK:
+1: 875MHz
+OD_VDDC_CURVE:
+0: 800MHz 710mV
+1: 1422MHz 808mV
+2: 1900MHz 1000mV
+FORCE_POWER_CAP: 270000000
+FORCE_PERF_LEVEL: manual
+FORCE_POWER_PROFILE: 1
+EOF
+
+# Enable amdgpu-clocks service
+sudo systemctl enable --now amdgpu-clocks

@@ -1,8 +1,8 @@
 # Fedora customization and setup scripts
 
 ## Notes
-gaming/gaming.sh downloads a corectrl profile (_global_.ccpro) that underclocks and undervolts a Radeon RX 5700 XT to 1900MHz and 1000mv, respectively.
-In my system, the performance is comparable to stock, but reduces the junction temperature by almost 20C in heavy load.
+gaming/gaming.sh installs Steam and sets controllers udev rules, but also underclocks and undervolts a Radeon RX 5700 XT to 1900MHz/1000mv.
+The performance is comparable to stock, but reduces the junction temperature by ~15C in heavy load.
 
 ## Recovery: chroot into system (nvme drive + encrypted /)
 Go into live mode and then run:
