@@ -101,7 +101,8 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
         "*.bu": "yaml",
         "*.ign": "json"
     },
-    "workbench.colorTheme": "GNOME dark"
+    "workbench.colorTheme": "GNOME dark",
+    "extensions.ignoreRecommendations": true
 }
 EOF
 
