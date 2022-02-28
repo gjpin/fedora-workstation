@@ -167,7 +167,6 @@ user_pref("ui.useOverlayScrollbars", 1);
 
 // Enable hardware acceleration
 user_pref("media.ffmpeg.vaapi.enabled", true);
-user_pref("media.rdd-ffmpeg.enabled", true);
 EOF
 cd
 
