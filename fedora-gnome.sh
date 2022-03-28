@@ -13,6 +13,12 @@ ${HOME}/.local/bin \
 ${HOME}/.local/share/themes \
 ${HOME}/src
 
+##### DNF
+sudo tee -a /etc/dnf/dnf.conf << EOF
+fastestmirror=true
+max_parallel_downloads=10
+EOF
+
 ##### FLATPAK
 # Add Flathub and Flathub Beta repos
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
