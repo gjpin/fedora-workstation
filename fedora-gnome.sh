@@ -226,5 +226,8 @@ gsettings set org.gnome.desktop.wm.keybindings switch-applications-backward "@as
 gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
 gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Shift><Alt>Tab']"
 
+# Text editor
+gsettings set org.gnome.TextEditor style-scheme "classic"
+
 ##### GNOME EXTENSIONS
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
