@@ -230,9 +230,9 @@ gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Shift
 gsettings set org.gnome.TextEditor style-scheme 'classic'
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
+gsettings set org.gnome.desktop.interface font-name 'Noto Sans 9'
+gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 9'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 9'
 
 ##### GNOME EXTENSIONS
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
