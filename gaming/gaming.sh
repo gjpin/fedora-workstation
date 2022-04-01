@@ -1,8 +1,7 @@
 ##### GNOME EXTENSIONS
 # Tray Icons: Reloaded
-wget https://extensions.gnome.org/extension-data/trayIconsReloadedselfmade.pl.v21.shell-extension.zip
-gnome-extensions install trayIconsReloadedselfmade.pl.v21.shell-extension.zip
-rm trayIconsReloadedselfmade.pl.v21.shell-extension.zip
+# or
+# Appindicator and kstatusnotifieritem support
 
 ###### STEAM
 sudo flatpak install -y flathub com.valvesoftware.Steam
