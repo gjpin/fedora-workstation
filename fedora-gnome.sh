@@ -211,6 +211,9 @@ gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/k
 # Window management
 gsettings set org.gnome.desktop.wm.keybindings close "['<Shift><Super>q']"
 
+# Screenshots
+gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Shift><Super>s']"
+
 # Applications
 gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Super>Return'
