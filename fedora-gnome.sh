@@ -34,6 +34,9 @@ sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 sudo flatpak install -y flathub dev.alextren.Spot
 sudo flatpak install -y flathub com.usebottles.bottles
 sudo flatpak install -y flathub com.github.tchx84.Flatseal
+sudo flatpak install -y flathub com.rafaelmardojai.Blanket
+sudo flatpak install -y flathub org.gaphor.Gaphor
+sudo flatpak install -y flathub de.haeckerfelix.Shortwave
 
 # Install Chrome and enable GPU acceleration
 sudo flatpak install -y flathub-beta com.google.Chrome
