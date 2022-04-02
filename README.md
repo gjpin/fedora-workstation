@@ -7,7 +7,7 @@ The performance is comparable to stock, but reduces the junction temperature by 
 ## Unlock LUKS with TPM2
 ```
 sudo dnf install -y tpm2-tools
-sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7+8 /dev/nvme0n1p3
+sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7+8
 sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
 sudo dracut -f
 ```
