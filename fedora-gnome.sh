@@ -19,6 +19,16 @@ fastestmirror=true
 max_parallel_downloads=10
 EOF
 
+##### FONTS
+# Install JetBrains Font
+mkdir -p ~/.local/share/fonts/JetBrainsMono
+
+curl -sSL https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/JetBrainsMono.zip -o JetBrainsMono.zip
+unzip JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMono
+rm JetBrainsMono.zip
+
+fc-cache -v
+
 ##### FLATPAK
 # Add Flathub and Flathub Beta repos
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -100,24 +110,29 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
     "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font Mono','Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
-    "workbench.iconTheme": "material-icon-theme",
+    "workbench.iconTheme": null,
+    "workbench.tree.indent": 12,
+    "window.menuBarVisibility": "toggle",
+    "window.titleBarStyle": "native",
+    "workbench.preferredDarkColorTheme": "Adwaita Dark",
+    "workbench.preferredLightColorTheme": "Adwaita Light",
     "editor.fontWeight": "500",
     "redhat.telemetry.enabled": false,
     "files.associations": {
         "*.j2": "terraform",
         "*.hcl": "terraform",
         "*.bu": "yaml",
-        "*.ign": "json"
+        "*.ign": "json",
         "*.service": "ini"
     },
     "extensions.ignoreRecommendations": true
 }
 EOF
 
-code --install-extension PKief.material-icon-theme
+code --install-extension piousdeer.adwaita-theme
 code --install-extension golang.Go
 code --install-extension HashiCorp.terraform
 code --install-extension redhat.ansible
