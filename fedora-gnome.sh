@@ -115,7 +115,6 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     "workbench.settings.enableNaturalLanguageSearch": false,
     "workbench.iconTheme": null,
     "workbench.tree.indent": 12,
-    "window.menuBarVisibility": "toggle",
     "window.titleBarStyle": "native",
     "workbench.preferredDarkColorTheme": "Adwaita Dark",
     "workbench.preferredLightColorTheme": "Adwaita Light",
@@ -128,7 +127,8 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
         "*.ign": "json",
         "*.service": "ini"
     },
-    "extensions.ignoreRecommendations": true
+    "extensions.ignoreRecommendations": true,
+    "workbench.colorTheme": "Adwaita Dark"
 }
 EOF
 
