@@ -6,7 +6,7 @@ VAULT_VERSION=1.10.0
 TERRAFORM_VERSION=1.1.7
 PACKER_VERSION=1.8.0
 
-##### FOLDERS
+##### FOLDERShttps://github.com/hardpixel/dark-variant
 mkdir -p \
 ${HOME}/.bashrc.d/ \
 ${HOME}/.local/bin \
@@ -256,6 +256,7 @@ gsettings set org.gnome.TextEditor style-scheme 'classic'
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 9'
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 9'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 9'
+gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrainsMono Nerd Font Mono 10'
 
 ##### GNOME EXTENSIONS
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
