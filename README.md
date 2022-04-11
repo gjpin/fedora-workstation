@@ -12,6 +12,13 @@ sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
 sudo dracut -f
 ```
 
+## Per app dark mode
+```
+sudo dnf install -y xprop
+
+Install 'Dark Variant' extension: https://github.com/hardpixel/dark-variant
+```
+
 ## Recovery: chroot into system (nvme drive + encrypted /)
 Go into live mode and then run:
 ```
