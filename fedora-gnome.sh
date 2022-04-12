@@ -19,6 +19,21 @@ fastestmirror=true
 max_parallel_downloads=10
 EOF
 
+# RPM Fusion and ffmpeg
+sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+sudo dnf groupupdate -y core
+
+sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+
+# Enable VA-API
+sudo dnf install -y libva libva-utils
+
+if [[ $(cat /proc/cpuinfo | grep vendor | uniq) =~ "GenuineIntel" ]]
+then
+  sudo dnf install -y intel-media-driver
+fi
+
 ##### FONTS
 # Install JetBrains Font
 mkdir -p ~/.local/share/fonts/JetBrainsMono
