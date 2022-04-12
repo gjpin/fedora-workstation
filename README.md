@@ -19,6 +19,15 @@ sudo dnf install -y xprop
 Install 'Dark Variant' extension: https://github.com/hardpixel/dark-variant
 ```
 
+## auto-cpufreq
+```
+# https://github.com/AdnanHodzic/auto-cpufreq
+cd ~/src
+git clone https://github.com/AdnanHodzic/auto-cpufreq.git
+cd auto-cpufreq && sudo ./auto-cpufreq-installer
+sudo auto-cpufreq --install
+```
+
 ## Recovery: chroot into system (nvme drive + encrypted /)
 Go into live mode and then run:
 ```
