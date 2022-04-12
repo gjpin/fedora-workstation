@@ -143,7 +143,7 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
         "*.service": "ini"
     },
     "extensions.ignoreRecommendations": true,
-    "workbench.colorTheme": "Adwaita Dark"
+    "workbench.colorTheme": "Adwaita Dark & default syntax highlighting"
 }
 EOF
 
