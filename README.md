@@ -19,6 +19,14 @@ sudo dnf install -y xprop
 Install 'Dark Variant' extension: https://github.com/hardpixel/dark-variant
 ```
 
+## tlp
+```
+sudo systemctl mask power-profiles-daemon.service
+sudo dnf install -y tlp
+sudo curl -sSL https://raw.githubusercontent.com/gjpin/fedora-gnome/main/tlp.conf -o /etc/tlp.conf
+sudo systemctl enable tlp.service
+```
+
 ## auto-cpufreq
 ```
 # https://github.com/AdnanHodzic/auto-cpufreq
