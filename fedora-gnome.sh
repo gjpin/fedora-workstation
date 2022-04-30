@@ -1,12 +1,12 @@
 ##### Versions
 GOLANG_VERSION=1.18.1
 NOMAD_VERSION=1.2.6
-CONSUL_VERSION=1.11.4
-VAULT_VERSION=1.10.0
-TERRAFORM_VERSION=1.1.7
+CONSUL_VERSION=1.20.0
+VAULT_VERSION=1.10.2
+TERRAFORM_VERSION=1.1.9
 PACKER_VERSION=1.8.0
 
-##### FOLDERShttps://github.com/hardpixel/dark-variant
+##### FOLDERS
 mkdir -p \
 ${HOME}/.bashrc.d/ \
 ${HOME}/.local/bin \
@@ -15,7 +15,6 @@ ${HOME}/src
 
 ##### DNF
 sudo tee -a /etc/dnf/dnf.conf << EOF
-fastestmirror=true
 max_parallel_downloads=10
 EOF
 
@@ -150,10 +149,10 @@ EOF
 code --install-extension piousdeer.adwaita-theme
 code --install-extension golang.Go
 code --install-extension HashiCorp.terraform
-code --install-extension redhat.ansible
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension editorconfig.editorconfig
-code --install-extension octref.vetur
+#code --install-extension redhat.ansible
+#code --install-extension dbaeumer.vscode-eslint
+#code --install-extension editorconfig.editorconfig
+#code --install-extension octref.vetur
 
 # Hashistack
 curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o hashistack-nomad.zip
