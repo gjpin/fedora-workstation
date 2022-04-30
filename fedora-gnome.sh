@@ -274,3 +274,13 @@ gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrainsMono Ner
 
 ##### GNOME EXTENSIONS
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
+
+##### GNOME SOFTWARE
+# Prevent Gnome Software from autostarting
+mkdir -p ~/.config/autostart
+cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
+echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
+dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+
+# Disable PackageKit
+#sudo systemctl mask packagekit.service
