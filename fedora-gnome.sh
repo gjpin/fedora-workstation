@@ -217,6 +217,12 @@ gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3
 sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
 sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
 
+# Customize bash
+tee ~/.bashrc.d/prompt << EOF
+PS1="\[\e[1;36m\]\w\[\e[m\] \[\e[1;33m\]\\$\[\e[m\] "
+PROMPT_COMMAND="export PROMPT_COMMAND=echo"
+EOF
+
 ##### UI / UX CONFIGURATIONS
 # Volume
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
