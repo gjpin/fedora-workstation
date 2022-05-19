@@ -1,5 +1,5 @@
 ##### Versions
-GOLANG_VERSION=1.18.1
+GOLANG_VERSION=1.18.2
 NOMAD_VERSION=1.2.6
 CONSUL_VERSION=1.12.0
 VAULT_VERSION=1.10.2
@@ -190,10 +190,9 @@ sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.fi
 timeout 5 flatpak run org.mozilla.firefox --headless
 
 # Install Firefox theme
-#git clone https://github.com/rafaelmardojai/firefox-gnome-theme && cd firefox-gnome-theme
-#git checkout libadwaita
-#./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
-#cd .. && rm -rf firefox-gnome-theme/
+git clone https://github.com/rafaelmardojai/firefox-gnome-theme && cd firefox-gnome-theme
+./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
+cd .. && rm -rf firefox-gnome-theme/
 
 # Import Firefox user settings
 cd ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release
@@ -201,6 +200,15 @@ rm user.js
 tee -a user.js << EOF
 // Enable hardware acceleration
 user_pref("media.ffmpeg.vaapi.enabled", true);
+
+// Enable customChrome.css
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+
+// Set UI density to normal
+user_pref("browser.uidensity", 0);
+
+// Enable SVG context-propertes
+user_pref("svg.context-properties.content.enabled", true);
 EOF
 cd
 
