@@ -1,9 +1,6 @@
 ##### Versions
 GOLANG_VERSION=1.18.2
-NOMAD_VERSION=1.2.6
-CONSUL_VERSION=1.12.0
-VAULT_VERSION=1.10.2
-TERRAFORM_VERSION=1.1.9
+TERRAFORM_VERSION=1.2.0
 PACKER_VERSION=1.8.0
 
 ##### FOLDERS
@@ -149,15 +146,8 @@ EOF
 code --install-extension piousdeer.adwaita-theme
 code --install-extension golang.Go
 code --install-extension HashiCorp.terraform
-#code --install-extension redhat.ansible
-#code --install-extension dbaeumer.vscode-eslint
-#code --install-extension editorconfig.editorconfig
-#code --install-extension octref.vetur
 
 # Hashistack
-curl -sSL https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip -o hashistack-nomad.zip
-curl -sSL https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip -o hashistack-consul.zip
-curl -sSL https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip -o hashistack-vault.zip
 curl -sSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o hashistack-terraform.zip
 curl -sSL https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip -o hashistack-packer.zip
 unzip 'hashistack-*.zip' -d  ${HOME}/.local/bin
@@ -174,8 +164,8 @@ tar -C ${HOME}/.local -xzf go${GOLANG_VERSION}.linux-amd64.tar.gz
 grep -qxF 'export PATH=$PATH:${HOME}/.local/go/bin' ${HOME}/.bashrc.d/exports || echo 'export PATH=$PATH:${HOME}/.local/go/bin' >> ${HOME}/.bashrc.d/exports
 rm go${GOLANG_VERSION}.linux-amd64.tar.gz
 
-# Node.js 16
-sudo dnf module install -y nodejs:16
+# Node.js 18
+sudo dnf module install -y nodejs:18
 
 ##### FIREFOX
 # Uninstall Firefox RPM
