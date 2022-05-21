@@ -32,14 +32,13 @@ sudo curl -sSL https://raw.githubusercontent.com/gjpin/amdgpu-clocks/master/amdg
 sudo chmod +x /usr/lib/systemd/system-sleep/amdgpu-clocks-resume
 
 # Import custom profile
-sudo tee -a /etc/default/amdgpu-custom-state.card0 << EOF
+sudo tee /etc/default/amdgpu-custom-state.card0 << EOF
 OD_SCLK:
 0: 800Mhz
 1: 1900Mhz
 OD_MCLK:
 1: 875MHz
 OD_VDDC_CURVE:
-0: 800MHz 710mV
 1: 1422MHz 808mV
 2: 1900MHz 1020mV
 FORCE_POWER_CAP: 270000000
