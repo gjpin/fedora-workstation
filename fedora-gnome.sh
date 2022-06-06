@@ -1,7 +1,7 @@
 ##### Versions
-GOLANG_VERSION=1.18.2
-TERRAFORM_VERSION=1.2.0
-PACKER_VERSION=1.8.0
+GOLANG_VERSION=1.18.3
+TERRAFORM_VERSION=1.2.2
+PACKER_VERSION=1.8.1
 
 ##### FOLDERS
 mkdir -p \
@@ -179,15 +179,28 @@ sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.fi
 # Open Firefox in headless mode and then close it to create profile folder
 timeout 5 flatpak run org.mozilla.firefox --headless
 
-# Install Firefox theme
+# Import Firefox user settings
+tee ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release/user.js << EOF
+// Enable hardware acceleration
+user_pref("media.ffmpeg.vaapi.enabled", true);
+EOF
+
+##### THEMING
+tee ${HOME}/.local/bin/update-themes << EOF
+# adw-gtk3
+git clone https://github.com/lassekongo83/adw-gtk3.git
+cd adw-gtk3
+meson -Dprefix="${HOME}/.local" build
+ninja -C build install
+cd .. && rm -rf adw-gtk3
+
+# firefox-gnome-theme
 git clone https://github.com/rafaelmardojai/firefox-gnome-theme && cd firefox-gnome-theme
 ./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
 cd .. && rm -rf firefox-gnome-theme/
 
-# Import Firefox user settings
-cd ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release
-rm user.js
-tee -a user.js << EOF
+# restore Firefox user.js
+tee ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release/user.js << EOD
 // Enable hardware acceleration
 user_pref("media.ffmpeg.vaapi.enabled", true);
 
@@ -199,16 +212,12 @@ user_pref("browser.uidensity", 0);
 
 // Enable SVG context-propertes
 user_pref("svg.context-properties.content.enabled", true);
+EOD
 EOF
-cd
 
-##### THEMING
-# adw-gtk3 theme (libadwaita ported to GTK3)
-git clone https://github.com/lassekongo83/adw-gtk3.git
-cd adw-gtk3
-meson -Dprefix="${HOME}/.local" build
-ninja -C build install
-cd .. && rm -rf adw-gtk3
+chmod +x ${HOME}/.local/bin/update-themes
+
+./update-themes
 
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3
 
