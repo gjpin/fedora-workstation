@@ -217,7 +217,7 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-themes
 
-./update-themes
+update-themes
 
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3
 
