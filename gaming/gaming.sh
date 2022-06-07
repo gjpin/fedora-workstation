@@ -18,6 +18,9 @@ sudo tee -a /etc/modules-load.d/uinput.conf << EOF
 uinput
 EOF
 
+###### Heroic Games Launcher
+sudo flatpak install -y com.heroicgameslauncher.hgl
+
 ###### AMDGPU-CLOCKS
 # Full AMD GPU controls
 sudo grubby --update-kernel=ALL --args=amdgpu.ppfeaturemask=0xffffffff
