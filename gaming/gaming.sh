@@ -20,6 +20,7 @@ EOF
 
 ###### Heroic Games Launcher
 sudo flatpak install -y com.heroicgameslauncher.hgl
+sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
 
 ###### AMDGPU-CLOCKS
 # Full AMD GPU controls
