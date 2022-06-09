@@ -18,6 +18,10 @@ sudo tee -a /etc/modules-load.d/uinput.conf << EOF
 uinput
 EOF
 
+# Install proton-ge
+# https://github.com/GloriousEggroll/proton-ge-custom
+flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
+
 ###### Heroic Games Launcher
 sudo flatpak install -y com.heroicgameslauncher.hgl
 sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
