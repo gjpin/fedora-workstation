@@ -30,6 +30,10 @@ then
   sudo dnf install -y intel-media-driver
 fi
 
+# Install firewalld GUI and set default zone to 'block'
+sudo dnf install -y firewall-config
+sudo firewall-cmd --set-default-zone=block
+
 ##### FONTS
 # Install JetBrains Font
 mkdir -p ~/.local/share/fonts/JetBrainsMono
