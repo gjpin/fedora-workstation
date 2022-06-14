@@ -101,6 +101,7 @@ git config --global init.defaultBranch main
 sudo dnf install -y podman
 tee -a ${HOME}/.bashrc.d/aliases << EOF
 alias docker="podman"
+alias lens="~/.local/bin/OpenLens-*.AppImage"
 EOF
 
 # SELinux tools and udica
