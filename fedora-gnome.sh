@@ -1,3 +1,7 @@
+sudo tee -a /etc/dnf/dnf.conf << EOF
+max_parallel_downloads=10
+EOF
+
 sudo dnf update -y --refresh
 
 ##### FOLDERS
@@ -6,11 +10,6 @@ ${HOME}/.bashrc.d/ \
 ${HOME}/.local/bin \
 ${HOME}/.local/share/themes \
 ${HOME}/src
-
-##### DNF
-sudo tee -a /etc/dnf/dnf.conf << EOF
-max_parallel_downloads=10
-EOF
 
 # RPM Fusion and multimedia packages
 sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
