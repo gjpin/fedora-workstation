@@ -1,3 +1,5 @@
+sudo dnf update -y --refresh
+
 ##### FOLDERS
 mkdir -p \
 ${HOME}/.bashrc.d/ \
