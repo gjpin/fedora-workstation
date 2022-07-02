@@ -169,6 +169,22 @@ code --install-extension HashiCorp.terraform
 code --install-extension redhat.ansible
 code --install-extension dbaeumer.vscode-eslint
 
+# Tailscale
+sudo rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg
+
+sudo tee /etc/yum.repos.d/tailscale.repo << 'EOF'
+[tailscale-stable]
+name=Tailscale stable
+baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
+EOF
+
+sudo dnf check-update
+
+sudo dnf install -y tailscale
+
 # Hashistack
 sudo rpm --import https://rpm.releases.hashicorp.com/gpg
 
