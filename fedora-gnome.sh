@@ -90,7 +90,7 @@ EOF
 
 ##### APPLICATIONS
 # Common software
-sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop
+sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop lm_sensors kernel-tools
 
 # Git
 sudo dnf install -y git
