@@ -8,7 +8,7 @@ sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak override --filesystem=/mnt/data/games/steam com.valvesoftware.Steam
 
 # Steam controllers udev rules
-sudo curl -sSL https://raw.githubusercontent.com/gjpin/fedora-gnome/main/gaming/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
+sudo curl -sSL https://raw.githubusercontent.com/gjpin/fedora-gnome/main/configs/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
 
 # Reload udev rules
 sudo udevadm control --reload && sudo udevadm trigger
@@ -26,7 +26,9 @@ flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 sudo flatpak install -y com.heroicgameslauncher.hgl
 sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
 
-###### AMDGPU-CLOCKS
+###### AMDGPU-CLOCKS (only if 5700 XT is detected)
+if lspci | grep VGA | grep "5700 XT" > /dev/null; then
+
 # Full AMD GPU controls
 sudo grubby --update-kernel=ALL --args=amdgpu.ppfeaturemask=0xffffffff
 
@@ -56,3 +58,5 @@ EOF
 
 # Enable amdgpu-clocks service
 sudo systemctl enable --now amdgpu-clocks
+
+fi

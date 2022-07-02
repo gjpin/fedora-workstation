@@ -23,8 +23,7 @@ sudo dnf groupupdate -y sound-and-video
 # Enable VA-API
 sudo dnf install -y libva libva-utils
 
-if [[ $(cat /proc/cpuinfo | grep vendor | uniq) =~ "GenuineIntel" ]]
-then
+if cat /proc/cpuinfo | grep vendor | grep "GenuineIntel" > /dev/null; then
   sudo dnf install -y intel-media-driver
 fi
 
@@ -310,11 +309,10 @@ gsettings set org.gtk.Settings.FileChooser sort-directories-first true
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'standard'
 
 # Laptop specific
-if [[ $(cat /sys/class/dmi/id/chassis_type) -eq 10 ]]
-then
-    gsettings set org.gnome.desktop.interface show-battery-percentage true
-    gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
-    gsettings set org.gnome.desktop.peripherals.touchpad disable-while-typing false
+if cat /sys/class/dmi/id/chassis_type | grep 10 > /dev/null; then
+  gsettings set org.gnome.desktop.interface show-battery-percentage true
+  gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
+  gsettings set org.gnome.desktop.peripherals.touchpad disable-while-typing false
 fi
 
 ##### SHORTCUTS
