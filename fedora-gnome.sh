@@ -177,7 +177,8 @@ sudo tee /etc/yum.repos.d/tailscale.repo << 'EOF'
 name=Tailscale stable
 baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
 enabled=1
-gpgcheck=1
+repo_gpgcheck=1
+gpgcheck=0
 gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
 EOF
 
