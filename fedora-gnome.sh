@@ -1,8 +1,3 @@
-##### Versions
-GOLANG_VERSION=1.18.3
-TERRAFORM_VERSION=1.2.2
-PACKER_VERSION=1.8.1
-
 ##### FOLDERS
 mkdir -p \
 ${HOME}/.bashrc.d/ \
@@ -15,12 +10,14 @@ sudo tee -a /etc/dnf/dnf.conf << EOF
 max_parallel_downloads=10
 EOF
 
-# RPM Fusion and ffmpeg
-sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+# RPM Fusion and multimedia packages
+sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 
 sudo dnf groupupdate -y core
 
 sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+
+sudo dnf groupupdate -y sound-and-video
 
 # Enable VA-API
 sudo dnf install -y libva libva-utils
@@ -49,6 +46,7 @@ fc-cache -v
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 sudo flatpak remote-modify flathub --enable
+sudo flatpak remote-modify flathub-beta --enable
 flatpak update --appstream
 
 # Install TOTP and password manager flatpaks
@@ -94,18 +92,24 @@ EOF
 sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop
 
 # Git
-sudo dnf install -y git-core
+sudo dnf install -y git
 git config --global init.defaultBranch main
 
 # Podman
 sudo dnf install -y podman
+
 tee -a ${HOME}/.bashrc.d/aliases << EOF
 alias docker="podman"
-alias lens="~/.local/bin/OpenLens-*.AppImage"
 EOF
 
 # SELinux tools and udica
 sudo dnf install -y setools-console udica
+
+tee -a ${HOME}/.bashrc.d/aliases << EOF
+alias sedenials="ausearch -m AVC,USER_AVC -ts recent"
+alias selogs="journalctl -t setroubleshoot"
+alias seinspect="sealert -l"
+EOF
 
 # Ansible
 sudo dnf install -y ansible
@@ -116,8 +120,18 @@ sudo systemctl enable --now syncthing@${USER}.service
 
 # Visual Studio Code
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-dnf check-update
+
+sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
+
+sudo dnf check-update
+
 sudo dnf install -y code
 
 mkdir -p ${HOME}/.config/Code/User
@@ -151,44 +165,100 @@ EOF
 code --install-extension piousdeer.adwaita-theme
 code --install-extension golang.Go
 code --install-extension HashiCorp.terraform
+code --install-extension redhat.ansible
+code --install-extension dbaeumer.vscode-eslint
 
 # Hashistack
-curl -sSL https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip -o hashistack-terraform.zip
-curl -sSL https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip -o hashistack-packer.zip
-unzip 'hashistack-*.zip' -d  ${HOME}/.local/bin
-rm hashistack-*.zip
+sudo rpm --import https://rpm.releases.hashicorp.com/gpg
 
-# Install hey
-curl -sSL https://hey-release.s3.us-east-2.amazonaws.com/hey_linux_amd64 -o ${HOME}/.local/bin/hey
-chmod +x ${HOME}/.local/bin/hey
+sudo tee /etc/yum.repos.d/hashicorp.repo << 'EOF'
+[hashicorp]
+name=Hashicorp Stable - $basearch
+baseurl=https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://rpm.releases.hashicorp.com/gpg
+EOF
 
-# Golang
-wget https://golang.org/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz
-rm -rf ${HOME}/.local/go
-tar -C ${HOME}/.local -xzf go${GOLANG_VERSION}.linux-amd64.tar.gz
-grep -qxF 'export PATH=$PATH:${HOME}/.local/go/bin' ${HOME}/.bashrc.d/exports || echo 'export PATH=$PATH:${HOME}/.local/go/bin' >> ${HOME}/.bashrc.d/exports
-rm go${GOLANG_VERSION}.linux-amd64.tar.gz
+sudo dnf check-update
 
-# Node.js 18
-sudo dnf module install -y nodejs:18
+sudo dnf -y install nomad consul vault packer terraform terraform-ls
+
+# k6.io
+sudo rpm --import https://dl.k6.io/key.gpg
+
+sudo tee /etc/yum.repos.d/k6-io.repo << 'EOF'
+[k6]
+name=k6
+baseurl=https://dl.k6.io/rpm/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=https://dl.k6.io/key.gpg
+EOF
+
+sudo dnf check-update
+
+sudo dnf -y install k6
+
+###### golang
+# install golang
+sudo dnf install -y golang
+
+# set paths
+tee -a ${HOME}/.bashrc.d/env << 'EOF'
+export GOPATH="$HOME/.go"
+EOF
+
+tee -a ${HOME}/.bashrc.d/paths << 'EOF'
+export PATH="$GOPATH/bin:$PATH"
+EOF
+
+##### nodejs
+# install nodejs
+sudo dnf module enable nodejs:18
+sudo dnf module install nodejs:18/common
+
+# change default npm directory
+mkdir ${HOME}/.npm-global
+npm config set prefix '~/.npm-global'
+
+# set paths
+tee -a ${HOME}/.bashrc.d/paths << 'EOF'
+export PATH="$HOME/.npm-global/bin:$PATH"
+EOF
+
+##### neovim
+# install neovim
+sudo dnf install -y neovim
+
+# import configurations
+mkdir -p ${HOME}/.config/nvim
+
+curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-gnome/main/configs/neovim \
+  -o ${HOME}/.config/nvim/init.lua
+
+# install lsp
+tee ${HOME}/.local/bin/update-lsp << EOF
+go install golang.org/x/tools/gopls@latest
+npm install -g typescript-language-server typescript
+npm install -g pyright
+EOF
+
+chmod +x ${HOME}/.local/bin/update-lsp
+
+update-lsp
+
+# bootstrap neovim
+nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 
 ##### FIREFOX
-# Uninstall Firefox RPM
-sudo dnf remove -y firefox
-
-# Install Firefox Flatpak
-sudo flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full
-sudo flatpak install -y flathub org.mozilla.firefox
-sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
-
-# Open Firefox in headless mode and then close it to create profile folder
-timeout 5 flatpak run org.mozilla.firefox --headless
-
-# Import Firefox user settings
-tee ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release/user.js << EOF
-// Enable hardware acceleration
-user_pref("media.ffmpeg.vaapi.enabled", true);
+# enable wayland
+tee -a ${HOME}/.bashrc.d/env << EOF
+export MOZ_ENABLE_WAYLAND=1
 EOF
+
+# open Firefox in headless mode and then close it to create profile folder
+timeout 5 firefox --headless
 
 ##### THEMING
 tee ${HOME}/.local/bin/update-themes << EOF
@@ -201,23 +271,8 @@ cd .. && rm -rf adw-gtk3
 
 # firefox-gnome-theme
 git clone https://github.com/rafaelmardojai/firefox-gnome-theme && cd firefox-gnome-theme
-./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
+./scripts/install.sh
 cd .. && rm -rf firefox-gnome-theme/
-
-# restore Firefox user.js
-tee ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*-release/user.js << EOD
-// Enable hardware acceleration
-user_pref("media.ffmpeg.vaapi.enabled", true);
-
-// Enable customChrome.css
-user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-
-// Set UI density to normal
-user_pref("browser.uidensity", 0);
-
-// Enable SVG context-propertes
-user_pref("svg.context-properties.content.enabled", true);
-EOD
 EOF
 
 chmod +x ${HOME}/.local/bin/update-themes
@@ -317,10 +372,10 @@ sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
 
 ##### GNOME SOFTWARE
 # Prevent Gnome Software from autostarting
-mkdir -p ~/.config/autostart
-cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
-echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
-dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+# mkdir -p ~/.config/autostart
+# cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
+# echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
+# dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
 
 # Disable PackageKit
 #sudo systemctl mask packagekit.service
