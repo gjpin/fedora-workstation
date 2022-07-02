@@ -12,7 +12,8 @@ ${HOME}/.local/share/themes \
 ${HOME}/src
 
 # RPM Fusion and multimedia packages
-sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 sudo dnf groupupdate -y core
 
@@ -98,14 +99,14 @@ git config --global init.defaultBranch main
 # Podman
 sudo dnf install -y podman
 
-tee -a ${HOME}/.bashrc.d/aliases << EOF
+tee -a ${HOME}/.bashrc.d/alias << EOF
 alias docker="podman"
 EOF
 
 # SELinux tools and udica
 sudo dnf install -y setools-console udica
 
-tee -a ${HOME}/.bashrc.d/aliases << EOF
+tee -a ${HOME}/.bashrc.d/alias << EOF
 alias sedenials="ausearch -m AVC,USER_AVC -ts recent"
 alias selogs="journalctl -t setroubleshoot"
 alias seinspect="sealert -l"
@@ -209,23 +210,27 @@ tee -a ${HOME}/.bashrc.d/env << 'EOF'
 export GOPATH="$HOME/.go"
 EOF
 
-tee -a ${HOME}/.bashrc.d/paths << 'EOF'
+tee -a ${HOME}/.bashrc.d/path << 'EOF'
 export PATH="$GOPATH/bin:$PATH"
 EOF
 
+source ${HOME}/.bashrc.d/path
+
 ##### nodejs
 # install nodejs
-sudo dnf module enable nodejs:18
-sudo dnf module install nodejs:18/common
+sudo dnf module enable -y nodejs:18
+sudo dnf module install -y nodejs:18/common
 
 # change default npm directory
 mkdir ${HOME}/.npm-global
 npm config set prefix '~/.npm-global'
 
-# set paths
-tee -a ${HOME}/.bashrc.d/paths << 'EOF'
+# set path
+tee -a ${HOME}/.bashrc.d/path << 'EOF'
 export PATH="$HOME/.npm-global/bin:$PATH"
 EOF
+
+source ${HOME}/.bashrc.d/path
 
 ##### neovim
 # install neovim
@@ -251,14 +256,15 @@ update-lsp
 # bootstrap neovim
 nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 
-##### FIREFOX
-# enable wayland
-tee -a ${HOME}/.bashrc.d/env << EOF
-export MOZ_ENABLE_WAYLAND=1
+tee -a ${HOME}/.bashrc.d/env << 'EOF'
+export EDITOR="nvim"
+export VISUAL="nvim"
 EOF
 
-# open Firefox in headless mode and then close it to create profile folder
-timeout 5 firefox --headless
+tee -a ${HOME}/.bashrc.d/alias << EOF
+alias vi="nvim"
+alias vim="nvim"
+EOF
 
 ##### THEMING
 tee ${HOME}/.local/bin/update-themes << EOF
@@ -305,7 +311,6 @@ gsettings set org.gnome.desktop.calendar show-weekdate true
 
 # Nautilus
 gsettings set org.gtk.Settings.FileChooser sort-directories-first true
-# gsettings set org.gnome.nautilus.preferences click-policy 'single'
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'standard'
 
 # Laptop specific
