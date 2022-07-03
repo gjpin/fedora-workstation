@@ -231,6 +231,7 @@ tee -a ${HOME}/.bashrc.d/path << 'EOF'
 export PATH="$GOPATH/bin:$PATH"
 EOF
 
+source ${HOME}/.bashrc.d/env
 source ${HOME}/.bashrc.d/path
 
 ##### nodejs
@@ -282,6 +283,8 @@ tee -a ${HOME}/.bashrc.d/alias << EOF
 alias vi="nvim"
 alias vim="nvim"
 EOF
+
+source ${HOME}/.bashrc.d/env
 
 ##### THEMING
 tee ${HOME}/.local/bin/update-themes << EOF
