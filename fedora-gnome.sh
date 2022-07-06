@@ -254,6 +254,11 @@ source ${HOME}/.bashrc.d/path
 # install neovim
 sudo dnf install -y neovim
 
+# neovim dependencies
+sudo dnf install fzf fd-find ripgrep tree-sitter-cli python3-pip
+npm install -g neovim
+python -m pip install pynvim
+
 # import configurations
 mkdir -p ${HOME}/.config/nvim
 
