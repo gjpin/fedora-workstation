@@ -7,9 +7,16 @@ The performance is comparable to stock, but reduces the junction temperature by 
 ## Unlock LUKS with TPM2
 ```
 sudo dnf install -y tpm2-tools
+
 sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7+8
+
 sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
+
 sudo dracut -f
+
+tee -a ${HOME}/.bashrc.d/alias << EOF
+alias cryptenroll="sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7+8"
+EOF
 ```
 
 ## Per app dark mode
