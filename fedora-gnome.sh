@@ -107,9 +107,9 @@ EOF
 sudo dnf install -y setools-console udica
 
 tee -a ${HOME}/.bashrc.d/alias << EOF
-alias sedenials="ausearch -m AVC,USER_AVC -ts recent"
-alias selogs="journalctl -t setroubleshoot"
-alias seinspect="sealert -l"
+alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
+alias selogs="sudo journalctl -t setroubleshoot"
+alias seinspect="sudo sealert -l"
 EOF
 
 # Ansible
