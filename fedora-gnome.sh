@@ -43,11 +43,9 @@ rm JetBrainsMono.zip
 fc-cache -v
 
 ##### FLATPAK
-# Add Flathub and Flathub Beta repos
+# Add Flathub repos
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 sudo flatpak remote-modify flathub --enable
-sudo flatpak remote-modify flathub-beta --enable
 flatpak update --appstream
 
 # Install TOTP and password manager flatpaks
@@ -66,7 +64,7 @@ sudo flatpak install -y flathub net.cozic.joplin_desktop
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 
 # Install Chrome and enable GPU acceleration
-sudo flatpak install -y flathub-beta com.google.Chrome
+sudo flatpak install -y flathub com.google.Chrome
 mkdir -p ~/.var/app/com.google.Chrome/config
 tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 --ignore-gpu-blacklist
