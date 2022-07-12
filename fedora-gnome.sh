@@ -311,10 +311,11 @@ chmod +x ${HOME}/.local/bin/update-themes
 
 update-themes
 
-gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3
-
 sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
 sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
+
+gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
+gsettings set org.gnome.desktop.interface color-scheme 'default'
 
 # Customize bash
 tee ~/.bashrc.d/prompt << EOF
