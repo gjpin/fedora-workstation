@@ -63,6 +63,7 @@ sudo flatpak install -y flathub com.rafaelmardojai.Blanket
 sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub de.haeckerfelix.Shortwave
 sudo flatpak install -y flathub net.cozic.joplin_desktop
+sudo flatpak install -y flathub rest.insomnia.Insomnia
 
 # Install Chrome and enable GPU acceleration
 sudo flatpak install -y flathub-beta com.google.Chrome
