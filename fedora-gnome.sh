@@ -55,13 +55,15 @@ sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 
 # Install applications
 sudo flatpak install -y flathub dev.alextren.Spot
-sudo flatpak install -y flathub com.usebottles.bottles
 sudo flatpak install -y flathub com.github.tchx84.Flatseal
 sudo flatpak install -y flathub com.rafaelmardojai.Blanket
 sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub de.haeckerfelix.Shortwave
 sudo flatpak install -y flathub net.cozic.joplin_desktop
 sudo flatpak install -y flathub rest.insomnia.Insomnia
+
+sudo flatpak install -y flathub com.usebottles.bottles
+sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
 
 # Install Chrome and enable GPU acceleration
 sudo flatpak install -y flathub com.google.Chrome
