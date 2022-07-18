@@ -20,10 +20,6 @@ EOF
 # https://github.com/GloriousEggroll/proton-ge-custom
 flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 
-###### Heroic Games Launcher
-sudo flatpak install -y com.heroicgameslauncher.hgl
-sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
-
 ###### Gamescope and mangohud
 sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
 sudo flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud
