@@ -1,9 +1,5 @@
 # Fedora customization and setup scripts
 
-## Notes
-gaming/gaming.sh installs Steam and sets controllers udev rules, but also underclocks and undervolts a Radeon RX 5700 XT to 1900MHz/1020mv.
-The performance is comparable to stock, but reduces the junction temperature by ~15C in heavy load.
-
 ## Unlock LUKS with TPM2
 ```
 sudo dnf install -y tpm2-tools
