@@ -273,8 +273,6 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-lsp
 
-update-lsp
-
 # bootstrap neovim
 nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 
