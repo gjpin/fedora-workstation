@@ -43,12 +43,12 @@ sudo chmod +x /usr/lib/systemd/system-sleep/amdgpu-clocks-resume
 sudo tee /etc/default/amdgpu-custom-state.card0 << EOF
 OD_SCLK:
 0: 800Mhz
-1: 1900Mhz
+1: 2000Mhz
 OD_MCLK:
 1: 875MHz
 OD_VDDC_CURVE:
 1: 1422MHz 808mV
-2: 1900MHz 1020mV
+2: 2000MHz 1100mV
 FORCE_POWER_CAP: 270000000
 FORCE_PERF_LEVEL: manual
 FORCE_POWER_PROFILE: 1
