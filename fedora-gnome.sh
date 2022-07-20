@@ -145,7 +145,6 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     "editor.fontFamily": "'JetBrainsMono Nerd Font Mono','Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
-    "workbench.iconTheme": null,
     "workbench.tree.indent": 12,
     "window.titleBarStyle": "native",
     "workbench.preferredDarkColorTheme": "Adwaita Dark",
@@ -160,7 +159,8 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
         "*.service": "ini"
     },
     "extensions.ignoreRecommendations": true,
-    "workbench.colorTheme": "Adwaita Dark & default syntax highlighting"
+    "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",
+    "editor.formatOnSave": true
 }
 EOF
 
