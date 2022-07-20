@@ -238,20 +238,12 @@ source ${HOME}/.bashrc.d/env
 source ${HOME}/.bashrc.d/path
 
 ##### nodejs
+# install pnpm
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+source ~/.bashrc
+
 # install nodejs
-sudo dnf module enable -y nodejs:18
-sudo dnf module install -y nodejs:18/common
-
-# change default npm directory
-mkdir ${HOME}/.npm-global
-npm config set prefix '~/.npm-global'
-
-# set path
-tee -a ${HOME}/.bashrc.d/path << 'EOF'
-export PATH="$HOME/.npm-global/bin:$PATH"
-EOF
-
-source ${HOME}/.bashrc.d/path
+pnpm env use -g 18
 
 ##### neovim
 # install neovim
@@ -259,7 +251,7 @@ sudo dnf install -y neovim
 
 # neovim dependencies
 sudo dnf install fzf fd-find ripgrep tree-sitter-cli python3-pip
-npm install -g neovim
+pnpm add -g neovim
 python -m pip install pynvim
 
 # import configurations
@@ -269,10 +261,14 @@ curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-gnome/main/configs/neov
   -o ${HOME}/.config/nvim/init.lua
 
 # install lsp
+go install golang.org/x/tools/gopls@latest
+pnpm add -g typescript-language-server typescript
+pnpm add -g pyright
+
 tee ${HOME}/.local/bin/update-lsp << EOF
 go install golang.org/x/tools/gopls@latest
-npm install -g typescript-language-server typescript
-npm install -g pyright
+pnpm update -g typescript-language-server typescript
+pnpm update -g pyright
 EOF
 
 chmod +x ${HOME}/.local/bin/update-lsp
@@ -361,27 +357,25 @@ gsettings set org.gnome.desktop.wm.keybindings close "['<Shift><Super>q']"
 gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Shift><Super>s']"
 
 # Applications
-gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Super>Return'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'gnome-terminal'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'gnome-terminal'
 
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Super>e'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Super>E'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'nautilus'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'nautilus'
 
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Shift><Control>Escape'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'gnome-system-monitor'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'gnome-system-monitor'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ binding '<Shift><Control>Escape'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ command 'gnome-system-monitor'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ name 'gnome-system-monitor'
 
 # Change alt+tab behaviour
 gsettings set org.gnome.desktop.wm.keybindings switch-applications "@as []"
 gsettings set org.gnome.desktop.wm.keybindings switch-applications-backward "@as []"
 gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
 gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Shift><Alt>Tab']"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Shift><Control>Escape'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'gnome-system-monitor'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'gnome-system-monitor'
+
 # Switch to workspace
 gsettings set org.gnome.shell.keybindings switch-to-application-1 "@as []"
 gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']"
