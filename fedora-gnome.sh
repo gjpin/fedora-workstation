@@ -251,7 +251,6 @@ sudo dnf install -y neovim
 
 # neovim dependencies
 sudo dnf install fzf fd-find ripgrep tree-sitter-cli python3-pip
-pnpm add -g neovim
 python -m pip install pynvim
 
 # import configurations
