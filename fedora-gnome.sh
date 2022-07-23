@@ -349,7 +349,7 @@ go install golang.org/x/tools/gopls@latest
 
 tee ${HOME}/.local/bin/update-lsp << EOF
 go install golang.org/x/tools/gopls@latest
-npm update -g typescript-language-server typescript pyright
+npm update -g typescript-language-server typescript pyright neovim
 EOF
 
 chmod +x ${HOME}/.local/bin/update-lsp
