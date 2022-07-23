@@ -237,13 +237,94 @@ EOF
 source ${HOME}/.bashrc.d/env
 source ${HOME}/.bashrc.d/path
 
-##### nodejs
-# install pnpm
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-source ~/.bashrc
+##### Node.js
+# Install NVM
+export NVM_DIR="$HOME/.nvm" && (
+  git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+  cd "$NVM_DIR"
+  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+) && \. "$NVM_DIR/nvm.sh"
 
-# install nodejs
-pnpm env use -g 18
+# Add NVM updater
+tee ${HOME}/.local/bin/update-nvm << 'EOF'
+(
+  cd "$NVM_DIR"
+  git fetch --tags origin
+  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+) && \. "$NVM_DIR/nvm.sh"
+EOF
+
+chmod +x ${HOME}/.local/bin/update-nvm
+
+# Set default global packages
+tee ${NVM_DIR}/default-packages << EOF
+typescript
+typescript-language-server
+pyright
+neovim
+EOF
+
+# Source NVM and automatically call nvm use based on nvmrc
+tee ${HOME}/.bashrc.d/nvm << 'EOF'
+# Source NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Automatically call nvm use
+cdnvm() {
+    command cd "$@";
+    nvm_path=$(nvm_find_up .nvmrc | tr -d '\n')
+
+    # If there are no .nvmrc file, use the default nvm version
+    if [[ ! $nvm_path = *[^[:space:]]* ]]; then
+
+        declare default_version;
+        default_version=$(nvm version default);
+
+        # If there is no default version, set it to `node`
+        # This will use the latest version on your machine
+        if [[ $default_version == "N/A" ]]; then
+            nvm alias default node;
+            default_version=$(nvm version default);
+        fi
+
+        # If the current version is not the default version, set it to use the default version
+        if [[ $(nvm current) != "$default_version" ]]; then
+            nvm use default;
+        fi
+
+    elif [[ -s $nvm_path/.nvmrc && -r $nvm_path/.nvmrc ]]; then
+        declare nvm_version
+        nvm_version=$(<"$nvm_path"/.nvmrc)
+
+        declare locally_resolved_nvm_version
+        # `nvm ls` will check all locally-available versions
+        # If there are multiple matching versions, take the latest one
+        # Remove the `->` and `*` characters and spaces
+        # `locally_resolved_nvm_version` will be `N/A` if no local versions are found
+        locally_resolved_nvm_version=$(nvm ls --no-colors "$nvm_version" | tail -1 | tr -d '\->*' | tr -d '[:space:]')
+
+        # If it is not already installed, install it
+        # `nvm install` will implicitly use the newly-installed version
+        if [[ "$locally_resolved_nvm_version" == "N/A" ]]; then
+            nvm install "$nvm_version";
+        elif [[ $(nvm current) != "$locally_resolved_nvm_version" ]]; then
+            nvm use "$nvm_version";
+        fi
+    fi
+}
+alias cd='cdnvm'
+cd "$PWD"
+EOF
+
+source ${HOME}/.bashrc.d/nvm
+
+# install nodejs 18
+nvm install 18
+
+# Update npm
+nvm install-latest-npm
 
 ##### neovim
 # install neovim
@@ -261,13 +342,10 @@ curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-gnome/main/configs/neov
 
 # install lsp
 go install golang.org/x/tools/gopls@latest
-pnpm add -g typescript-language-server typescript
-pnpm add -g pyright
 
 tee ${HOME}/.local/bin/update-lsp << EOF
 go install golang.org/x/tools/gopls@latest
-pnpm update -g typescript-language-server typescript
-pnpm update -g pyright
+npm update -g typescript-language-server typescript pyright
 EOF
 
 chmod +x ${HOME}/.local/bin/update-lsp
@@ -304,8 +382,10 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-themes
 
+# Install GTK and Firefox themes
 update-themes
 
+# Set GTK theme
 sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
 sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
 
@@ -316,6 +396,29 @@ gsettings set org.gnome.desktop.interface color-scheme 'default'
 tee ~/.bashrc.d/prompt << EOF
 PS1="\[\e[1;36m\]\w\[\e[m\] \[\e[1;33m\]\\$\[\e[m\] "
 PROMPT_COMMAND="export PROMPT_COMMAND=echo"
+EOF
+
+# Updater bash function
+tee ${HOME}/.bashrc.d/update-all << EOF
+update-all() {
+  # Update Flatpak apps
+  flatpak update
+
+  # Update system packages
+  sudo dnf update -y --refresh
+
+  # Update LSP servers
+  update-lsp
+
+  # Update GTK and Firefox themes
+  update-themes
+
+  # Update NVM
+  update-nvm
+
+  # Update NPM
+  nvm install-latest-npm
+}
 EOF
 
 # Terminal
