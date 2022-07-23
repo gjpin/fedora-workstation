@@ -264,12 +264,24 @@ pyright
 neovim
 EOF
 
-# Source NVM and automatically call nvm use based on nvmrc
+# Source NVM
 tee ${HOME}/.bashrc.d/nvm << 'EOF'
 # Source NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+EOF
+
+source ${HOME}/.bashrc.d/nvm
+
+# install nodejs 18
+nvm install 18
+
+# Update npm
+nvm install-latest-npm
+
+# Source NVM and automatically call nvm use based on nvmrc
+tee -a ${HOME}/.bashrc.d/nvm << 'EOF'
 
 # Automatically call nvm use
 cdnvm() {
@@ -317,14 +329,6 @@ cdnvm() {
 alias cd='cdnvm'
 cd "$PWD"
 EOF
-
-source ${HOME}/.bashrc.d/nvm
-
-# install nodejs 18
-nvm install 18
-
-# Update npm
-nvm install-latest-npm
 
 ##### neovim
 # install neovim
