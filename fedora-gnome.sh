@@ -32,16 +32,6 @@ fi
 sudo dnf install -y firewall-config
 sudo firewall-cmd --set-default-zone=block
 
-##### FONTS
-# Install JetBrains Font
-mkdir -p ~/.local/share/fonts/JetBrainsMono
-
-curl -sSL https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/JetBrainsMono.zip -o JetBrainsMono.zip
-unzip JetBrainsMono.zip -d ~/.local/share/fonts/JetBrainsMono
-rm JetBrainsMono.zip
-
-fc-cache -v
-
 ##### FLATPAK
 # Add Flathub repos
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -142,7 +132,7 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
     "workbench.startupEditor": "none",
-    "editor.fontFamily": "'JetBrainsMono Nerd Font Mono','Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "editor.fontFamily": "'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
     "workbench.iconTheme": null,
@@ -503,7 +493,7 @@ gsettings set org.gnome.TextEditor style-scheme 'classic'
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 9'
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 9'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 9'
-gsettings set org.gnome.desktop.interface monospace-font-name 'JetBrainsMono Nerd Font Mono 10'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
 
 ##### GNOME EXTENSIONS
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
