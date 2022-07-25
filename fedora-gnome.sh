@@ -490,9 +490,9 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Su
 gsettings set org.gnome.TextEditor style-scheme 'classic'
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 9'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 9'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 9'
+gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
+gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
 
 ##### GNOME EXTENSIONS
