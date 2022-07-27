@@ -4,7 +4,7 @@
 ```
 sudo dnf install -y tpm2-tools
 
-sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7+8+14
+sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
 
 sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
 
