@@ -1,3 +1,5 @@
+#!/bin/bash
+
 sudo tee -a /etc/dnf/dnf.conf << EOF
 max_parallel_downloads=10
 EOF
@@ -90,14 +92,11 @@ git config --global init.defaultBranch main
 # Podman
 sudo dnf install -y podman
 
-tee -a ${HOME}/.bashrc.d/alias << EOF
-alias docker="podman"
-EOF
-
 # SELinux tools and udica
 sudo dnf install -y setools-console udica
 
-tee -a ${HOME}/.bashrc.d/alias << EOF
+tee -a ${HOME}/.bashrc.d/selinux << EOF
+# alias
 alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
 alias selogs="sudo journalctl -t setroubleshoot"
 alias seinspect="sudo sealert -l"
@@ -195,129 +194,77 @@ sudo dnf check-update
 
 sudo dnf -y install nomad consul vault packer terraform terraform-ls
 
-# k6.io
-sudo rpm --import https://dl.k6.io/key.gpg
-
-sudo tee /etc/yum.repos.d/k6-io.repo << 'EOF'
-[k6]
-name=k6
-baseurl=https://dl.k6.io/rpm/$basearch
-enabled=1
-gpgcheck=1
-gpgkey=https://dl.k6.io/key.gpg
-EOF
-
-sudo dnf check-update
-
-sudo dnf -y install k6
-
 ###### golang
 # install golang
 sudo dnf install -y golang
 
 # set paths
-tee -a ${HOME}/.bashrc.d/env << 'EOF'
+tee -a ${HOME}/.bashrc.d/golang << 'EOF'
+# paths
 export GOPATH="$HOME/.go"
-EOF
-
-tee -a ${HOME}/.bashrc.d/path << 'EOF'
 export PATH="$GOPATH/bin:$PATH"
 EOF
 
-source ${HOME}/.bashrc.d/env
-source ${HOME}/.bashrc.d/path
+source ${HOME}/.bashrc.d/golang
 
 ##### Node.js
-# Install NVM
-export NVM_DIR="$HOME/.nvm" && (
-  git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
-  cd "$NVM_DIR"
-  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
-) && \. "$NVM_DIR/nvm.sh"
+# Install fnm
+curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
 
-# Add NVM updater
-tee ${HOME}/.local/bin/update-nvm << 'EOF'
-(
-  cd "$NVM_DIR"
-  git fetch --tags origin
-  git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
-) && \. "$NVM_DIR/nvm.sh"
+tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
+# Source fnm
+export PATH="$HOME/.fnm:$PATH"
+eval "`fnm env`"
+eval "$(fnm env --use-on-cd)"
 EOF
 
-chmod +x ${HOME}/.local/bin/update-nvm
+source ${HOME}/.bashrc.d/nodejs
 
-# Set default global packages
-tee ${NVM_DIR}/default-packages << EOF
-typescript
-typescript-language-server
-pyright
-neovim
+# Add nfm updater
+tee ${HOME}/.local/bin/update-fnm << 'EOF'
+#!/bin/bash
+
+curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
 EOF
 
-# Source NVM
-tee ${HOME}/.bashrc.d/nvm << 'EOF'
-# Source NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-EOF
+chmod +x ${HOME}/.local/bin/update-fnm
 
-source ${HOME}/.bashrc.d/nvm
+# install nodejs lts
+fnm install --lts
 
-# install nodejs 18
-nvm install 18
+# Set global packages folder and install global packages
+mkdir -p ${HOME}/.npmbin
 
-# Update npm
-nvm install-latest-npm
+cd ${HOME}/.npmbin
 
-# Source NVM and automatically call nvm use based on nvmrc
-tee -a ${HOME}/.bashrc.d/nvm << 'EOF'
-
-# Automatically call nvm use
-cdnvm() {
-    command cd "$@";
-    nvm_path=$(nvm_find_up .nvmrc | tr -d '\n')
-
-    # If there are no .nvmrc file, use the default nvm version
-    if [[ ! $nvm_path = *[^[:space:]]* ]]; then
-
-        declare default_version;
-        default_version=$(nvm version default);
-
-        # If there is no default version, set it to `node`
-        # This will use the latest version on your machine
-        if [[ $default_version == "N/A" ]]; then
-            nvm alias default node;
-            default_version=$(nvm version default);
-        fi
-
-        # If the current version is not the default version, set it to use the default version
-        if [[ $(nvm current) != "$default_version" ]]; then
-            nvm use default;
-        fi
-
-    elif [[ -s $nvm_path/.nvmrc && -r $nvm_path/.nvmrc ]]; then
-        declare nvm_version
-        nvm_version=$(<"$nvm_path"/.nvmrc)
-
-        declare locally_resolved_nvm_version
-        # `nvm ls` will check all locally-available versions
-        # If there are multiple matching versions, take the latest one
-        # Remove the `->` and `*` characters and spaces
-        # `locally_resolved_nvm_version` will be `N/A` if no local versions are found
-        locally_resolved_nvm_version=$(nvm ls --no-colors "$nvm_version" | tail -1 | tr -d '\->*' | tr -d '[:space:]')
-
-        # If it is not already installed, install it
-        # `nvm install` will implicitly use the newly-installed version
-        if [[ "$locally_resolved_nvm_version" == "N/A" ]]; then
-            nvm install "$nvm_version";
-        elif [[ $(nvm current) != "$locally_resolved_nvm_version" ]]; then
-            nvm use "$nvm_version";
-        fi
-    fi
+tee ${HOME}/.npmbin/package.json << 'EOF'
+{
+  "name": "npmbin",
+  "version": "1.0.0",
+  "description": ""
 }
-alias cd='cdnvm'
-cd "$PWD"
+EOF
+
+npm install typescript typescript-language-server pyright
+
+cd
+
+# Easily install global packages
+tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
+
+# Install global packages
+npmg() {
+  cd ${HOME}/.npmbin
+  npm install $@
+  cd -
+}
+EOF
+
+# Source global packages
+tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
+
+# Source global packages
+export PATH="$HOME/.npmbin/node_modules/.bin:$PATH"
 EOF
 
 ##### neovim
@@ -338,8 +285,10 @@ curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-gnome/main/configs/neov
 go install golang.org/x/tools/gopls@latest
 
 tee ${HOME}/.local/bin/update-lsp << EOF
+#!/bin/bash
+
 go install golang.org/x/tools/gopls@latest
-npm update -g typescript-language-server typescript pyright neovim
+npmg typescript-language-server typescript pyright
 EOF
 
 chmod +x ${HOME}/.local/bin/update-lsp
@@ -347,20 +296,20 @@ chmod +x ${HOME}/.local/bin/update-lsp
 # bootstrap neovim
 nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
 
-tee -a ${HOME}/.bashrc.d/env << 'EOF'
+tee -a ${HOME}/.bashrc.d/neovim << 'EOF'
+# env
 export EDITOR="nvim"
 export VISUAL="nvim"
-EOF
 
-tee -a ${HOME}/.bashrc.d/alias << EOF
+# alias
 alias vi="nvim"
 alias vim="nvim"
 EOF
 
-source ${HOME}/.bashrc.d/env
-
 ##### THEMING
 tee ${HOME}/.local/bin/update-themes << EOF
+#!/bin/bash
+
 # adw-gtk3
 git clone https://github.com/lassekongo83/adw-gtk3.git
 cd adw-gtk3
@@ -387,7 +336,7 @@ gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
 gsettings set org.gnome.desktop.interface color-scheme 'default'
 
 # Customize bash
-tee ~/.bashrc.d/prompt << EOF
+tee ${HOME}/.bashrc.d/prompt << EOF
 PS1="\[\e[1;36m\]\w\[\e[m\] \[\e[1;33m\]\\$\[\e[m\] "
 PROMPT_COMMAND="export PROMPT_COMMAND=echo"
 EOF
@@ -395,11 +344,11 @@ EOF
 # Updater bash function
 tee ${HOME}/.bashrc.d/update-all << EOF
 update-all() {
-  # Update Flatpak apps
-  flatpak update -y
-
   # Update system packages
   sudo dnf update -y --refresh
+
+  # Update Flatpak apps
+  flatpak update -y
 
   # Update LSP servers
   update-lsp
@@ -408,10 +357,7 @@ update-all() {
   update-themes
 
   # Update NVM
-  update-nvm
-
-  # Update NPM
-  nvm install-latest-npm
+  update-fnm
 }
 EOF
 
