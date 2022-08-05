@@ -396,7 +396,7 @@ EOF
 tee ${HOME}/.bashrc.d/update-all << EOF
 update-all() {
   # Update Flatpak apps
-  flatpak update
+  flatpak update -y
 
   # Update system packages
   sudo dnf update -y --refresh
@@ -493,7 +493,7 @@ gsettings set org.gnome.TextEditor style-scheme 'classic'
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11'
 
 ##### GNOME EXTENSIONS
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
