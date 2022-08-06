@@ -97,6 +97,8 @@ Name=Godot
 Exec=/home/$USER/.local/bin/godot
 Icon=/home/$USER/.local/share/godot/icon.svg
 Type=Application
-Categories=Graphics;2DGraphics
+Categories=Graphics;2DGraphics;3DGraphics
+
+# Change base color to #1d1d1d
 EOF
 ```
