@@ -67,3 +67,12 @@ echo 'nameserver 1.1.1.1' > /mnt/run/systemd/resolve/stub-resolv.conf
 # chroot
 chroot /mnt
 ```
+
+## To install .deb packages (eg. Aseprite)
+```
+ar -x Aseprite*
+tar xf data.tar.xz
+sudo cp -r usr/bin/* /usr/bin/
+sudo cp -r usr/share/* /usr/share/
+sudo sed -i "s|Icon=aseprite|Icon=/usr/share/icons/hicolor/64x64/apps/aseprite.png|" /usr/share/applications/aseprite.desktop
+```
