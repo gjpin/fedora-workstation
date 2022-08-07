@@ -159,6 +159,7 @@ code --install-extension golang.Go
 code --install-extension HashiCorp.terraform
 code --install-extension redhat.ansible
 code --install-extension dbaeumer.vscode-eslint
+code --install-extension geequlim.godot-tools
 
 # Tailscale
 sudo rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg
