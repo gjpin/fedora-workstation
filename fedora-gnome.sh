@@ -214,7 +214,6 @@ curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
 tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
 # Source fnm
 export PATH="$HOME/.fnm:$PATH"
-eval "`fnm env`"
 eval "$(fnm env --use-on-cd)"
 EOF
 
