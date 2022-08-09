@@ -59,6 +59,6 @@ chroot /mnt
 ```
 ar -x Aseprite*
 tar xf data.tar.xz
-cp -r data/usr/bin/aseprite ~/.local/bin/
-cp -r data/usr/share/* ~/.local/share/
+cp -r usr/bin/aseprite ~/.local/bin/
+cp -r usr/share/* ~/.local/share/
 ```
