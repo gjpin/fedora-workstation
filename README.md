@@ -1,20 +1,7 @@
 # Fedora customization and setup scripts
 
-## Unlock LUKS with TPM2
-```
-sudo dnf install -y tpm2-tools
-
-sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
-
-sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
-
-sudo dracut -f
-```
-
 ## Per app dark mode
 ```
-sudo dnf install -y xprop
-
 Install 'Dark Variant' extension: https://github.com/hardpixel/dark-variant
 ```
 
@@ -72,9 +59,9 @@ chroot /mnt
 ```
 ar -x Aseprite*
 tar xf data.tar.xz
-sudo cp -r usr/bin/* /usr/bin/
-sudo cp -r usr/share/* /usr/share/
-sudo sed -i "s|Icon=aseprite|Icon=/usr/share/icons/hicolor/64x64/apps/aseprite.png|" /usr/share/applications/aseprite.desktop
+cp -r usr/bin/* ~/local/bin/
+cp -r usr/share/* ~/local/share/
+sed -i "s|Icon=aseprite|Icon=/usr/share/icons/hicolor/64x64/apps/aseprite.png|" ~/local/share/applications/aseprite.desktop
 ```
 
 ## Download and install godot

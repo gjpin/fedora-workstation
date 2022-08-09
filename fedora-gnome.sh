@@ -36,29 +36,31 @@ sudo firewall-cmd --set-default-zone=block
 
 ##### FLATPAK
 # Add Flathub repos
-sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-modify flathub --enable
 flatpak update --appstream
 
 # Install TOTP and password manager flatpaks
-sudo flatpak install -y flathub org.gnome.World.Secrets
-sudo flatpak install -y flathub com.belmoussaoui.Authenticator
+flatpak install -y flathub org.gnome.World.Secrets
+flatpak install -y flathub com.belmoussaoui.Authenticator
 sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 
 # Install applications
-sudo flatpak install -y flathub dev.alextren.Spot
-sudo flatpak install -y flathub com.github.tchx84.Flatseal
-sudo flatpak install -y flathub com.rafaelmardojai.Blanket
-sudo flatpak install -y flathub org.gaphor.Gaphor
-sudo flatpak install -y flathub de.haeckerfelix.Shortwave
-sudo flatpak install -y flathub net.cozic.joplin_desktop
-sudo flatpak install -y flathub rest.insomnia.Insomnia
+flatpak install -y flathub dev.alextren.Spot
+flatpak install -y flathub com.github.tchx84.Flatseal
+flatpak install -y flathub com.rafaelmardojai.Blanket
+flatpak install -y flathub org.gaphor.Gaphor
+flatpak install -y flathub de.haeckerfelix.Shortwave
+flatpak install -y flathub net.cozic.joplin_desktop
+flatpak install -y flathub rest.insomnia.Insomnia
+flatpak install -y flathub org.blender.Blender
+flatpak install -y flathub org.godotengine.Godot
 
-sudo flatpak install -y flathub com.usebottles.bottles
+flatpak install -y flathub com.usebottles.bottles
 sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
 
 # Install Chrome and enable GPU acceleration
-sudo flatpak install -y flathub com.google.Chrome
+flatpak install -y flathub com.google.Chrome
 mkdir -p ~/.var/app/com.google.Chrome/config
 tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 --ignore-gpu-blacklist
@@ -70,7 +72,7 @@ tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 EOF
 
 # Install Chromium and enable GPU acceleration
-sudo flatpak install -y flathub org.chromium.Chromium
+flatpak install -y flathub org.chromium.Chromium
 mkdir -p ~/.var/app/org.chromium.Chromium/config
 tee -a ~/.var/app/org.chromium.Chromium/config/chromium-flags.conf << EOF
 --ignore-gpu-blacklist
@@ -83,7 +85,7 @@ EOF
 
 ##### APPLICATIONS
 # Common software
-sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop lm_sensors kernel-tools
+sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop lm_sensors kernel-tools xprop keepassxc
 
 # Git
 sudo dnf install -y git
@@ -307,7 +309,7 @@ alias vim="nvim"
 EOF
 
 ##### THEMING
-tee ${HOME}/.local/bin/update-themes << EOF
+tee ${HOME}/.local/bin/update-themes << 'EOF'
 #!/bin/bash
 
 # adw-gtk3
@@ -329,8 +331,8 @@ chmod +x ${HOME}/.local/bin/update-themes
 update-themes
 
 # Set GTK theme
-sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
-sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
+flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
+flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
 
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
 gsettings set org.gnome.desktop.interface color-scheme 'default'
@@ -442,14 +444,18 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11'
 
 ##### GNOME EXTENSIONS
-sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
+flatpak install -y flathub com.mattjakeman.ExtensionManager
 
 ##### GNOME SOFTWARE
 # Prevent Gnome Software from autostarting
-# mkdir -p ~/.config/autostart
-# cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
-# echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
-# dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+mkdir -p ~/.config/autostart
+cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
+echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
+dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
 
-# Disable PackageKit
-#sudo systemctl mask packagekit.service
+
+##### Unlock LUKS with TPM2
+sudo dnf install -y tpm2-tools
+sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
+sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
+sudo dracut -f
