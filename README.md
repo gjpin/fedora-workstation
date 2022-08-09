@@ -59,33 +59,6 @@ chroot /mnt
 ```
 ar -x Aseprite*
 tar xf data.tar.xz
-cp -r usr/bin/* ~/local/bin/
-cp -r usr/share/* ~/local/share/
-sed -i "s|Icon=aseprite|Icon=/usr/share/icons/hicolor/64x64/apps/aseprite.png|" ~/local/share/applications/aseprite.desktop
-```
-
-## Download and install godot
-```
-# Download and install Godot
-GODOT_VERSION=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/godotengine/godot/tags | jq -j -r .[0].name)
-curl -sSL https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}/Godot_v${GODOT_VERSION}_x11.64.zip -O
-unzip Godot*
-rm Godot*.zip
-mv Godot* ${HOME}/.local/bin/godot
-
-# Download icon
-mkdir -p ${HOME}/.local/share/godot
-curl -sSL https://upload.wikimedia.org/wikipedia/commons/6/6a/Godot_icon.svg -o ${HOME}/.local/share/godot/icon.svg
-
-# Create desktop entry
-tee ${HOME}/.local/share/applications/godot.desktop << EOF
-[Desktop Entry]
-Name=Godot
-Exec=/home/$USER/.local/bin/godot
-Icon=/home/$USER/.local/share/godot/icon.svg
-Type=Application
-Categories=Graphics;2DGraphics;3DGraphics
-
-# Change base color to #1d1d1d
-EOF
+cp -r data/usr/bin/aseprite ~/.local/bin/
+cp -r data/usr/share/* ~/.local/share/
 ```
