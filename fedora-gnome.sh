@@ -36,31 +36,31 @@ sudo firewall-cmd --set-default-zone=block
 
 ##### FLATPAK
 # Add Flathub repos
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-modify flathub --enable
-flatpak update --appstream
+sudo flatpak update --appstream
 
 # Install TOTP and password manager flatpaks
-flatpak install -y flathub org.gnome.World.Secrets
-flatpak install -y flathub com.belmoussaoui.Authenticator
+sudo flatpak install -y flathub org.gnome.World.Secrets
+sudo flatpak install -y flathub com.belmoussaoui.Authenticator
 sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
 
 # Install applications
-flatpak install -y flathub dev.alextren.Spot
-flatpak install -y flathub com.github.tchx84.Flatseal
-flatpak install -y flathub com.rafaelmardojai.Blanket
-flatpak install -y flathub org.gaphor.Gaphor
-flatpak install -y flathub de.haeckerfelix.Shortwave
-flatpak install -y flathub net.cozic.joplin_desktop
-flatpak install -y flathub rest.insomnia.Insomnia
-flatpak install -y flathub org.blender.Blender
-flatpak install -y flathub org.godotengine.Godot
+sudo flatpak install -y flathub dev.alextren.Spot
+sudo flatpak install -y flathub com.github.tchx84.Flatseal
+sudo flatpak install -y flathub com.rafaelmardojai.Blanket
+sudo flatpak install -y flathub org.gaphor.Gaphor
+sudo flatpak install -y flathub de.haeckerfelix.Shortwave
+sudo flatpak install -y flathub net.cozic.joplin_desktop
+sudo flatpak install -y flathub rest.insomnia.Insomnia
+sudo flatpak install -y flathub org.blender.Blender
+sudo flatpak install -y flathub org.godotengine.Godot
 
-flatpak install -y flathub com.usebottles.bottles
+sudo flatpak install -y flathub com.usebottles.bottles
 sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
 
 # Install Chrome and enable GPU acceleration
-flatpak install -y flathub com.google.Chrome
+sudo flatpak install -y flathub com.google.Chrome
 mkdir -p ~/.var/app/com.google.Chrome/config
 tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 --ignore-gpu-blacklist
@@ -72,7 +72,7 @@ tee -a ~/.var/app/com.google.Chrome/config/chrome-flags.conf << EOF
 EOF
 
 # Install Chromium and enable GPU acceleration
-flatpak install -y flathub org.chromium.Chromium
+sudo flatpak install -y flathub org.chromium.Chromium
 mkdir -p ~/.var/app/org.chromium.Chromium/config
 tee -a ~/.var/app/org.chromium.Chromium/config/chromium-flags.conf << EOF
 --ignore-gpu-blacklist
@@ -177,7 +177,7 @@ gpgcheck=0
 gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
 EOF
 
-sudo dnf check-update
+sudo dnf check-update -y
 
 sudo dnf install -y tailscale
 
@@ -274,7 +274,7 @@ EOF
 sudo dnf install -y neovim
 
 # neovim dependencies
-sudo dnf install fzf fd-find ripgrep tree-sitter-cli python3-pip
+sudo dnf install -y fzf fd-find ripgrep tree-sitter-cli python3-pip
 python -m pip install pynvim
 
 # import configurations
@@ -331,8 +331,8 @@ chmod +x ${HOME}/.local/bin/update-themes
 update-themes
 
 # Set GTK theme
-flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
-flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
+sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
+sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
 
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
 gsettings set org.gnome.desktop.interface color-scheme 'default'
@@ -444,7 +444,7 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11'
 
 ##### GNOME EXTENSIONS
-flatpak install -y flathub com.mattjakeman.ExtensionManager
+sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
 
 ##### GNOME SOFTWARE
 # Prevent Gnome Software from autostarting
