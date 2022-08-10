@@ -292,7 +292,10 @@ tee ${HOME}/.local/bin/update-lsp << EOF
 #!/bin/bash
 
 go install golang.org/x/tools/gopls@latest
-npmg typescript-language-server typescript pyright
+
+cd ${HOME}/.npmbin
+npm update
+cd -
 EOF
 
 chmod +x ${HOME}/.local/bin/update-lsp
