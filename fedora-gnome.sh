@@ -55,6 +55,8 @@ sudo flatpak install -y flathub net.cozic.joplin_desktop
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak install -y flathub org.blender.Blender
 sudo flatpak install -y flathub org.godotengine.Godot
+sudo flatpak install -y flathub com.spotify.Client
+sudo flatpak install -y flathub org.keepassxc.KeePassXC
 
 sudo flatpak install -y flathub com.usebottles.bottles
 sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
@@ -85,7 +87,7 @@ EOF
 
 ##### APPLICATIONS
 # Common software
-sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop lm_sensors kernel-tools xprop keepassxc
+sudo dnf install -y ninja-build meson sassc autoconf automake make jq htop lm_sensors kernel-tools xprop
 
 # Git
 sudo dnf install -y git
