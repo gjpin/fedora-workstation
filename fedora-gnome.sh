@@ -43,10 +43,11 @@ sudo flatpak update --appstream
 # Install TOTP and password manager flatpaks
 sudo flatpak install -y flathub org.gnome.World.Secrets
 sudo flatpak install -y flathub com.belmoussaoui.Authenticator
-sudo flatpak override --unshare=network com.belmoussaoui.Authenticator
+sudo flatpak install -y flathub org.keepassxc.KeePassXC
 
 # Install applications
 sudo flatpak install -y flathub dev.alextren.Spot
+sudo flatpak install -y flathub com.spotify.Client
 sudo flatpak install -y flathub com.github.tchx84.Flatseal
 sudo flatpak install -y flathub com.rafaelmardojai.Blanket
 sudo flatpak install -y flathub org.gaphor.Gaphor
@@ -55,9 +56,7 @@ sudo flatpak install -y flathub net.cozic.joplin_desktop
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak install -y flathub org.blender.Blender
 sudo flatpak install -y flathub org.godotengine.Godot
-sudo flatpak install -y flathub com.spotify.Client
-sudo flatpak install -y flathub org.keepassxc.KeePassXC
-
+sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
 sudo flatpak install -y flathub com.usebottles.bottles
 sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
 
@@ -166,38 +165,38 @@ code --install-extension dbaeumer.vscode-eslint
 code --install-extension geequlim.godot-tools
 
 # Tailscale
-sudo rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg
+# sudo rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg
 
-sudo tee /etc/yum.repos.d/tailscale.repo << 'EOF'
-[tailscale-stable]
-name=Tailscale stable
-baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
-enabled=1
-type=rpm
-repo_gpgcheck=1
-gpgcheck=0
-gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
-EOF
+# sudo tee /etc/yum.repos.d/tailscale.repo << 'EOF'
+# [tailscale-stable]
+# name=Tailscale stable
+# baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
+# enabled=1
+# type=rpm
+# repo_gpgcheck=1
+# gpgcheck=0
+# gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
+# EOF
 
-sudo dnf check-update -y
+# sudo dnf check-update -y
 
-sudo dnf install -y tailscale
+# sudo dnf install -y tailscale
 
 # Hashistack
-sudo rpm --import https://rpm.releases.hashicorp.com/gpg
+# sudo rpm --import https://rpm.releases.hashicorp.com/gpg
 
-sudo tee /etc/yum.repos.d/hashicorp.repo << 'EOF'
-[hashicorp]
-name=Hashicorp Stable - $basearch
-baseurl=https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
-enabled=1
-gpgcheck=1
-gpgkey=https://rpm.releases.hashicorp.com/gpg
-EOF
+# sudo tee /etc/yum.repos.d/hashicorp.repo << 'EOF'
+# [hashicorp]
+# name=Hashicorp Stable - $basearch
+# baseurl=https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
+# enabled=1
+# gpgcheck=1
+# gpgkey=https://rpm.releases.hashicorp.com/gpg
+# EOF
 
-sudo dnf check-update
+# sudo dnf check-update
 
-sudo dnf -y install nomad consul vault packer terraform terraform-ls
+# sudo dnf -y install nomad consul vault packer terraform terraform-ls
 
 ###### golang
 # install golang
@@ -213,92 +212,29 @@ EOF
 source ${HOME}/.bashrc.d/golang
 
 ##### Node.js
-# Install fnm
-curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
+# Install and configure Node.js
+sudo dnf install -y nodejs npm
+mkdir -p ${HOME}/.npm-global
+npm config set prefix '~/.npm-global'
 
 tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
-# Source fnm
-export PATH="$HOME/.fnm:$PATH"
-eval "$(fnm env --use-on-cd)"
+export PATH="$HOME/.npm-global/bin:$PATH"
 EOF
 
 source ${HOME}/.bashrc.d/nodejs
 
-# Add nfm updater
-tee ${HOME}/.local/bin/update-fnm << 'EOF'
-#!/bin/bash
-
-curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
-EOF
-
-chmod +x ${HOME}/.local/bin/update-fnm
-
-# install nodejs lts
-fnm install --lts
-
-# Set global packages folder and install global packages
-mkdir -p ${HOME}/.npmbin
-
-cd ${HOME}/.npmbin
-
-tee ${HOME}/.npmbin/package.json << 'EOF'
-{
-  "name": "npmbin",
-  "version": "1.0.0",
-  "description": ""
-}
-EOF
-
-npm install typescript typescript-language-server pyright
-
-cd
-
-# Easily install global packages
-tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
-
-# Install global packages
-npmg() {
-  cd ${HOME}/.npmbin
-  npm install $@
-  cd -
-}
-EOF
-
-# Source global packages
-tee -a ${HOME}/.bashrc.d/nodejs << 'EOF'
-
-# Source global packages
-export PATH="$HOME/.npmbin/node_modules/.bin:$PATH"
-EOF
+# Install Node.js global packages
+npm install -g typescript typescript-language-server pyright
 
 ##### neovim
-# install neovim
-sudo dnf install -y neovim
-
-# neovim dependencies
-sudo dnf install -y fzf fd-find ripgrep tree-sitter-cli python3-pip
-python -m pip install pynvim
+# install neovim and dependencies
+sudo dnf install -y neovim fzf fd-find ripgrep tree-sitter-cli python3-pip python-neovim
 
 # import configurations
 mkdir -p ${HOME}/.config/nvim
 
 curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-gnome/main/configs/neovim \
   -o ${HOME}/.config/nvim/init.lua
-
-# install lsp
-go install golang.org/x/tools/gopls@latest
-
-tee ${HOME}/.local/bin/update-lsp << EOF
-#!/bin/bash
-
-go install golang.org/x/tools/gopls@latest
-
-cd ${HOME}/.npmbin
-npm update
-cd -
-EOF
-
-chmod +x ${HOME}/.local/bin/update-lsp
 
 # bootstrap neovim
 nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
@@ -357,14 +293,11 @@ update-all() {
   # Update Flatpak apps
   flatpak update -y
 
-  # Update LSP servers
-  update-lsp
+  # Update Node.js global packages
+  npm update -g
 
   # Update GTK and Firefox themes
   update-themes
-
-  # Update NVM
-  update-fnm
 }
 EOF
 
@@ -448,16 +381,12 @@ gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11'
 
-##### GNOME EXTENSIONS
-sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
-
 ##### GNOME SOFTWARE
 # Prevent Gnome Software from autostarting
-mkdir -p ~/.config/autostart
-cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
-echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
-dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
-
+# mkdir -p ~/.config/autostart
+# cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
+# echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
+# dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
 
 ##### Unlock LUKS with TPM2
 sudo dnf install -y tpm2-tools
