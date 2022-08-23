@@ -153,7 +153,10 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     },
     "extensions.ignoreRecommendations": true,
     "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true
 }
 EOF
 
