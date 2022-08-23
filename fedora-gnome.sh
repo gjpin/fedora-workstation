@@ -393,3 +393,16 @@ sudo dnf install -y tpm2-tools
 sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
 sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
 sudo dracut -f
+
+##### Configure DNS over TLS with DNSSEC
+sudo mkdir -p /etc/systemd/resolved.conf.d
+
+sudo tee /etc/systemd/resolved.conf.d/dns_over_tls.conf << EOF
+[Resolve]
+DNS=1.1.1.1 9.9.9.9
+DNSOverTLS=yes
+DNSSEC=yes
+FallbackDNS=8.8.8.8 1.0.0.1 8.8.4.4
+EOF
+
+sudo systemctl restart systemd-resolved
