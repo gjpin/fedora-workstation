@@ -38,11 +38,25 @@ sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslaunche
 # MangoHud
 mangohud %command%
 
-# gamescope native 1440p + MangoHud
-gamescope -h 1440 -H 1440 -f -- mangohud %command%
+# gamescope native resolution
+gamescope -f -e -- %command%
 
-# gamescope upscale 1080p to 1440p with FSR + mangohud
-gamescope -h 1080 -H 1440 -U -f -- mangohud %command%
+# gamescope native resolution + MangoHud
+gamescope -f -e -- mangohud %command%
+
+# gamescope upscale from 1080p to 1440p with FSR + mangohud
+gamescope -h 1080 -H 1440 -U -f -e -- mangohud %command%
+```
+
+## Install Proton-GE manually
+```
+mkdir -p ~/.var/app/com.valvesoftware.Steam/data/Steam/compatibilitytools.d/
+
+curl -sSL https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton7-30/GE-Proton7-30.tar.gz -O
+
+tar -xf GE-Proton*.tar.gz -C ~/.var/app/com.valvesoftware.Steam/data/Steam/compatibilitytools.d/
+
+rm GE-Proton*.tar.gz
 ```
 
 ## Recovery: chroot into system (nvme drive + encrypted /)
