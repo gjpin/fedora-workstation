@@ -57,8 +57,13 @@ sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak install -y flathub org.blender.Blender
 sudo flatpak install -y flathub org.godotengine.Godot
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
+
 sudo flatpak install -y flathub com.usebottles.bottles
 sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
+
+sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform
+sudo flatpak install -y flathub org.kde.PlatformTheme.QtSNI
+sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration
 
 # Install Chrome and enable GPU acceleration
 sudo flatpak install -y flathub com.google.Chrome
