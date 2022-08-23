@@ -5,6 +5,15 @@
 Install 'Dark Variant' extension: https://github.com/hardpixel/dark-variant
 ```
 
+## Gamescope + MangoHUD + Steam
+```
+# Native 1440p + mangohud
+gamescope -h 1440 -H 1440 -f -- mangohud %command%
+
+# Upscale 1080p to 1440p with FSR + mangohud
+gamescope -h 1080 -H 1440 -U -f -- mangohud %command%
+```
+
 ## tlp
 ```
 sudo systemctl disable --now power-profiles-daemon.service

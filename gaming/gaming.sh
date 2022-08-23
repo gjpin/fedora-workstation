@@ -3,6 +3,8 @@
 
 ###### STEAM
 sudo flatpak install -y flathub com.valvesoftware.Steam
+sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
+sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 sudo flatpak override --filesystem=/mnt/data/games/steam com.valvesoftware.Steam
 
 # Steam controllers udev rules
@@ -16,13 +18,12 @@ sudo tee -a /etc/modules-load.d/uinput.conf << EOF
 uinput
 EOF
 
-# Install proton-ge
-# https://github.com/GloriousEggroll/proton-ge-custom
-flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
-
-###### Gamescope and mangohud
-sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
+###### mangohud
 sudo flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud
+
+###### mangohud
+sudo flatpak install -y com.heroicgameslauncher.hgl
+sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
 
 ###### AMDGPU-CLOCKS (only if 5700 XT is detected)
 if lspci | grep VGA | grep "5700 XT" > /dev/null; then
