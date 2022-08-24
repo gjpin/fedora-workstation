@@ -89,6 +89,11 @@ EOF
 sudo nmcli con import type wireguard file /etc/wireguard/wg_home.conf
 nmcli connection up wg_home
 
+# Set wg_home connection as trusted
+sudo firewall-cmd --permanent --zone=trusted --add-interface=wg_home
+
+-------
+
 # Reset wireguard connections and configurations
 nmcli connection down wg_home
 nmcli connection delete wg_home
