@@ -59,6 +59,36 @@ tar -xf GE-Proton*.tar.gz -C ~/.var/app/com.valvesoftware.Steam/data/Steam/compa
 rm GE-Proton*.tar.gz
 ```
 
+## Connect to WireGuard server
+```
+# Install WireGuard tools
+dnf install -y wireguard-tools
+
+# Generate key pairs
+wg genkey | tee wg_home_private_key | wg pubkey > wg_home_public_key
+mv wg_home_* /etc/wireguard
+
+# Configure WireGuard interface
+WG_HOME_PRIVATE_KEY=$(cat /etc/wireguard/wg_home_private_key)
+
+tee /etc/wireguard/wg_home.conf << EOF
+[Interface]
+Address = 10.0.0.2
+SaveConfig = true
+PrivateKey = ${WG_HOME_PRIVATE_KEY}
+
+[Peer]
+PublicKey = ${SERVER_PUBLIC_KEY}
+AllowedIPs = 10.0.0.0/24 # or 0.0.0.0/0 for all traffic
+Endpoint = ${WG_PUBLIC_ADDRESS}:60001
+PersistentKeepalive = 15
+EOF
+
+# Import interface profile into NetworkManager
+nmcli con import type wireguard file /etc/wireguard/wg_home.conf
+nmcli connection up wg_home
+```
+
 ## Recovery: chroot into system (nvme drive + encrypted /)
 Go into live mode and then run:
 ```

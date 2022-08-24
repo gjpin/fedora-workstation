@@ -403,14 +403,14 @@ sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
 sudo dracut -f
 
 ##### Configure DNS over TLS with DNSSEC
-sudo mkdir -p /etc/systemd/resolved.conf.d
+# sudo mkdir -p /etc/systemd/resolved.conf.d
 
-sudo tee /etc/systemd/resolved.conf.d/dns_over_tls.conf << EOF
-[Resolve]
-DNS=1.1.1.1 9.9.9.9
-DNSOverTLS=yes
-DNSSEC=yes
-FallbackDNS=8.8.8.8 1.0.0.1 8.8.4.4
-EOF
+# sudo tee /etc/systemd/resolved.conf.d/dns_over_tls.conf << EOF
+# [Resolve]
+# DNS=1.1.1.1 9.9.9.9
+# DNSOverTLS=yes
+# DNSSEC=yes
+# FallbackDNS=8.8.8.8 1.0.0.1 8.8.4.4
+# EOF
 
-sudo systemctl restart systemd-resolved
+# sudo systemctl restart systemd-resolved
