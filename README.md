@@ -62,16 +62,17 @@ rm GE-Proton*.tar.gz
 ## Connect to WireGuard server
 ```
 # Install WireGuard tools
-dnf install -y wireguard-tools
+sudo dnf install -y wireguard-tools
 
 # Generate key pairs
 wg genkey | tee wg_home_private_key | wg pubkey > wg_home_public_key
-mv wg_home_* /etc/wireguard
+sudo chown root:root wg_home_*
+sudo mv wg_home_* /etc/wireguard/
 
 # Configure WireGuard interface
-WG_HOME_PRIVATE_KEY=$(cat /etc/wireguard/wg_home_private_key)
+WG_HOME_PRIVATE_KEY=$(sudo cat /etc/wireguard/wg_home_private_key)
 
-tee /etc/wireguard/wg_home.conf << EOF
+sudo tee /etc/wireguard/wg_home.conf << EOF
 [Interface]
 Address = 10.0.0.2
 SaveConfig = true
@@ -80,12 +81,18 @@ PrivateKey = ${WG_HOME_PRIVATE_KEY}
 [Peer]
 PublicKey = ${SERVER_PUBLIC_KEY}
 AllowedIPs = 10.0.0.0/24 # or 0.0.0.0/0 for all traffic
-Endpoint = ${WG_PUBLIC_ADDRESS}:60001
+Endpoint = ${SERVER_PUBLIC_ADDRESS}:60001
 PersistentKeepalive = 15
 EOF
 
 # Import interface profile into NetworkManager
-nmcli con import type wireguard file /etc/wireguard/wg_home.conf
+sudo nmcli con import type wireguard file /etc/wireguard/wg_home.conf
+nmcli connection up wg_home
+
+# Reset wireguard connections and configurations
+nmcli connection down wg_home
+nmcli connection delete wg_home
+sudo nmcli con import type wireguard file /etc/wireguard/wg_home.conf
 nmcli connection up wg_home
 ```
 
