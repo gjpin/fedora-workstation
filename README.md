@@ -80,7 +80,7 @@ PrivateKey = ${WG_HOME_PRIVATE_KEY}
 
 [Peer]
 PublicKey = ${SERVER_PUBLIC_KEY}
-AllowedIPs = 10.0.0.0/24 # or 0.0.0.0/0 for all traffic
+AllowedIPs = 10.0.0.0/24 # also add other LAN IPs if required. eg. 192.168.1.252 or 0.0.0.0/0 for all traffic
 Endpoint = ${SERVER_PUBLIC_ADDRESS}:60001
 PersistentKeepalive = 15
 EOF
