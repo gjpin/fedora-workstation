@@ -4,7 +4,7 @@ sudo tee -a /etc/dnf/dnf.conf << EOF
 max_parallel_downloads=10
 EOF
 
-sudo dnf update -y --refresh
+sudo dnf upgrade -y --refresh
 
 ##### FOLDERS
 mkdir -p \
@@ -296,7 +296,8 @@ EOF
 tee ${HOME}/.bashrc.d/update-all << EOF
 update-all() {
   # Update system packages
-  sudo dnf update -y --refresh
+  sudo dnf clean all
+  sudo dnf upgrade -y --refresh
 
   # Update Flatpak apps
   flatpak update -y
