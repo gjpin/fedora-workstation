@@ -399,7 +399,7 @@ echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software
 
 ##### SEARCH
 # Disable select search providers
-dconf write /org/gnome/desktop/search-providers/disabled "['firefox.desktop', 'org.gnome.Software.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Characters.desktop', 'org.gnome.clocks.desktop']"
+dconf write /org/gnome/desktop/search-providers/disabled "['firefox.desktop', 'org.gnome.Software.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Characters.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Contacts.desktop']"
 
 ##### Unlock LUKS with TPM2
 sudo dnf install -y tpm2-tools
