@@ -393,10 +393,13 @@ gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11
 
 ##### GNOME SOFTWARE
 # Prevent Gnome Software from autostarting
-# mkdir -p ~/.config/autostart
-# cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
-# echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
-# dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+mkdir -p ~/.config/autostart
+cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
+echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
+
+##### SEARCH
+# Disable select search providers
+dconf write /org/gnome/desktop/search-providers/disabled "['firefox.desktop', 'org.gnome.Software.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Characters.desktop', 'org.gnome.clocks.desktop']"
 
 ##### Unlock LUKS with TPM2
 sudo dnf install -y tpm2-tools
