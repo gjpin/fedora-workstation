@@ -139,6 +139,7 @@ ar -x Aseprite*
 tar xf data.tar.xz
 cp -r usr/bin/aseprite ~/.local/bin/
 cp -r usr/share/* ~/.local/share/
+rm -rf usr/ debian-binary data.tar.xz control.tar.xz Aseprite_1.3-beta21-1_amd64.deb
 ```
 
 ## tlp
