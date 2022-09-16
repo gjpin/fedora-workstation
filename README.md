@@ -192,3 +192,47 @@ EOF
 # Enable amdgpu-clocks service
 sudo systemctl enable --now amdgpu-clocks
 ```
+
+## blender / godot
+```
+mkdir ${HOME}/apps/{blender,godot}
+
+# Blender
+rm ${HOME}/apps/blender/blender
+curl -sSL https://mirrors.dotsrc.org/blender/release/Blender3.3/blender-3.3.0-linux-x64.tar.xz -o ${HOME}/apps/blender/blender.tar.xz
+tar -xf ${HOME}/apps/blender/blender.tar.xz -C ${HOME}/apps/blender
+rm ${HOME}/apps/blender/blender.tar.xz
+
+tee /home/$USER/.local/share/applications/blender.desktop << EOF
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+NoDisplay=false
+Terminal=false
+Exec=/home/${USER}/apps/blender/blender-3.3.0-linux-x64/blender
+Icon=/home/${USER}/apps/blender/blender-3.3.0-linux-x64/blender.svg
+Name=Blender
+Comment=
+Categories=
+EOF
+
+# Godot
+rm ${HOME}/apps/godot/godot
+curl -sSL https://downloads.tuxfamily.org/godotengine/4.0/beta1/Godot_v4.0-beta1_linux.x86_64.zip -o ${HOME}/apps/godot/godot.zip
+unzip ${HOME}/apps/godot/godot.zip -d ${HOME}/apps/godot
+mv ${HOME}/apps/godot/Godot_v* ${HOME}/apps/godot/godot
+rm ${HOME}/apps/godot/godot.zip
+
+tee /home/$USER/.local/share/applications/godot.desktop << EOF
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+NoDisplay=false
+Terminal=false
+Exec=/home/${USER}/apps/godot/godot
+Icon=/home/${USER}/apps/godot/Godot_icon.svg
+Name=Godot
+Comment=
+Categories=
+EOF
+```

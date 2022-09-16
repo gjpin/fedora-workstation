@@ -54,9 +54,7 @@ sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub de.haeckerfelix.Shortwave
 sudo flatpak install -y flathub net.cozic.joplin_desktop
 sudo flatpak install -y flathub rest.insomnia.Insomnia
-sudo flatpak install -y flathub org.blender.Blender
 sudo flatpak install -y flathub org.gimp.GIMP
-sudo flatpak install -y flathub org.godotengine.Godot
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
 
 sudo flatpak install -y flathub com.usebottles.bottles
