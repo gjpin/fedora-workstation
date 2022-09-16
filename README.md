@@ -133,15 +133,6 @@ echo 'nameserver 1.1.1.1' > /mnt/run/systemd/resolve/stub-resolv.conf
 chroot /mnt
 ```
 
-## To install .deb packages (eg. Aseprite)
-```
-ar -x Aseprite*
-tar xf data.tar.xz
-cp -r usr/bin/aseprite ~/.local/bin/
-cp -r usr/share/* ~/.local/share/
-rm -rf usr/ debian-binary data.tar.xz control.tar.xz Aseprite_1.3-beta21-1_amd64.deb
-```
-
 ## tlp
 ```
 sudo systemctl disable --now power-profiles-daemon.service
@@ -193,9 +184,18 @@ EOF
 sudo systemctl enable --now amdgpu-clocks
 ```
 
+## To install .deb packages (eg. Aseprite)
+```
+ar -x Aseprite*
+tar xf data.tar.xz
+cp -r usr/bin/aseprite ~/.local/bin/
+cp -r usr/share/* ~/.local/share/
+rm -rf usr/ debian-binary data.tar.xz control.tar.xz Aseprite_1.3-beta21-1_amd64.deb
+```
+
 ## blender / godot
 ```
-mkdir ${HOME}/apps/{blender,godot}
+mkdir -p ${HOME}/apps/{blender,godot}
 
 # Blender
 rm ${HOME}/apps/blender/blender
@@ -217,6 +217,7 @@ Categories=
 EOF
 
 # Godot
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/assets/Godot_icon.svg -o ${HOME}/apps/godot/Godot_icon.svg
 rm ${HOME}/apps/godot/godot
 curl -sSL https://downloads.tuxfamily.org/godotengine/4.0/beta1/Godot_v4.0-beta1_linux.x86_64.zip -o ${HOME}/apps/godot/godot.zip
 unzip ${HOME}/apps/godot/godot.zip -d ${HOME}/apps/godot
