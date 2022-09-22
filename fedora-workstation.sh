@@ -8,9 +8,9 @@ sudo dnf upgrade -y --refresh
 
 ##### FOLDERS
 mkdir -p \
-${HOME}/.bashrc.d/ \
+${HOME}/.bashrc.d \
 ${HOME}/.local/bin \
-${HOME}/.local/share/themes \
+${HOME}/.themes \
 ${HOME}/src
 
 # RPM Fusion and multimedia packages
@@ -49,17 +49,13 @@ sudo flatpak install -y flathub org.keepassxc.KeePassXC
 sudo flatpak install -y flathub dev.alextren.Spot
 sudo flatpak install -y flathub com.spotify.Client
 sudo flatpak install -y flathub com.github.tchx84.Flatseal
-sudo flatpak install -y flathub com.rafaelmardojai.Blanket
 sudo flatpak install -y flathub org.gaphor.Gaphor
-sudo flatpak install -y flathub de.haeckerfelix.Shortwave
 sudo flatpak install -y flathub net.cozic.joplin_desktop
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak install -y flathub org.gimp.GIMP
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
-
-sudo flatpak install -y flathub com.usebottles.bottles
-sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
-
+sudo flatpak install -y flathub com.usebottles.bottles && \
+  sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
 sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform
 sudo flatpak install -y flathub org.kde.PlatformTheme.QtSNI
 sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration
@@ -169,7 +165,6 @@ code --install-extension golang.Go
 code --install-extension HashiCorp.terraform
 code --install-extension redhat.ansible
 code --install-extension dbaeumer.vscode-eslint
-code --install-extension geequlim.godot-tools
 
 # Tailscale
 # sudo rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg
@@ -261,14 +256,16 @@ tee ${HOME}/.local/bin/update-themes << 'EOF'
 #!/bin/bash
 
 # adw-gtk3
-git clone https://github.com/lassekongo83/adw-gtk3.git
-cd adw-gtk3
-meson -Dprefix="${HOME}/.local" build
-ninja -C build install
-cd .. && rm -rf adw-gtk3
+REPO='lassekongo83/adw-gtk3'
+URL=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
+curl -sSL ${URL} -O
+rm -rf adw-gtk3*
+tar -xf adw-*.tar.xz -C ${HOME}/.themes/
+rm -f adw-*.tar.xz
 
 # firefox-gnome-theme
-git clone https://github.com/rafaelmardojai/firefox-gnome-theme && cd firefox-gnome-theme
+git clone https://github.com/rafaelmardojai/firefox-gnome-theme
+cd firefox-gnome-theme
 ./scripts/install.sh
 cd .. && rm -rf firefox-gnome-theme/
 EOF
@@ -285,11 +282,11 @@ sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
 gsettings set org.gnome.desktop.interface color-scheme 'default'
 
-# Customize bash
-tee ${HOME}/.bashrc.d/prompt << EOF
-PS1="\[\e[1;36m\]\w\[\e[m\] \[\e[1;33m\]\\$\[\e[m\] "
-PROMPT_COMMAND="export PROMPT_COMMAND=echo"
-EOF
+# # Customize bash
+# tee ${HOME}/.bashrc.d/prompt << EOF
+# PS1="\[\e[1;36m\]\w\[\e[m\] \[\e[1;33m\]\\$\[\e[m\] "
+# PROMPT_COMMAND="export PROMPT_COMMAND=echo"
+# EOF
 
 # Updater bash function
 tee ${HOME}/.bashrc.d/update-all << EOF
@@ -309,11 +306,11 @@ update-all() {
 }
 EOF
 
-# Terminal
-dconf write /org/gnome/terminal/legacy/theme-variant "'dark'"
-GNOME_TERMINAL_PROFILE=`gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'`
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ default-size-columns 110
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
+# # Terminal
+# dconf write /org/gnome/terminal/legacy/theme-variant "'dark'"
+# GNOME_TERMINAL_PROFILE=`gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'`
+# gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ default-size-columns 110
+# gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
 
 ##### UI / UX CONFIGURATIONS
 # Volume
@@ -333,12 +330,21 @@ if cat /sys/class/dmi/id/chassis_type | grep 10 > /dev/null; then
   gsettings set org.gnome.desktop.peripherals.touchpad disable-while-typing false
 fi
 
+# # Text editor
+# gsettings set org.gnome.TextEditor style-scheme 'classic'
+
+# # Set fonts
+# gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
+# gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
+# gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
+# gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11'
+
 ##### SHORTCUTS
 # Terminal
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/ next-tab '<Primary>Tab'
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/ close-tab '<Primary><Shift>w'
 
-# Window management
+# Windows management
 gsettings set org.gnome.desktop.wm.keybindings close "['<Shift><Super>q']"
 
 # Screenshots
@@ -380,30 +386,21 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-2 "['<Shift><Su
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-3 "['<Shift><Super>numbersign']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Super>dollar']"
 
-# Text editor
-gsettings set org.gnome.TextEditor style-scheme 'classic'
-
-# Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 11'
-
 ##### GNOME SOFTWARE
-# Prevent Gnome Software from autostarting
-mkdir -p ~/.config/autostart
-cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
-echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
+# # Prevent Gnome Software from autostarting
+# mkdir -p ~/.config/autostart
+# cp /etc/xdg/autostart/org.gnome.Software.desktop ~/.config/autostart/
+# echo "X-GNOME-Autostart-enabled=false" >> ~/.config/autostart/org.gnome.Software.desktop
 
 ##### SEARCH
 # Disable select search providers
 dconf write /org/gnome/desktop/search-providers/disabled "['firefox.desktop', 'org.gnome.Software.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Characters.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Contacts.desktop']"
 
 ##### Unlock LUKS with TPM2
-sudo dnf install -y tpm2-tools
-sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
-sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
-sudo dracut -f
+# sudo dnf install -y tpm2-tools
+# sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
+# sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
+# sudo dracut -f
 
 ##### Configure DNS over TLS with DNSSEC
 # sudo mkdir -p /etc/systemd/resolved.conf.d
