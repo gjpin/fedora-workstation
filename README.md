@@ -1,14 +1,9 @@
 # Fedora customization and setup scripts
 
-## Gnome extensions
-```
-Per app titlebar dark mode: [Dark Variant](https://github.com/hardpixel/dark-variant)
-KStatusNotifierItem support: [Appindicator and kstatusnotifieritem support](https://github.com/ubuntu/gnome-shell-extension-appindicator)
-```
-
 ## Gaming
 ```
 ###### STEAM
+mkdir -p /mnt/data/games/steam
 sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
 sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
@@ -29,6 +24,7 @@ EOF
 sudo flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud
 
 ###### Heroic Games Launcher
+mkdir -p /mnt/data/games/heroic
 sudo flatpak install -y com.heroicgameslauncher.hgl
 sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
 ```
