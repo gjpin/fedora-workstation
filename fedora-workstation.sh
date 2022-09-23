@@ -112,24 +112,16 @@ sudo dnf install -y ansible
 sudo dnf install -y syncthing
 sudo systemctl enable --now syncthing@${USER}.service
 
-# Visual Studio Code
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+################################################
+##### Visual Studio Code
+################################################
 
-sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
-[code]
-name=Visual Studio Code
-baseurl=https://packages.microsoft.com/yumrepos/vscode
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
+# Install VSCode
+sudo flatpak install -y flathub com.visualstudio.code
 
-sudo dnf check-update
-
-sudo dnf install -y code
-
-mkdir -p ${HOME}/.config/Code/User
-tee -a ${HOME}/.config/Code/User/settings.json << EOF
+# Configure VSCode
+mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
+tee ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json << EOF
 {
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
@@ -145,26 +137,38 @@ tee -a ${HOME}/.config/Code/User/settings.json << EOF
     "editor.fontWeight": "500",
     "redhat.telemetry.enabled": false,
     "files.associations": {
-        "*.j2": "terraform",
-        "*.hcl": "terraform",
-        "*.bu": "yaml",
-        "*.ign": "json",
-        "*.service": "ini"
+      "*.j2": "terraform",
+      "*.hcl": "terraform",
+      "*.bu": "yaml",
+      "*.ign": "json",
+      "*.service": "ini"
     },
     "extensions.ignoreRecommendations": true,
     "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",
     "editor.formatOnSave": true,
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
-    "git.autofetch": true
+    "git.autofetch": true,
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.profiles.linux": {
+      "toolbox": {
+        "path": "/usr/bin/flatpak-spawn",
+        "args": ["--host", "--env=TERM=xterm-256color", "toolbox", "enter"]
+      },
+      "bash": {
+        "path": "/usr/bin/flatpak-spawn",
+        "args": ["--host", "--env=TERM=xterm-256color", "bash"]
+      }
+    }
 }
 EOF
 
-code --install-extension piousdeer.adwaita-theme
-code --install-extension golang.Go
-code --install-extension HashiCorp.terraform
-code --install-extension redhat.ansible
-code --install-extension dbaeumer.vscode-eslint
+# Install extensions
+flatpak run com.visualstudio.code --install-extension piousdeer.adwaita-theme
+flatpak run com.visualstudio.code --install-extension golang.Go
+flatpak run com.visualstudio.code --install-extension HashiCorp.terraform
+flatpak run com.visualstudio.code --install-extension redhat.ansible
+flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
 
 # Tailscale
 # sudo rpm --import https://pkgs.tailscale.com/stable/fedora/repo.gpg
@@ -259,7 +263,7 @@ tee ${HOME}/.local/bin/update-themes << 'EOF'
 REPO='lassekongo83/adw-gtk3'
 URL=$(curl -s https://api.github.com/repos/${REPO}/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
 curl -sSL ${URL} -O
-rm -rf adw-gtk3*
+rm -rf ${HOME}/.themes/adw-gtk3*
 tar -xf adw-*.tar.xz -C ${HOME}/.themes/
 rm -f adw-*.tar.xz
 
