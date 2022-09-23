@@ -112,6 +112,7 @@ sudo dnf remove -y firefox
 sudo flatpak install -y flathub org.mozilla.firefox
 sudo flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/21.08
 sudo flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/21.08
+sudo flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
 
 # Set Firefox Flatpak as default browser
 xdg-settings set default-web-browser org.mozilla.firefox.desktop
