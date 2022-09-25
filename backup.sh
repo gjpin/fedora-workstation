@@ -58,31 +58,6 @@ EOF
 
 
 
-
-
-
-# Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
-
-
-
-
-
-
-#### Unlock LUKS with TPM2
-sudo dnf install -y tpm2-tools
-sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=7
-sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
-sudo dracut -f
-
-
-
-
-
-
 #### Configure DNS over TLS with DNSSEC
 sudo mkdir -p /etc/systemd/resolved.conf.d
 
