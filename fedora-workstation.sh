@@ -163,6 +163,7 @@ sudo flatpak install -y flathub org.gimp.GIMP
 sudo flatpak install -y flathub org.blender.Blender
 sudo flatpak install -y flathub org.gnome.Builder
 sudo flatpak install -y flathub org.gnome.Totem
+sudo flatpak install -y flathub io.github.seadve.Kooha
 sudo flatpak install -y flathub com.usebottles.bottles && \
     sudo flatpak override com.usebottles.bottles --filesystem=xdg-data/applications
 
