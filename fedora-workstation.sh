@@ -589,4 +589,9 @@ ExecStart=-/usr/bin/echo 0 > /sys/devices/system/cpu/intel_pstate/no_turbo
 WantedBy=ac.target
 EOF
 
+# Enable services
+sudo systemctl daemon-reload
+sudo systemctl enable disable-turbo-boost.service
+sudo systemctl enable enable-turbo-boost.service
+
 fi
