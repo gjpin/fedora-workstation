@@ -483,8 +483,8 @@ ExecStart=/usr/bin/podman run \
     -p 21027:21027/udp \
     -v ${HOME}/containers/syncthing:/var/syncthing:Z \
     docker.io/syncthing/syncthing:latest
-ExecStop=/usr/bin/podman stop syncthing
-ExecStopPost=/usr/bin/podman rm syncthing
+ExecStop=/usr/bin/podman stop --time 2 syncthing
+ExecStopPost=/usr/bin/podman rm --force syncthing
 Restart=always
 
 [Install]
