@@ -516,3 +516,13 @@ sudo dracut -f
 
 # Enroll TPM2 token into LUKS2
 sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/nvme0n1p3
+
+################################################
+##### Enable amd-pstate CPU Performance Scaling Driver
+################################################
+
+# Check if CPU is AMD and current scaling driver is not amd-pstate
+if cat /proc/cpuinfo | grep "AuthenticAMD" > /dev/null && cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver | grep -v "amd-pstate" > /dev/null; then
+  sudo grubby --update-kernel=ALL --args="amd_pstate.shared_mem=1"
+  echo amd_pstate | sudo tee /etc/modules-load.d/amd-pstate.conf
+fi
