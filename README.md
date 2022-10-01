@@ -44,16 +44,6 @@ gamescope -f -e -- mangohud %command%
 gamescope -h 1080 -H 1440 -U -f -e -- mangohud %command%
 ```
 
-## Override systemd configurations
-```
-sudo mkdir -p /etc/systemd/system.conf.d/
-
-sudo tee /etc/systemd/system.conf.d/99-default-timeout.conf << EOF
-[Manager]
-DefaultTimeoutStopSec=10s
-EOF
-```
-
 ## Disable turbo boost if on battery (laptops only)
 ```
 # References:
