@@ -59,6 +59,10 @@ EOF
 # References:
 # https://chrisdown.name/2017/10/29/adding-power-related-targets-to-systemd.html
 
+# Confirm udev events:
+# udevadm monitor --environment
+# udevadm info -a -p /sys/class/power_supply/AC
+
 # If device is a laptop
 if cat /sys/class/dmi/id/chassis_type | grep 10 > /dev/null; then
 
