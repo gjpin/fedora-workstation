@@ -112,7 +112,7 @@ sudo flatpak update --appstream
 ################################################
 
 # Remove Firefox RPM
-sudo dnf remove -y firefox
+sudo rpm-ostree override remove firefox
 
 # Install Firefox from Flathub
 sudo flatpak install -y flathub org.mozilla.firefox
@@ -129,17 +129,25 @@ timeout 5 flatpak run org.mozilla.firefox --headless
 # Install Firefox Gnome theme
 git clone https://github.com/rafaelmardojai/firefox-gnome-theme
 cd firefox-gnome-theme
-./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
+./scripts/install.sh -f ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox
 cd .. && rm -rf firefox-gnome-theme/
 
 # Firefox theme updater
 tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
 #!/usr/bin/env bash
 
+# Update Firefox theme
 git clone https://github.com/rafaelmardojai/firefox-gnome-theme
 cd firefox-gnome-theme
 ./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
 cd .. && rm -rf firefox-gnome-theme/
+
+# Enable FFMPEG VA-API
+tee -a ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default*/user.js << EOD
+
+// Enable FFMPEG VA-API
+user_pref("media.ffmpeg.vaapi.enabled", true);
+EOD
 EOF
 
 chmod +x ${HOME}/.local/bin/update-firefox-theme
@@ -151,6 +159,13 @@ sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.fi
 if lspci | grep VGA | grep "Intel" > /dev/null; then
   sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/21.08
 fi
+
+# Enable FFMPEG VA-API
+tee -a ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default*/user.js << EOF
+
+// Enable FFMPEG VA-API
+user_pref("media.ffmpeg.vaapi.enabled", true);
+EOF
 
 ################################################
 ##### Applications
