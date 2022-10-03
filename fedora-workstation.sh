@@ -73,6 +73,9 @@ EOF
 ##### Tools
 ################################################
 
+# Install bind-utils (dig, etc)
+sudo dnf install -y bind-utils
+
 # Install ansible
 sudo dnf install -y ansible
 
