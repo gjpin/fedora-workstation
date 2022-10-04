@@ -1,7 +1,7 @@
 # Fedora customization and setup scripts
 
 ## Gaming
-```
+```bash
 ###### STEAM
 mkdir -p /mnt/data/games/steam
 sudo flatpak install -y flathub com.valvesoftware.Steam
@@ -30,7 +30,7 @@ sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslaunche
 ```
 
 ## Gamescope + MangoHud + Steam
-```
+```bash
 # MangoHud
 mangohud %command%
 
@@ -45,7 +45,7 @@ gamescope -h 1080 -H 1440 -U -f -e -- mangohud %command%
 ```
 
 ## Disable turbo boost if on battery (laptops only)
-```
+```bash
 # References:
 # https://chrisdown.name/2017/10/29/adding-power-related-targets-to-systemd.html
 
@@ -117,7 +117,7 @@ fi
 ```
 
 ## Enable amd-pstate CPU Performance Scaling Driver
-```
+```bash
 # Check if CPU is AMD and current scaling driver is not amd-pstate
 if cat /proc/cpuinfo | grep "AuthenticAMD" > /dev/null && cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_driver | grep -v "amd-pstate" > /dev/null; then
   sudo grubby --update-kernel=ALL --args="amd_pstate.shared_mem=1"
@@ -126,7 +126,7 @@ fi
 ```
 
 ## Install Proton-GE manually
-```
+```bash
 mkdir -p ~/.var/app/com.valvesoftware.Steam/data/Steam/compatibilitytools.d/
 
 curl -sSL https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton7-30/GE-Proton7-30.tar.gz -O
@@ -137,7 +137,7 @@ rm GE-Proton*.tar.gz
 ```
 
 ## Connect to WireGuard server
-```
+```bash
 # Install WireGuard tools
 sudo dnf install -y wireguard-tools
 
@@ -180,7 +180,7 @@ sudo firewall-cmd --permanent --zone=home --add-interface=wg_home
 
 ## Recovery: chroot into system (nvme drive + encrypted /)
 Go into live mode and then run:
-```
+```bash
 su
 
 # open encrypted partition
@@ -211,7 +211,7 @@ chroot /mnt
 ```
 
 ## tlp
-```
+```bash
 sudo systemctl disable --now power-profiles-daemon.service
 sudo systemctl mask power-profiles-daemon.service
 sudo dnf install -y tlp
@@ -220,7 +220,7 @@ sudo systemctl enable --now tlp.service
 ```
 
 ## auto-cpufreq
-```
+```bash
 # https://github.com/AdnanHodzic/auto-cpufreq
 cd ~/src
 git clone https://github.com/AdnanHodzic/auto-cpufreq.git
@@ -229,7 +229,7 @@ sudo auto-cpufreq --install
 ```
 
 ## amgpu undervolt example
-```
+```bash
 # Full AMD GPU controls
 sudo grubby --update-kernel=ALL --args=amdgpu.ppfeaturemask=0xffffffff
 
@@ -262,7 +262,7 @@ sudo systemctl enable --now amdgpu-clocks
 ```
 
 ## To install .deb packages (eg. Aseprite)
-```
+```bash
 ar -x Aseprite*
 tar xf data.tar.xz
 cp -r usr/bin/aseprite ~/.local/bin/
@@ -271,7 +271,7 @@ rm -rf usr/ debian-binary data.tar.xz control.tar.xz Aseprite_1.3-beta21-1_amd64
 ```
 
 ## blender / godot
-```
+```bash
 mkdir -p ${HOME}/apps/{blender,godot}
 
 # Blender
