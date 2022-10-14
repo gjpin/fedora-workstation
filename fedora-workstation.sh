@@ -32,6 +32,9 @@ update-all() {
   # Update Firefox theme
   update-firefox-theme
 
+  # Update Firefox configs
+  update-firefox-configs
+
   # Update GTK theme
   update-gtk-theme
 
@@ -144,13 +147,6 @@ git clone https://github.com/rafaelmardojai/firefox-gnome-theme
 cd firefox-gnome-theme
 ./scripts/install.sh -f ~/.var/app/org.mozilla.firefox/.mozilla/firefox
 cd .. && rm -rf firefox-gnome-theme/
-
-# Enable FFMPEG VA-API
-tee -a ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default*/user.js << EOD
-
-// Enable FFMPEG VA-API
-user_pref("media.ffmpeg.vaapi.enabled", true);
-EOD
 EOF
 
 chmod +x ${HOME}/.local/bin/update-firefox-theme
@@ -163,12 +159,149 @@ if lspci | grep VGA | grep "Intel" > /dev/null; then
   sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/21.08
 fi
 
-# Enable FFMPEG VA-API
-tee -a ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default*/user.js << EOF
+# Import Firefox configs
+# Reference: https://github.com/pyllyukko/user.js/blob/master/user.js
+# https://github.com/rafaelmardojai/firefox-gnome-theme/blob/master/configuration/user.js
+tee ${HOME}/.local/bin/update-firefox-configs << 'EOF'
+#!/usr/bin/env bash
+
+tee ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default*/user.js << EOD
+
+// Enable customChrome.css (required by Firefox Gnome theme)
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+
+// Set UI density to normal (required by Firefox Gnome theme)
+user_pref("browser.uidensity", 0);
+
+// Enable SVG context-propertes (required by Firefox Gnome theme)
+user_pref("svg.context-properties.content.enabled", true);
 
 // Enable FFMPEG VA-API
 user_pref("media.ffmpeg.vaapi.enabled", true);
+
+// Disable Location-Aware Browsing (geolocation)
+user_pref("geo.enabled",					false);
+
+// Disable "beacon" asynchronous HTTP transfers (used for analytics)
+user_pref("beacon.enabled",					false);
+
+// Disable speech recognition
+user_pref("media.webspeech.recognition.enable",			false);
+
+// Disable speech synthesis
+user_pref("media.webspeech.synth.enabled",			false);
+
+// Disable pinging URIs specified in HTML <a> ping= attributes
+user_pref("browser.send_pings",					false);
+
+// Don't try to guess domain names when entering an invalid domain name in URL bar
+user_pref("browser.fixup.alternate.enabled",			false);
+
+// Opt-out of add-on metadata updates
+user_pref("extensions.getAddons.cache.enabled",			false);
+
+// Opt-out of themes (Persona) updates
+user_pref("lightweightThemes.update.enabled",			false);
+
+// Disable Flash Player NPAPI plugin
+user_pref("plugin.state.flash",					0);
+
+// Disable Java NPAPI plugin
+user_pref("plugin.state.java",					0);
+
+// Disable Gnome Shell Integration NPAPI plugin
+user_pref("plugin.state.libgnome-shell-browser-plugin",		0);
+
+// Updates addons automatically
+user_pref("extensions.update.enabled",				true);
+
+// Enable add-on and certificate blocklists (OneCRL) from Mozilla
+user_pref("extensions.blocklist.enabled",			true);
+user_pref("services.blocklist.update_enabled",			true);
+
+// Disable Extension recommendations
+user_pref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr",	false);
+
+// Disable Mozilla telemetry/experiments
+user_pref("toolkit.telemetry.enabled",				false);
+user_pref("toolkit.telemetry.unified",				false);
+user_pref("toolkit.telemetry.archive.enabled",			false);
+user_pref("experiments.supported",				false);
+user_pref("experiments.enabled",				false);
+user_pref("experiments.manifest.uri",				"");
+
+// Disallow Necko to do A/B testing
+user_pref("network.allow-experiments",				false);
+
+// Disable sending Firefox crash reports to Mozilla servers
+user_pref("breakpad.reportURL",					"");
+
+// Disable sending reports of tab crashes to Mozilla
+user_pref("browser.tabs.crashReporting.sendReport",		false);
+user_pref("browser.crashReports.unsubmittedCheck.enabled",	false);
+
+// Enable Firefox Tracking Protection
+user_pref("privacy.trackingprotection.enabled",			true);
+user_pref("privacy.trackingprotection.pbmode.enabled",		true);
+
+// Enable Firefox's anti-fingerprinting mode
+user_pref("privacy.resistFingerprinting",			true);
+
+// Disable collection/sending of the health report
+user_pref("datareporting.healthreport.uploadEnabled",		false);
+user_pref("datareporting.healthreport.service.enabled",		false);
+user_pref("datareporting.policy.dataSubmissionEnabled",		false);
+user_pref("browser.discovery.enabled",				false);
+
+// Disable Shield/Heartbeat/Normandy
+user_pref("app.normandy.enabled", false);
+user_pref("app.normandy.api_url", "");
+user_pref("extensions.shield-recipe-client.enabled",		false);
+user_pref("app.shield.optoutstudies.enabled",			false);
+
+// Disable Firefox Hello metrics collection
+user_pref("loop.logDomains",					false);
+
+// Enable blocking reported web forgeries
+user_pref("browser.safebrowsing.phishing.enabled",		true);
+
+// Enable blocking reported attack sites
+user_pref("browser.safebrowsing.malware.enabled",		true);
+
+// Disable Pocket
+user_pref("browser.pocket.enabled",				false);
+user_pref("extensions.pocket.enabled",				false);
+user_pref("browser.newtabpage.activity-stream.feeds.section.topstories",	false);
+
+// Disable downloading homepage snippets/messages from Mozilla
+user_pref("browser.aboutHomeSnippets.updateUrl",		"");
+
+// Enable Content Security Policy (CSP)
+user_pref("security.csp.experimentalEnabled",			true);
+
+// Enable Subresource Integrity
+user_pref("security.sri.enable",				true);
+
+// Don't send referer headers when following links across different domains
+user_pref("network.http.referer.XOriginPolicy",		2);
+
+// Disable new tab tile ads & preload
+user_pref("browser.newtabpage.enhanced",			false);
+user_pref("browser.newtab.preload",				false);
+user_pref("browser.newtabpage.directory.ping",			"");
+user_pref("browser.newtabpage.directory.source",		"data:text/plain,{}");
+
+// Enable HTTPS-Only Mode
+user_pref("dom.security.https_only_mode",			true);
+
+// Enable HSTS preload list
+user_pref("network.stricttransportsecurity.preloadlist",	true);
+EOD
 EOF
+
+chmod +x ${HOME}/.local/bin/update-firefox-configs
+
+update-firefox-configs
 
 ################################################
 ##### Applications
