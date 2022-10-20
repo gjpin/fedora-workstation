@@ -350,6 +350,7 @@ EOF
 flatpak run com.visualstudio.code --install-extension piousdeer.adwaita-theme
 flatpak run com.visualstudio.code --install-extension golang.Go
 flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
+flatpak run com.visualstudio.code --install-extension vue.volar
 
 # Configure VSCode
 mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
