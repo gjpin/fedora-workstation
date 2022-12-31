@@ -422,31 +422,25 @@ EOF
 
 chmod +x ${HOME}/.local/share/applications/android-studio.desktop
 
-# Download and install Android CLI tools
+# Download and install Android CLI and platform tools
+sudo mkdir -p /opt/android-sdk/cmdline-tools
 curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O
-
-sudo unzip commandlinetools-linux-*.zip -d /opt
-
+sudo unzip commandlinetools-linux-*.zip -d /opt/android-sdk/cmdline-tools
 rm -f commandlinetools-linux-*.zip
+sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
 
-sudo mv /opt/cmdline-tools /opt/android-sdk-cli-tools
-
-tee ${HOME}/.bashrc.d/android-sdk-cli-tools << EOF
-export PATH=\$PATH:/opt/android-sdk-cli-tools/bin
-EOF
-
-# Download and install Android SDK platform tools
 curl -sSL  https://dl.google.com/android/repository/platform-tools-latest-linux.zip -O
-
-sudo unzip platform-tools-latest-linux.zip -d /opt
-
+sudo unzip platform-tools-latest-linux.zip -d /opt/android-sdk
 rm -f platform-tools-latest-linux.zip
 
-sudo mv /opt/platform-tools /opt/android-sdk-platform-tools
-
 tee ${HOME}/.bashrc.d/android-sdk-platform-tools << EOF
-export PATH=\$PATH:/opt/android-sdk-platform-tools
+export ANDROID_HOME=/opt/android-sdk/cmdline-tools/latest/bin
+export PATH=\$PATH:/opt/android-sdk/cmdline-tools/latest/bin
+export PATH=\$PATH:/opt/android-sdk/platform-tools
 EOF
+
+# Accept Android SDK licenses
+yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
 ################################################
 ##### systemd
