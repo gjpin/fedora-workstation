@@ -125,6 +125,9 @@ if lspci | grep VGA | grep "AMD" > /dev/null; then
   sudo dnf swap mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
 fi
 
+# Install chromium with non-free multimedia formats support
+sudo dnf install -y chromium-freeworld
+
 ################################################
 ##### Flatpak / Flathub
 ################################################
@@ -441,6 +444,25 @@ EOF
 
 # Accept Android SDK licenses
 yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+
+################################################
+##### waydroid
+################################################
+
+# commented for now, as it's in the testing repos
+
+# References:
+# https://docs.waydro.id/usage/waydroid-command-line-options#init-options
+# https://wiki.archlinux.org/title/Waydroid
+
+# # Install waydroid
+# sudo dnf install -y waydroid
+
+# # Initialize waydroid
+# sudo waydroid init -c https://ota.waydro.id/system -v https://ota.waydro.id/vendor -s GAPPS
+
+# # Enable waydroid service
+# sudo systemctl enable --now waydroid-container.service
 
 ################################################
 ##### systemd
