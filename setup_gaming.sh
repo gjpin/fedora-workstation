@@ -69,3 +69,15 @@ sudo flatpak install -y flathub com.heroicgameslauncher.hgl
 
 # Allow Heroic to access external directory
 sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
+
+################################################
+##### Lutris
+################################################
+
+# Install GNOME Compat and GL32 extensions
+sudo flatpak install -y flathub org.gnome.Platform.Compat.i386//22.08
+sudo flatpak install -y flathub org.freedesktop.Platform.GL32.default//22.08
+sudo flatpak install -y flathub org.freedesktop.Platform.GL.default//22.08
+
+# Install Lutris
+sudo flatpak install -y flathub net.lutris.Lutris

@@ -157,6 +157,8 @@ sudo flatpak install -y flathub io.github.seadve.Kooha
 sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub com.github.flxzt.rnote
 
+sudo flatpak install -y flathub org.gnome.gitg
+
 # Insomnia
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak override --env=GTK_THEME=adw-gtk3-dark rest.insomnia.Insomnia
@@ -369,6 +371,23 @@ sudo dnf install -y unityhub
 
 # Install VSCode extensions
 code --install-extension Unity.unity-debug
+
+################################################
+##### Virtualization
+################################################
+
+# References:
+# https://docs.fedoraproject.org/en-US/quick-docs/getting-started-with-virtualization/
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/optimizing-virtual-machine-performance-in-rhel_configuring-and-managing-virtualization
+
+# Install virtualization group
+sudo dnf install -y @virtualization
+
+# Enable service
+sudo systemctl enable libvirtd
+
+# Install QEMU
+sudo dnf install -y qemu
 
 ################################################
 ##### Java / OpenJDK
