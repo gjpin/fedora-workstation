@@ -286,6 +286,7 @@ EOF
 # https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
 # https://learn.microsoft.com/en-us/dotnet/core/install/linux-fedora#dependencies
 # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
+# https://learn.microsoft.com/en-us/dotnet/core/tools/telemetry#how-to-opt-out
 
 # Install dependencies
 sudo dnf install -y \
@@ -304,6 +305,7 @@ dotnet-install.sh --channel STS
 
 # Export dotnet to path
 tee ${HOME}/.bashrc.d/dotnet << EOF
+export DOTNET_CLI_TELEMETRY_OPTOUT=true
 export DOTNET_ROOT=${HOME}/.dotnet
 export PATH=\$PATH:${HOME}/.dotnet
 EOF
