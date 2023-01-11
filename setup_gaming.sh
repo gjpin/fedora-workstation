@@ -81,3 +81,6 @@ sudo flatpak install -y flathub org.freedesktop.Platform.GL.default//22.08
 
 # Install Lutris
 sudo flatpak install -y flathub net.lutris.Lutris
+
+# Allow Lutris to access external directory
+sudo flatpak override --filesystem=/mnt/data/games/lutris net.lutris.Lutris

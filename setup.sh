@@ -35,7 +35,8 @@ sudo dnf install -y \
 mkdir -p \
   ${HOME}/.local/share/applications \
   ${HOME}/.bashrc.d \
-  ${HOME}/.local/bin
+  ${HOME}/.local/bin \
+  ${HOME}/.config/autostart
 
 ################################################
 ##### bash
@@ -56,9 +57,6 @@ update-all() {
 
   # Update GTK theme
   update-gtk-theme
-
-  # Update .NET
-  update-dotnet
 }
 EOF
 
@@ -101,6 +99,7 @@ sudo chmod 700 /etc/wireguard/
 # References:
 # https://rpmfusion.org/Configuration/
 # https://rpmfusion.org/Howto/Multimedia
+# https://copr-dist-git.fedorainfracloud.org/cgit/gloriouseggroll/nobara/nobara-login.git/tree/codeccheck.sh?h=f37
 
 # Enable free and nonfree repositories
 sudo dnf install -y \
@@ -128,6 +127,9 @@ fi
 # Install chromium with non-free multimedia formats support
 sudo dnf install -y chromium-freeworld
 
+# Install additional codecs
+sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-aptx libmediainfo mediainfo compat-ffmpeg4
+
 ################################################
 ##### Flatpak / Flathub
 ################################################
@@ -145,7 +147,7 @@ if lspci | grep VGA | grep "Intel" > /dev/null; then
 fi
 
 # Install common applications
-sudo flatpak install -y flathub com.bitwarden.desktop
+sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
 sudo flatpak install -y flathub com.belmoussaoui.Authenticator
 sudo flatpak install -y flathub org.keepassxc.KeePassXC
 sudo flatpak install -y flathub com.github.tchx84.Flatseal
@@ -159,11 +161,16 @@ sudo flatpak install -y flathub com.github.flxzt.rnote
 
 sudo flatpak install -y flathub org.gnome.gitg
 
+# Bitwarden
+sudo flatpak install -y flathub com.bitwarden.desktop
+sudo flatpak override --socket=wayland com.bitwarden.desktop
+cp /var/lib/flatpak/app/com.bitwarden.desktop/current/active/files/share/applications/com.bitwarden.desktop.desktop ${HOME}/.local/share/applications
+sed -i "s|Exec=bitwarden|Exec=flatpak run com.bitwarden.desktop --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/com.bitwarden.desktop.desktop
+
 # Insomnia
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak override --env=GTK_THEME=adw-gtk3-dark rest.insomnia.Insomnia
 sudo flatpak override --socket=wayland rest.insomnia.Insomnia
-
 cp /var/lib/flatpak/app/rest.insomnia.Insomnia/current/active/files/share/applications/rest.insomnia.Insomnia.desktop ${HOME}/.local/share/applications
 sed -i "s|Exec=/app/bin/insomnia|Exec=flatpak run rest.insomnia.Insomnia --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/rest.insomnia.Insomnia.desktop
 
@@ -279,102 +286,6 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
 EOF
 
 ################################################
-##### .NET SDK
-################################################
-
-# References:
-# https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
-# https://learn.microsoft.com/en-us/dotnet/core/install/linux-fedora#dependencies
-# https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
-# https://learn.microsoft.com/en-us/dotnet/core/tools/telemetry#how-to-opt-out
-
-# Install dependencies
-sudo dnf install -y \
-  krb5-libs \
-  libicu \
-  openssl-libs \
-  zlib \
-  libgdiplus
-
-# Download install script
-curl -sSL https://dot.net/v1/dotnet-install.sh -o ${HOME}/.local/bin/dotnet-install.sh
-chmod +x ${HOME}/.local/bin/dotnet-install.sh
-
-# Install latest .NET
-dotnet-install.sh --channel STS
-
-# Export dotnet to path
-tee ${HOME}/.bashrc.d/dotnet << EOF
-export DOTNET_CLI_TELEMETRY_OPTOUT=true
-export DOTNET_ROOT=${HOME}/.dotnet
-export PATH=\$PATH:${HOME}/.dotnet
-EOF
-
-# Enable tab autocomplete for the .NET CLI
-tee -a ${HOME}/.bashrc.d/dotnet << 'EOF'
-
-# bash parameter completion for the dotnet CLI
-function _dotnet_bash_complete()
-{
-  local cur="${COMP_WORDS[COMP_CWORD]}" IFS=$'\n'
-  local candidates
-
-  read -d '' -ra candidates < <(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)
-
-  read -d '' -ra COMPREPLY < <(compgen -W "${candidates[*]:-}" -- "$cur")
-}
-
-complete -f -F _dotnet_bash_complete dotnet
-EOF
-
-# .NET updater
-tee ${HOME}/.local/bin/update-dotnet << 'EOF'
-#!/usr/bin/env bash
-
-curl -sSL https://dot.net/v1/dotnet-install.sh -o ${HOME}/.local/bin/dotnet-install.sh
-chmod +x ${HOME}/.local/bin/dotnet-install.sh
-dotnet-install.sh --channel STS
-EOF
-
-chmod +x ${HOME}/.local/bin/update-dotnet
-
-# Install VSCode extensions
-code --install-extension ms-dotnettools.csharp
-
-################################################
-##### Unity Hub
-################################################
-
-# References:
-# https://docs.unity3d.com/hub/manual/InstallHub.html#install-hub-linux
-# https://www.reddit.com/r/Fedora/comments/wupxy7/how_to_install_correctly_unity_hub_on_fedora/
-
-# Install dependencies
-sudo dnf install -y \
-    openssl \
-    openssl-libs \
-    GConf2 \
-    openssl1.1
-
-# Add Unity Hub repository
-sudo tee /etc/yum.repos.d/unityhub.repo << EOF
-[unityhub]
-name=Unity Hub
-baseurl=https://hub.unity3d.com/linux/repos/rpm/stable
-enabled=1
-gpgcheck=1
-gpgkey=https://hub.unity3d.com/linux/repos/rpm/stable/repodata/repomd.xml.key
-repo_gpgcheck=1
-EOF
-
-# Install Unity Hub
-dnf check-update
-sudo dnf install -y unityhub
-
-# Install VSCode extensions
-code --install-extension Unity.unity-debug
-
-################################################
 ##### Virtualization
 ################################################
 
@@ -390,100 +301,6 @@ sudo systemctl enable libvirtd
 
 # Install QEMU
 sudo dnf install -y qemu
-
-################################################
-##### Java / OpenJDK
-################################################
-
-# References:
-# https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
-
-# Install OpenJDK
-sudo dnf install -y \
-  java-latest-openjdk \
-  java-latest-openjdk-devel
-
-# Set env vars
-tee ${HOME}/.bashrc.d/java << EOF
-export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
-export PATH=\$PATH:\$JAVA_HOME/bin
-export CLASSPATH=.:\$JAVA_HOME/jre/lib:\$JAVA_HOME/lib:\$JAVA_HOME/lib/tools.jar
-EOF
-
-################################################
-##### Android Studio
-################################################
-
-# References:
-# https://developer.android.com/studio/install#linux
-# https://github.com/flathub/com.google.AndroidStudio/blob/master/com.google.AndroidStudio.json
-# https://developer.android.com/studio/releases/cmdline-tools
-# https://developer.android.com/studio/releases/platform-tools
-
-# Install dependencies
-sudo dnf install -y \
-  zlib.i686 \
-  ncurses-libs.i686 \
-  bzip2-libs.i686
-
-# Download and install Android Studio
-curl -sSL https://dl.google.com/dl/android/studio/ide-zips/2021.3.1.17/android-studio-2021.3.1.17-linux.tar.gz -O
-sudo tar -xzf android-studio-*-linux.tar.gz -C /opt
-rm -f android-studio-*-linux.tar.gz
-
-# Create desktop entry
-tee ${HOME}/.local/share/applications/android-studio.desktop << EOF
-[Desktop Entry]
-Type=Application
-Name=Android Studio
-Exec="/opt/android-studio/bin/studio.sh" %f
-Icon=/opt/android-studio/bin/studio.png
-Categories=Development;IDE;
-Terminal=false
-StartupNotify=true
-StartupWMClass=android-studio
-EOF
-
-chmod +x ${HOME}/.local/share/applications/android-studio.desktop
-
-# Download and install Android CLI and platform tools
-sudo mkdir -p /opt/android-sdk/cmdline-tools
-curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O
-sudo unzip commandlinetools-linux-*.zip -d /opt/android-sdk/cmdline-tools
-rm -f commandlinetools-linux-*.zip
-sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
-
-curl -sSL  https://dl.google.com/android/repository/platform-tools-latest-linux.zip -O
-sudo unzip platform-tools-latest-linux.zip -d /opt/android-sdk
-rm -f platform-tools-latest-linux.zip
-
-tee ${HOME}/.bashrc.d/android-sdk-platform-tools << EOF
-export ANDROID_HOME=/opt/android-sdk/cmdline-tools/latest/bin
-export PATH=\$PATH:/opt/android-sdk/cmdline-tools/latest/bin
-export PATH=\$PATH:/opt/android-sdk/platform-tools
-EOF
-
-# Accept Android SDK licenses
-yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-
-################################################
-##### waydroid
-################################################
-
-# commented for now, as it's in the testing repos
-
-# References:
-# https://docs.waydro.id/usage/waydroid-command-line-options#init-options
-# https://wiki.archlinux.org/title/Waydroid
-
-# # Install waydroid
-# sudo dnf install -y waydroid
-
-# # Initialize waydroid
-# sudo waydroid init -c https://ota.waydro.id/system -v https://ota.waydro.id/vendor -s GAPPS
-
-# # Enable waydroid service
-# sudo systemctl enable --now waydroid-container.service
 
 ################################################
 ##### systemd
@@ -636,28 +453,26 @@ gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10
 # Create Gnome shell extensions folder
 mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
+# AppIndicator and KStatusNotifierItem Support
+# https://extensions.gnome.org/extension/615/appindicator-support/
+sudo dnf install -y gnome-shell-extension-appindicator
+
+# GSConnect
+# https://extensions.gnome.org/extension/1319/gsconnect/
+sudo dnf install -y gnome-shell-extension-gsconnect nautilus-gsconnect webextension-gsconnect
+
 # Dark Variant
 # https://extensions.gnome.org/extension/4488/dark-variant/
 sudo dnf install -y xprop
 
 curl -sSL https://extensions.gnome.org/extension-data/dark-varianthardpixel.eu.v8.shell-extension.zip -O
-EXTENSION_UUID=$(unzip -c *shell-extension.zip metadata.json | grep uuid | cut -d \" -f4)
-mkdir -p ${HOME}/.local/share/gnome-shell/extensions/${EXTENSION_UUID}
-unzip -q *shell-extension.zip -d ${HOME}/.local/share/gnome-shell/extensions/${EXTENSION_UUID}
+gnome-extensions install dark-varianthardpixel.eu.v8.shell-extension.zip
 rm -f *shell-extension.zip
 
-gsettings set org.gnome.shell.extensions.dark-variant applications "['com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop']"
-
-# AppIndicator and KStatusNotifierItem Support
-# https://extensions.gnome.org/extension/615/appindicator-support/
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v46.shell-extension.zip -O
-EXTENSION_UUID=$(unzip -c *shell-extension.zip metadata.json | grep uuid | cut -d \" -f4)
-mkdir -p ${HOME}/.local/share/gnome-shell/extensions/${EXTENSION_UUID}
-unzip -q *shell-extension.zip -d ${HOME}/.local/share/gnome-shell/extensions/${EXTENSION_UUID}
-rm -f *shell-extension.zip
+gsettings set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop']"
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu']"
+gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io']"
 
 ################################################
 ##### Unlock LUKS2 with TPM2 token
