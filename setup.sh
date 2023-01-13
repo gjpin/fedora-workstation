@@ -130,6 +130,9 @@ sudo dnf install -y chromium-freeworld
 # Install additional codecs
 sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-aptx libmediainfo mediainfo compat-ffmpeg4
 
+# Install Microsoft fonts
+sudo dnf install -y lpf-cleartype-fonts lpf-mscore-fonts
+
 ################################################
 ##### Flatpak / Flathub
 ################################################
