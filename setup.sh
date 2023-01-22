@@ -20,6 +20,7 @@ sudo hostnamectl set-hostname --static "${NEW_HOSTNAME}"
 
 # Configure DNF
 sudo tee -a /etc/dnf/dnf.conf << EOF
+fastestmirror=1
 max_parallel_downloads=10
 EOF
 
@@ -37,6 +38,27 @@ mkdir -p \
   ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart
+
+################################################
+##### systemd
+################################################
+
+# References:
+# https://www.freedesktop.org/software/systemd/man/systemd-system.conf.html
+
+# Configure default timeout to stop system units
+sudo mkdir -p /etc/systemd/system.conf.d
+sudo tee /etc/systemd/system.conf.d/default-timeout.conf << EOF
+[Manager]
+DefaultTimeoutStopSec=10s
+EOF
+
+# Configure default timeout to stop user units
+sudo mkdir -p /etc/systemd/user.conf.d
+sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
+[Manager]
+DefaultTimeoutStopSec=10s
+EOF
 
 ################################################
 ##### bash
@@ -197,8 +219,14 @@ sudo flatpak override --env=GTK_THEME=adw-gtk3-dark md.obsidian.Obsidian
 ##### Firefox
 ################################################
 
-# Install Firefox Gnome theme
+# Set Firefox profile path
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
+
+# Import Firefox configs
+curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox.js \
+  -o ${FIREFOX_PROFILE_PATH}/user.js
+
+# Install Firefox Gnome theme
 mkdir -p ${FIREFOX_PROFILE_PATH}/chrome
 git clone https://github.com/rafaelmardojai/firefox-gnome-theme.git ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme
 echo "@import \"firefox-gnome-theme/userChrome.css\"" > ${FIREFOX_PROFILE_PATH}/chrome/userChrome.css
@@ -213,10 +241,6 @@ user_pref("browser.uidensity", 0);
 // Enable SVG context-propertes
 user_pref("svg.context-properties.content.enabled", true);
 EOF
-
-# Import Firefox configs
-curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox.js \
-  -o ${FIREFOX_PROFILE_PATH}/user.js
 
 # Firefox theme updater
 tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
@@ -282,48 +306,11 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "extensions.ignoreRecommendations": true,
     "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",
     "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
 }
-EOF
-
-################################################
-##### Virtualization
-################################################
-
-# References:
-# https://docs.fedoraproject.org/en-US/quick-docs/getting-started-with-virtualization/
-# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/optimizing-virtual-machine-performance-in-rhel_configuring-and-managing-virtualization
-
-# Install virtualization group
-sudo dnf install -y @virtualization
-
-# Enable service
-sudo systemctl enable libvirtd
-
-# Install QEMU
-sudo dnf install -y qemu
-
-################################################
-##### systemd
-################################################
-
-# References:
-# https://www.freedesktop.org/software/systemd/man/systemd-system.conf.html
-
-# Configure default timeout to stop system units
-sudo mkdir -p /etc/systemd/system.conf.d
-sudo tee /etc/systemd/system.conf.d/default-timeout.conf << EOF
-[Manager]
-DefaultTimeoutStopSec=10s
-EOF
-
-# Configure default timeout to stop user units
-sudo mkdir -p /etc/systemd/user.conf.d
-sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
-[Manager]
-DefaultTimeoutStopSec=10s
 EOF
 
 ################################################

@@ -261,6 +261,26 @@ EOF
 sudo grubby --update-kernel=ALL --args=amdgpu.ppfeaturemask=0xffffffff
 ```
 
+## Virtualization
+```bash
+################################################
+##### Virtualization
+################################################
+
+# References:
+# https://docs.fedoraproject.org/en-US/quick-docs/getting-started-with-virtualization/
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/optimizing-virtual-machine-performance-in-rhel_configuring-and-managing-virtualization
+
+# Install virtualization group
+sudo dnf install -y @virtualization
+
+# Enable service
+sudo systemctl enable libvirtd
+
+# Install QEMU
+sudo dnf install -y qemu
+```
+
 ## WayDroid
 ```bash
 ################################################
