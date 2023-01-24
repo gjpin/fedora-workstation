@@ -30,6 +30,7 @@ sudo dnf upgrade -y --refresh
 # Install common packages
 sudo dnf install -y \
     bind-utils \
+    kernel-tools \
     unzip
 
 # Create common user directories
