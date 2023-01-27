@@ -31,7 +31,8 @@ sudo dnf upgrade -y --refresh
 sudo dnf install -y \
     bind-utils \
     kernel-tools \
-    unzip
+    unzip \
+    cascadia-code-fonts
 
 # Create common user directories
 mkdir -p \
@@ -288,7 +289,8 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
     "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "editor.fontFamily": "'Cascadia Code', 'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "editor.fontLigatures": true,
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
     "workbench.iconTheme": null,
