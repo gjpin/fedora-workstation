@@ -157,6 +157,9 @@ sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-ap
 # Install Microsoft fonts
 sudo dnf install -y lpf-cleartype-fonts lpf-mscore-fonts
 
+# Install Steam devices
+sudo dnf install -y steam-devices
+
 ################################################
 ##### Flatpak / Flathub
 ################################################
@@ -187,6 +190,7 @@ sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub com.github.flxzt.rnote
 
 sudo flatpak install -y flathub org.gnome.gitg
+sudo flatpak install -y flathub com.github.marhkb.Pods
 
 # Bitwarden
 sudo flatpak install -y flathub com.bitwarden.desktop

@@ -50,25 +50,12 @@ sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
 sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 
-# Allow Steam to access external directory
-sudo flatpak override --filesystem=/mnt/data/games/steam com.valvesoftware.Steam
-
-# Steam controllers udev rules
-curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -O
-sudo mv 60-steam-input.rules /etc/udev/rules.d/60-steam-input.rules
-sudo udevadm control --reload
-sudo udevadm trigger
-echo 'uinput' | sudo tee /etc/modules-load.d/uinput.conf
-
 ################################################
 ##### Heroic Games Launcher
 ################################################
 
 # Install Heroic Games Launcher
 sudo flatpak install -y flathub com.heroicgameslauncher.hgl
-
-# Allow Heroic to access external directory
-sudo flatpak override --filesystem=/mnt/data/games/heroic com.heroicgameslauncher.hgl
 
 ################################################
 ##### Lutris
@@ -81,6 +68,3 @@ sudo flatpak install -y flathub org.freedesktop.Platform.GL.default//22.08
 
 # Install Lutris
 sudo flatpak install -y flathub net.lutris.Lutris
-
-# Allow Lutris to access external directory
-sudo flatpak override --filesystem=/mnt/data/games/lutris net.lutris.Lutris
