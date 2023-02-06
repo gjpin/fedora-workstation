@@ -252,6 +252,9 @@ user_pref("browser.uidensity", 0);
 
 // Enable SVG context-propertes
 user_pref("svg.context-properties.content.enabled", true);
+
+// Add more contrast to the active tab
+user_pref("gnomeTheme.activeTabContrast", true);
 EOF
 
 # Firefox theme updater
@@ -299,7 +302,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
     "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Cascadia Code', 'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
+    "editor.fontFamily": "'Noto Sans Mono', 'Droid Sans Mono', 'monospace', 'Droid Sans Fallback'",
     "editor.fontLigatures": true,
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
@@ -444,10 +447,10 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Inter Regular 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Open Sans Regular 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Inter Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Cascadia Code Regular 10'
+gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
+gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
 
 ################################################
 ##### Gnome Shell Extensions
@@ -458,11 +461,15 @@ mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
 # AppIndicator and KStatusNotifierItem Support
 # https://extensions.gnome.org/extension/615/appindicator-support/
-sudo dnf install -y gnome-shell-extension-appindicator
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v46.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
 
 # GSConnect
 # https://extensions.gnome.org/extension/1319/gsconnect/
-sudo dnf install -y gnome-shell-extension-gsconnect nautilus-gsconnect webextension-gsconnect
+curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v54.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
 
 # Dark Variant
 # https://extensions.gnome.org/extension/4488/dark-variant/
@@ -470,12 +477,18 @@ sudo dnf install -y xprop
 
 curl -sSL https://extensions.gnome.org/extension-data/dark-varianthardpixel.eu.v8.shell-extension.zip -O
 gnome-extensions install dark-varianthardpixel.eu.v8.shell-extension.zip
-rm -f *shell-extension.zip
+rm -f *.shell-extension.zip
 
 gsettings set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop']"
 
+# Rounded Window Corners
+# https://extensions.gnome.org/extension/5237/rounded-window-corners/
+curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v10.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io']"
+gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt']"
 
 ################################################
 ##### Unlock LUKS2 with TPM2 token
