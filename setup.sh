@@ -29,10 +29,16 @@ sudo dnf upgrade -y --refresh
 
 # Install common packages
 sudo dnf install -y \
-    bind-utils \
-    kernel-tools \
-    unzip \
-    cascadia-code-fonts
+  bind-utils \
+  kernel-tools \
+  unzip
+
+# Install fonts
+sudo dnf install -y \
+  cascadia-code-fonts \
+  rsms-inter-fonts \
+  google-roboto-fonts \
+  open-sans-fonts
 
 # Create common user directories
 mkdir -p \
@@ -422,7 +428,7 @@ gsettings set org.gnome.desktop.calendar show-weekdate true
 
 # Nautilus
 gsettings set org.gtk.Settings.FileChooser sort-directories-first true
-gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small'
+gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
 
 # Laptop specific
 if cat /sys/class/dmi/id/chassis_type | grep 10 > /dev/null; then
@@ -438,10 +444,10 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
+gsettings set org.gnome.desktop.interface font-name 'Inter Regular 10'
+gsettings set org.gnome.desktop.interface document-font-name 'Open Sans Regular 10'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Inter Bold 10'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Cascadia Code Regular 10'
 
 ################################################
 ##### Gnome Shell Extensions
