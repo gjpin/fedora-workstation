@@ -158,7 +158,7 @@ EOF
 
 # .NET updater
 tee ${HOME}/.local/bin/update-dotnet << 'EOF'
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 curl -sSL https://dot.net/v1/dotnet-install.sh -o ${HOME}/.local/bin/dotnet-install.sh
 chmod +x ${HOME}/.local/bin/dotnet-install.sh

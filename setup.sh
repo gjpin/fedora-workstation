@@ -11,6 +11,31 @@ read -p "Gaming (yes / no): " GAMING
 export GAMING
 
 ################################################
+##### Remove unneeded packages and services
+################################################
+
+# Remove packages
+sudo dnf remove -y \
+    gnome-software \
+    gnome-weather \
+    gnome-contacts \
+    gnome-maps \
+    gnome-photos \
+    gnome-tour \
+    gnome-connections \
+    simple-scan \
+    rhythmbox \
+    cheese \
+    mediawriter \
+    yelp \
+    abrt
+
+# Mask services
+sudo systemctl mask \
+  ModemManager.service \
+  pcscd.service
+
+################################################
 ##### General
 ################################################
 
@@ -31,14 +56,8 @@ sudo dnf upgrade -y --refresh
 sudo dnf install -y \
   bind-utils \
   kernel-tools \
-  unzip
-
-# Install fonts
-sudo dnf install -y \
-  cascadia-code-fonts \
-  rsms-inter-fonts \
-  google-roboto-fonts \
-  open-sans-fonts
+  unzip \
+  htop
 
 # Create common user directories
 mkdir -p \
@@ -78,6 +97,10 @@ update-all() {
   # Update system
   sudo dnf clean all
   sudo dnf upgrade -y --refresh
+
+  # Update firmware
+  sudo fwupdmgr refresh
+  sudo fwupdmgr update
 
   # Update Flatpak apps
   flatpak update -y
@@ -253,13 +276,16 @@ user_pref("browser.uidensity", 0);
 // Enable SVG context-propertes
 user_pref("svg.context-properties.content.enabled", true);
 
+// Disable private window dark theme
+user_pref("browser.theme.dark-private-windows", false);
+
 // Add more contrast to the active tab
 user_pref("gnomeTheme.activeTabContrast", true);
 EOF
 
 # Firefox theme updater
 tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Update Firefox theme
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
@@ -322,7 +348,6 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "extensions.ignoreRecommendations": true,
     "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
@@ -355,7 +380,7 @@ rm -f adw-*.tar.xz
 
 # GTK theme updater
 tee ${HOME}/.local/bin/update-gtk-theme << 'EOF'
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 URL=$(curl -s https://api.github.com/repos/lassekongo83/adw-gtk3/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
 curl -sSL ${URL} -O
@@ -422,6 +447,9 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Su
 ################################################
 ##### UI / UX changes
 ################################################
+
+# Set dash applications
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.TextEditor.desktop', 'code.desktop']"
 
 # Volume
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
@@ -505,6 +533,23 @@ sudo dracut -f
 
 # Enroll TPM2 token into LUKS2
 sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/nvme0n1p3
+
+################################################
+##### Cleanup
+################################################
+
+APPLICATIONS=('htop')
+for APPLICATION in "${APPLICATIONS[@]}"
+do
+    # Create a local copy of the desktop files and append properties
+    cp /usr/share/applications/${APPLICATION}.desktop ${HOME}/.local/share/applications/${APPLICATION}.desktop 2>/dev/null || : 
+
+    if test -f "${HOME}/.local/share/applications/${APPLICATION}.desktop"; then
+        echo "NoDisplay=true" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
+        echo "Hidden=true" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
+        echo "NotShowIn=KDE;GNOME;" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
+    fi
+done
 
 ################################################
 ##### Gaming
