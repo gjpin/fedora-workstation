@@ -516,10 +516,6 @@ gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
 
-################################################
-##### Gnome app picker
-################################################
-
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System']"
 
@@ -536,6 +532,14 @@ gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folder
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ apps "['org.gnome.baobab.desktop', 'firewall-config.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'org.gnome.Settings.desktop', 'gnome-system-monitor.desktop', 'org.gnome.Characters.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.font-viewer.desktop', 'org.gnome.Logs.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']"
 
 gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, 'Media': <{'position': <1>}>, 'Office': <{'position': <2>}>, 'System': <{'position': <3>}>, 'com.belmoussaoui.Authenticator.desktop': <{'position': <4>}>, 'com.bitwarden.desktop.desktop': <{'position': <5>}>, 'com.usebottles.bottles.desktop': <{'position': <6>}>, 'chromium-freeworld.desktop': <{'position': <7>}>, 'com.github.tchx84.Flatseal.desktop': <{'position': <8>}>}]"
+
+# Wallpaper and screensaver
+gsettings set org.gnome.desktop.background picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'
+gsettings set org.gnome.desktop.background picture-uri-dark 'file:///usr/share/backgrounds/gnome/blobs-d.svg'
+gsettings set org.gnome.desktop.background primary-color '#241f31'
+
+gsettings set org.gnome.desktop.screensaver picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'
+gsettings set org.gnome.desktop.screensaver primary-color '#241f31'
 
 ################################################
 ##### Gnome Shell Extensions

@@ -1,3 +1,6 @@
+// Set homepage
+user_pref("browser.startup.homepage", "https://google.com/");
+
 // Enable FFMPEG VA-API
 user_pref("media.ffmpeg.vaapi.enabled", true);
 
