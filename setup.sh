@@ -61,6 +61,7 @@ sudo dnf install -y \
 # Create common user directories
 mkdir -p \
   ${HOME}/.local/share/applications \
+  ${HOME}/.local/share/themes \
   ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart
@@ -276,6 +277,9 @@ sudo flatpak override --env=GTK_THEME=adw-gtk3-dark md.obsidian.Obsidian
 ################################################
 ##### Firefox
 ################################################
+
+# Open Firefox to create profile folder
+timeout 5 firefox --headless
 
 # Set Firefox profile path
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
