@@ -1,5 +1,5 @@
 // Set homepage
-user_pref("browser.startup.homepage", "https://google.com/");
+user_pref("browser.startup.homepage", "chrome://browser/content/blanktab.html");
 
 // Enable FFMPEG VA-API
 user_pref("media.ffmpeg.vaapi.enabled", true);

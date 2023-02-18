@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 ################################################
 ##### Set variables
@@ -226,9 +226,12 @@ sudo flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem
 # Install Flatpak runtimes
 sudo flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
 sudo flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
-if lspci | grep VGA | grep "Intel" > /dev/null; then
-  sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
-fi
+sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git/x86_64/22.08
+sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git/x86_64/22.08
+sudo flatpak install -y flathub org.gnome.Platform.Compat.i386/x86_64/43
+sudo flatpak install -y flathub org.freedesktop.Platform.GL32.default/x86_64/22.08
+sudo flatpak install -y flathub org.freedesktop.Platform.GL.default/x86_64/22.08
+sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
 
 ################################################
 ##### Flatpak applications
@@ -520,7 +523,7 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
 
 # Folders
-gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System']"
+gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
 
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ name 'Office'
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ apps "['libreoffice-calc.desktop', 'libreoffice-impress.desktop', 'libreoffice-writer.desktop', 'com.github.flxzt.rnote.desktop', 'org.gnome.Evince.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.clocks.desktop', 'md.obsidian.Obsidian.desktop']"
@@ -534,7 +537,13 @@ gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folder
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ name 'System'
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ apps "['org.gnome.baobab.desktop', 'firewall-config.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'org.gnome.Settings.desktop', 'gnome-system-monitor.desktop', 'org.gnome.Characters.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.font-viewer.desktop', 'org.gnome.Logs.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']"
 
-gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, 'Media': <{'position': <1>}>, 'Office': <{'position': <2>}>, 'System': <{'position': <3>}>, 'com.belmoussaoui.Authenticator.desktop': <{'position': <4>}>, 'com.bitwarden.desktop.desktop': <{'position': <5>}>, 'com.usebottles.bottles.desktop': <{'position': <6>}>, 'chromium-freeworld.desktop': <{'position': <7>}>, 'com.github.tchx84.Flatseal.desktop': <{'position': <8>}>}]"
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Gaming/ name 'Gaming'
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Gaming/ apps "['com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'net.lutris.Lutris.desktop']"
+
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ name 'Emulators'
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ apps "['org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'org.DolphinEmu.dolphin-emu.desktop', 'org.yuzu_emu.yuzu.desktop', 'org.citra_emu.citra.desktop', 'org.flycast.Flycast.desktop', 'app.xemu.xemu.desktop', 'com.snes9x.Snes9x.desktop', 'net.kuribo64.melonDS.desktop']"
+
+gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, 'Emulators': <{'position': <1>}>, 'Gaming': <{'position': <2>}>, 'Media': <{'position': <3>}>, 'Office': <{'position': <4>}>, 'System': <{'position': <5>}>, 'com.belmoussaoui.Authenticator.desktop': <{'position': <6>}>, 'com.bitwarden.desktop.desktop': <{'position': <7>}>, 'com.usebottles.bottles.desktop': <{'position': <8>}>, 'chromium-freeworld.desktop': <{'position': <9>}>, 'com.github.tchx84.Flatseal.desktop': <{'position': <10>}>}]"
 
 # Wallpaper and screensaver
 gsettings set org.gnome.desktop.background picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'

@@ -34,6 +34,20 @@ gamescope -f -e -- mangohud %command%
 gamescope -h 1080 -H 1440 -U -f -e -- mangohud %command%
 ```
 
+## How to set default Flatpak GL drivers to mesa-git
+```bash
+# References:
+# https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/wikis/Mesa-git
+
+sudo flatpak override --env=FLATPAK_GL_DRIVERS=mesa-git
+
+sudo tee -a /etc/environment << EOF
+
+# Flatpak
+FLATPAK_GL_DRIVERS=mesa-git
+EOF
+```
+
 ## How to install .deb package (eg. Aseprite)
 ```bash
 mkdir -p ${HOME}/aseprite

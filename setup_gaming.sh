@@ -1,24 +1,4 @@
-#!/bin/bash
-
-################################################
-##### Mesa-git
-################################################
-
-# References:
-# https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/wikis/Mesa-git
-
-# Install Mesa git
-sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git//22.08
-sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git//22.08
-
-# Set default Flatpak GL drivers to mesa-git
-sudo flatpak override --env=FLATPAK_GL_DRIVERS=mesa-git
-
-sudo tee -a /etc/environment << EOF
-
-# Flatpak
-FLATPAK_GL_DRIVERS=mesa-git
-EOF
+#!/usr/bin/bash
 
 ################################################
 ##### MangoHud
@@ -28,7 +8,7 @@ EOF
 # https://github.com/flathub/com.valvesoftware.Steam.Utility.MangoHud
 
 # Install MangoHud
-sudo flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//22.08
+sudo flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/22.08
 
 # Configure MangoHud
 mkdir -p ${HOME}/.config/MangoHud
@@ -42,29 +22,31 @@ EOF
 sudo flatpak override --filesystem=xdg-config/MangoHud:ro
 
 ################################################
-##### Steam
+##### Platforms
 ################################################
 
-# Install Steam
+# Steam
 sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
 sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 
-################################################
-##### Heroic Games Launcher
-################################################
-
-# Install Heroic Games Launcher
+# Heroic Games Launcher
 sudo flatpak install -y flathub com.heroicgameslauncher.hgl
 
-################################################
-##### Lutris
-################################################
-
-# Install GNOME Compat and GL32 extensions
-sudo flatpak install -y flathub org.gnome.Platform.Compat.i386//22.08
-sudo flatpak install -y flathub org.freedesktop.Platform.GL32.default//22.08
-sudo flatpak install -y flathub org.freedesktop.Platform.GL.default//22.08
-
-# Install Lutris
+# Lutris
 sudo flatpak install -y flathub net.lutris.Lutris
+
+################################################
+##### Emulators
+################################################
+
+sudo flatpak install -y flathub org.duckstation.DuckStation # psx
+sudo flatpak install -y flathub net.pcsx2.PCSX2 # ps2
+sudo flatpak install -y flathub org.ppsspp.PPSSPP # psp
+sudo flatpak install -y flathub org.DolphinEmu.dolphin-emu # gamecube / wii
+sudo flatpak install -y flathub org.yuzu_emu.yuzu # switch
+sudo flatpak install -y flathub org.citra_emu.citra # 3ds
+sudo flatpak install -y flathub org.flycast.Flycast # dreamcast
+sudo flatpak install -y flathub app.xemu.xemu # xbox
+sudo flatpak install -y flathub com.snes9x.Snes9x # snes
+sudo flatpak install -y flathub net.kuribo64.melonDS # ds
