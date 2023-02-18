@@ -65,7 +65,10 @@ mkdir -p \
   ${HOME}/.local/share/themes \
   ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
-  ${HOME}/.config/autostart
+  ${HOME}/.config/autostart \
+  ${HOME}/.ssh
+
+chmod 700 ${HOME}/.ssh
 
 ################################################
 ##### Mounts
