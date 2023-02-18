@@ -45,7 +45,6 @@ sudo hostnamectl set-hostname --static "${NEW_HOSTNAME}"
 
 # Configure DNF
 sudo tee -a /etc/dnf/dnf.conf << EOF
-fastestmirror=1
 max_parallel_downloads=10
 EOF
 
