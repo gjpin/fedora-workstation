@@ -26,6 +26,7 @@ sudo dnf remove -y \
     simple-scan \
     rhythmbox \
     cheese \
+    totem \
     mediawriter \
     yelp \
     abrt
@@ -585,7 +586,7 @@ sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/nvme0n1p3
 ##### Cleanup
 ################################################
 
-APPLICATIONS=('htop')
+APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify')
 for APPLICATION in "${APPLICATIONS[@]}"
 do
     # Create a local copy of the desktop files and append properties
