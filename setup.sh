@@ -490,9 +490,6 @@ gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'fir
 # Volume
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
 
-# Disable system sounds
-gsettings set org.gnome.desktop.sound event-sounds false
-
 # Calendar
 gsettings set org.gnome.desktop.calendar show-weekdate true
 
