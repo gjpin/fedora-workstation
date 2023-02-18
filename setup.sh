@@ -67,6 +67,18 @@ mkdir -p \
   ${HOME}/.config/autostart
 
 ################################################
+##### Mounts
+################################################
+
+# Enable additional BTRFS options
+if grep -E 'noatime|space_cache|discard' /etc/fstab; then
+  echo "Possible conflict. No changes have been made."
+else
+  sudo sed -i "s|compress=zstd:1|&,noatime,space_cache=v2,discard=async|" /etc/fstab
+  sudo systemctl daemon-reload
+fi
+
+################################################
 ##### systemd
 ################################################
 
@@ -200,10 +212,23 @@ sudo flatpak remote-modify flathub --enable
 sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
 sudo flatpak remote-modify flathub-beta --enable
 
-# Install Intel VA-API drivers
+# Global override to deny all applications the permission to access certain directories
+flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem='xdg-cache' --nofilesystem='xdg-config' --nofilesystem='xdg-data'
+
+################################################
+##### Flatpak runtimes
+################################################
+
+# Install Flatpak runtimes
+sudo flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
+sudo flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
 if lspci | grep VGA | grep "Intel" > /dev/null; then
   sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
 fi
+
+################################################
+##### Flatpak applications
+################################################
 
 # Install common applications
 sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
@@ -219,7 +244,6 @@ sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub com.github.flxzt.rnote
 
 sudo flatpak install -y flathub org.gnome.gitg
-sudo flatpak install -y flathub com.github.marhkb.Pods
 
 # Bitwarden
 sudo flatpak install -y flathub com.bitwarden.desktop
@@ -352,6 +376,19 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.confirmSync": false,
     "git.autofetch": true,
 }
+EOF
+
+################################################
+##### Podman
+################################################
+
+# Install Pods (podman frontend)
+sudo flatpak install -y flathub com.github.marhkb.Pods
+
+# Re-enable unqualified search registries
+tee -a /etc/containers/registries.conf << EOF
+# Enable docker.io as unqualified search registry
+unqualified-search-registries = ["docker.io"]
 EOF
 
 ################################################
