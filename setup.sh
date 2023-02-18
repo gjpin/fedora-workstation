@@ -245,6 +245,7 @@ sudo flatpak install -y flathub org.gaphor.Gaphor
 sudo flatpak install -y flathub com.github.flxzt.rnote
 
 sudo flatpak install -y flathub org.gnome.gitg
+sudo flatpak install -y flathub com.github.marhkb.Pods
 
 # Bitwarden
 sudo flatpak install -y flathub com.bitwarden.desktop
@@ -387,19 +388,6 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.confirmSync": false,
     "git.autofetch": true,
 }
-EOF
-
-################################################
-##### Podman
-################################################
-
-# Install Pods (podman frontend)
-sudo flatpak install -y flathub com.github.marhkb.Pods
-
-# Re-enable unqualified search registries
-tee -a /etc/containers/registries.conf << EOF
-# Enable docker.io as unqualified search registry
-unqualified-search-registries = ["docker.io"]
 EOF
 
 ################################################
@@ -555,7 +543,7 @@ curl -sSL https://extensions.gnome.org/extension-data/dark-varianthardpixel.eu.v
 gnome-extensions install dark-varianthardpixel.eu.v8.shell-extension.zip
 rm -f *.shell-extension.zip
 
-gsettings set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop']"
+gsettings --schemadir ~/.local/share/gnome-shell/extensions/dark-variant@hardpixel.eu/schemas set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop']"
 
 # Rounded Window Corners
 # https://extensions.gnome.org/extension/5237/rounded-window-corners/
@@ -586,7 +574,7 @@ sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/nvme0n1p3
 ##### Cleanup
 ################################################
 
-APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify')
+APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify' 'syncthing-start' 'syncthing-ui')
 for APPLICATION in "${APPLICATIONS[@]}"
 do
     # Create a local copy of the desktop files and append properties
