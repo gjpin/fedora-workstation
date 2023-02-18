@@ -2,10 +2,9 @@
 1. Clone project: `git clone https://github.com/gjpin/fedora-workstation.git`
 2. Run setup.sh: `fedora-workstation/setup.sh`
 3. Reboot
-4. Enroll TPM2 token into LUKS2: `sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/nvme0n1p3`
-5. Import WireGuard config to /etc/wireguard
-6. Enable WireGuard connection: `sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf`
-7. Set wg0's firewalld zone: `sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-interface=wg0`
+4. Import WireGuard config to /etc/wireguard
+5. Enable WireGuard connection: `sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf`
+6. Set wg0's firewalld zone: `sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-interface=wg0`
 
 # Guides
 ## How to revert to a previous Flatpak commit

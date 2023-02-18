@@ -589,11 +589,14 @@ gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas
 # Install tpm2-tools
 sudo dnf install -y tpm2-tools
 
+# Enroll TPM2 key
+sudo systemd-cryptenroll --tpm2-pcrs=0+1+7 --tpm2-device=auto /dev/nvme0n1p3
+
 # Update crypttab
-sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
+sudo sed -i "s|discard|&,tpm2-device=auto|" /etc/crypttab
 
 # Regenerate initramfs
-sudo dracut -f
+sudo dracut --regenerate-all --force
 
 ################################################
 ##### Cleanup
