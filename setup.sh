@@ -490,6 +490,9 @@ gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'fir
 # Volume
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
 
+# Disable system sounds
+gsettings set org.gnome.desktop.sound event-sounds false
+
 # Calendar
 gsettings set org.gnome.desktop.calendar show-weekdate true
 
@@ -515,6 +518,27 @@ gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
 gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
+
+################################################
+##### Gnome app picker
+################################################
+
+# Folders
+gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System']"
+
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ name 'Office'
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ apps "['libreoffice-calc.desktop', 'libreoffice-impress.desktop', 'libreoffice-writer.desktop', 'com.github.flxzt.rnote.desktop', 'org.gnome.Evince.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.clocks.desktop', 'md.obsidian.Obsidian.desktop']"
+
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ name 'Dev'
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ apps "['code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.github.marhkb.Pods.desktop', 'org.gaphor.Gaphor.desktop', 'org.gnome.gitg.desktop', 'org.gnome.Boxes.desktop']"
+
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ name 'Media'
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ apps "['io.github.celluloid_player.Celluloid.desktop', 'io.github.seadve.Kooha.desktop', 'com.spotify.Client.desktop', 'org.blender.Blender.desktop', 'org.gimp.GIMP.desktop', 'org.gnome.eog.desktop']"
+
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ name 'System'
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ apps "['org.gnome.baobab.desktop', 'firewall-config.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'org.gnome.Settings.desktop', 'gnome-system-monitor.desktop', 'org.gnome.Characters.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.font-viewer.desktop', 'org.gnome.Logs.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop']"
+
+gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, 'Media': <{'position': <1>}>, 'Office': <{'position': <2>}>, 'System': <{'position': <3>}>, 'com.belmoussaoui.Authenticator.desktop': <{'position': <4>}>, 'com.bitwarden.desktop.desktop': <{'position': <5>}>, 'com.usebottles.bottles.desktop': <{'position': <6>}>, 'chromium-freeworld.desktop': <{'position': <7>}>, 'com.github.tchx84.Flatseal.desktop': <{'position': <8>}>}]"
 
 ################################################
 ##### Gnome Shell Extensions
@@ -566,9 +590,6 @@ sudo sed -ie '/^luks-/s/$/ tpm2-device=auto/' /etc/crypttab
 
 # Regenerate initramfs
 sudo dracut -f
-
-# Enroll TPM2 token into LUKS2
-sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/nvme0n1p3
 
 ################################################
 ##### Cleanup
