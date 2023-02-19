@@ -226,12 +226,22 @@ sudo flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem
 # Install Flatpak runtimes
 sudo flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
 sudo flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
-sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git/x86_64/22.08
-sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git/x86_64/22.08
-sudo flatpak install -y flathub org.gnome.Platform.Compat.i386/x86_64/43
 sudo flatpak install -y flathub org.freedesktop.Platform.GL32.default/x86_64/22.08
 sudo flatpak install -y flathub org.freedesktop.Platform.GL.default/x86_64/22.08
 sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
+sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git/x86_64/22.08
+sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git/x86_64/22.08
+sudo flatpak install -y flathub org.gnome.Platform.Compat.i386/x86_64/43
+
+# Better Qt integration
+sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/5.15-22.08
+sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/6.4
+
+sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/5.15-22.08
+sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/6.4
+
+sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/6.4
+sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/5.15-22.08
 
 ################################################
 ##### Flatpak applications
