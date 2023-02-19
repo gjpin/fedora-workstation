@@ -41,11 +41,29 @@ gamescope -h 1080 -H 1440 -U -f -e -- mangohud %command%
 
 sudo flatpak override --env=FLATPAK_GL_DRIVERS=mesa-git
 
-sudo tee -a /etc/environment << EOF
-
-# Flatpak
+tee ${HOME}/.config/environment.d/flatpak-mesa-git.conf << EOF
 FLATPAK_GL_DRIVERS=mesa-git
 EOF
+```
+
+## How to setup Kvantum with KvLibadwaita
+```bash
+sudo dnf install -y kvantum
+mkdir ${HOME}/.config/Kvantum
+
+tee ${HOME}/.config/environment.d/qt.conf << EOF
+QT_STYLE_OVERRIDE=kvantum
+EOF
+
+sudo flatpak install -y flathub org.kde.KStyle.Kvantum/x86_64/5.15
+sudo flatpak install -y flathub org.kde.KStyle.Kvantum/x86_64/5.15-21.08
+sudo flatpak install -y flathub org.kde.KStyle.Kvantum/x86_64/5.15-22.08
+sudo flatpak override --env=QT_STYLE_OVERRIDE=kvantum --filesystem=xdg-config/Kvantum:ro
+
+git clone https://github.com/GabePoel/KvLibadwaita.git
+cp -r KvLibadwaita/src/KvLibadwaita ${HOME}/.config/Kvantum
+rm -rf KvLibadwaita
+echo 'theme=KvLibadwaita' > ${HOME}/.config/Kvantum/kvantum.kvconfig
 ```
 
 ## How to install .deb package (eg. Aseprite)

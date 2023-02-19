@@ -66,7 +66,8 @@ mkdir -p \
   ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart \
-  ${HOME}/.ssh
+  ${HOME}/.ssh \
+  ${HOME}/.config/environment.d
 
 chmod 700 ${HOME}/.ssh
 
@@ -578,6 +579,8 @@ rm -f *.shell-extension.zip
 
 # GSConnect
 # https://extensions.gnome.org/extension/1319/gsconnect/
+sudo dnf install -y openssl
+
 curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v54.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
