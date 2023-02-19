@@ -67,7 +67,8 @@ mkdir -p \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart \
   ${HOME}/.ssh \
-  ${HOME}/.config/environment.d
+  ${HOME}/.config/environment.d \
+  ${HOME}/src
 
 chmod 700 ${HOME}/.ssh
 
@@ -127,6 +128,9 @@ update-all() {
 
   # Update GTK theme
   update-gtk-theme
+
+  # Update Volta
+  update-volta
 }
 EOF
 
@@ -406,6 +410,43 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.autofetch": true,
 }
 EOF
+
+################################################
+##### Volta (Node.js version manager)
+################################################
+
+# Create Volta's directory
+mkdir -p ${HOME}/.volta/bin
+
+# Download and install latest Volta release
+URL=$(curl -s https://api.github.com/repos/volta-cli/volta/releases/latest | awk -F\" '/browser_download_url.*-linux.tar.gz/{print $(NF-1)}')
+curl -sSL ${URL} -O
+tar -xf volta-*-linux.tar.gz -C ${HOME}/.volta/bin
+rm -f volta-*-linux.tar.gz
+
+# Volta updater
+tee ${HOME}/.local/bin/update-volta << 'EOF'
+#!/usr/bin/bash
+
+URL=$(curl -s https://api.github.com/repos/volta-cli/volta/releases/latest | awk -F\" '/browser_download_url.*-linux.tar.gz/{print $(NF-1)}')
+curl -sSL ${URL} -O
+rm -rf ${HOME}/.volta/bin/*
+tar -xf volta-*-linux.tar.gz -C ${HOME}/.volta/bin
+rm -f volta-*-linux.tar.gz
+EOF
+
+chmod +x ${HOME}/.local/bin/update-volta
+
+# Set environment variables and path
+tee ${HOME}/.bashrc.d/volta << 'EOF'
+export VOLTA_HOME="$HOME/.volta"
+export PATH=$VOLTA_HOME/bin:$PATH
+EOF
+
+source ~/.bashrc
+
+# Install NodeJS LTS
+volta install node
 
 ################################################
 ##### Syncthing
