@@ -439,12 +439,13 @@ EOF
 chmod +x ${HOME}/.local/bin/update-volta
 
 # Set environment variables and path
-tee ${HOME}/.bashrc.d/volta << 'EOF'
-export VOLTA_HOME="$HOME/.volta"
-export PATH=$VOLTA_HOME/bin:$PATH
+tee -a ${HOME}/.bash_profile << 'EOF'
+# Volta
+VOLTA_HOME="${HOME}/.volta"
+PATH="${VOLTA_HOME}/bin:${PATH}"
 EOF
 
-source ~/.bashrc
+source ~/.bash_profile
 
 # Install NodeJS LTS
 volta install node
