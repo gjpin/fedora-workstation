@@ -22,6 +22,11 @@ user_pref("browser.shell.checkDefaultBrowser", false);
 // Enable scrolling with middle mouse button
 user_pref("general.autoScroll", true);
 
+// Fonts
+user_pref("font.name.monospace.x-western", "Noto Sans Mono");
+user_pref("font.name.sans-serif.x-western", "Noto Sans");
+user_pref("font.name.serif.x-western", "Noto Sans");
+
 // Enable Firefox Tracking Protection
 user_pref("browser.contentblocking.category", "strict");
 user_pref("privacy.trackingprotection.enabled", true);
