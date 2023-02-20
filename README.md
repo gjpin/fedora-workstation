@@ -1,10 +1,7 @@
 # Installation guide
 1. Clone project: `git clone https://github.com/gjpin/fedora-workstation.git`
 2. Run setup.sh: `fedora-workstation/setup.sh`
-3. Reboot
-4. Import WireGuard config to /etc/wireguard
-5. Enable WireGuard connection: `sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf`
-6. Set wg0's firewalld zone: `sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-interface=wg0`
+3. Reboot and enjoy
 
 # Guides
 ## How to revert to a previous Flatpak commit

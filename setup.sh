@@ -313,8 +313,7 @@ curl https://addons.mozilla.org/firefox/downloads/file/3998783/floccus-latest.xp
 curl https://addons.mozilla.org/firefox/downloads/file/3932862/multi_account_containers-latest.xpi -o ${FIREFOX_PROFILE_PATH}/extensions/@testpilot-containers.xpi
 
 # Import Firefox configs
-curl -Ssl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox.js \
-  -o ${FIREFOX_PROFILE_PATH}/user.js
+cp ./configs/firefox.js ${FIREFOX_PROFILE_PATH}/user.js
 
 # Install Firefox Gnome theme
 mkdir -p ${FIREFOX_PROFILE_PATH}/chrome
@@ -641,8 +640,14 @@ curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilo
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
+# Legacy (GTK3) Theme Scheme Auto Switcher
+# https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
+curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v4.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt']"
+gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Unlock LUKS2 with TPM2 token
@@ -683,8 +688,5 @@ done
 
 # Install and configure gaming with Flatpak
 if [ ${GAMING} = "yes" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/setup_gaming.sh -O
-    chmod +x setup_gaming.sh
     ./setup_gaming.sh
-    rm setup_gaming.sh
 fi
