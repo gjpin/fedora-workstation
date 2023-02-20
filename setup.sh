@@ -195,8 +195,8 @@ fi
 
 # Install AMD hardware accelerated codecs
 if lspci | grep VGA | grep "AMD" > /dev/null; then
-  sudo dnf swap mesa-va-drivers mesa-va-drivers-freeworld
-  sudo dnf swap mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
+  sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld
+  sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
 fi
 
 # Install chromium with non-free multimedia formats support
