@@ -108,9 +108,6 @@ user_pref("breakpad.reportURL", "");
 user_pref("browser.tabs.crashReporting.sendReport", false);
 user_pref("browser.crashReports.unsubmittedCheck.enabled", false);
 
-// Enable Firefox's anti-fingerprinting mode
-user_pref("privacy.resistFingerprinting", true);
-
 // Disable Shield/Heartbeat/Normandy
 user_pref("app.normandy.enabled", false);
 user_pref("app.normandy.api_url", "");
