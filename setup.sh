@@ -421,7 +421,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
-    "editor.fontSize": 15,
+    "editor.fontSize": 16,
 }
 EOF
 
@@ -584,10 +584,10 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Ubuntu Regular 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Ubuntu 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Ubuntu Mono Regular 11'
+gsettings set org.gnome.desktop.interface font-name 'Ubuntu Regular 11'
+gsettings set org.gnome.desktop.interface document-font-name 'Ubuntu Regular 11'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 11'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Ubuntu Mono Regular 12'
 
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
