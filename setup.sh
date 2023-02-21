@@ -444,7 +444,6 @@ tee ${HOME}/.local/bin/update-volta << 'EOF'
 
 URL=$(curl -s https://api.github.com/repos/volta-cli/volta/releases/latest | awk -F\" '/browser_download_url.*-linux.tar.gz/{print $(NF-1)}')
 curl -sSL ${URL} -O
-rm -rf ${HOME}/.volta/bin/*
 tar -xf volta-*-linux.tar.gz -C ${HOME}/.volta/bin
 rm -f volta-*-linux.tar.gz
 EOF
