@@ -328,3 +328,23 @@ sudo waydroid init -c https://ota.waydro.id/system -v https://ota.waydro.id/vend
 # Enable waydroid service
 sudo systemctl enable waydroid-container.service
 ```
+
+## Font Rendering
+```bash
+################################################
+##### Font rendering
+################################################
+
+# Set antialiasing to subpixel
+gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'
+
+# Set hinting to none
+gsettings set org.gnome.desktop.interface font-hinting 'none'
+
+# Add font configs
+sudo ln -s /usr/share/fontconfig/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/
+
+# Rebuild font cache
+sudo fc-cache -f
+fc-cache -f
+```

@@ -23,7 +23,7 @@ user_pref("browser.shell.checkDefaultBrowser", false);
 user_pref("general.autoScroll", true);
 
 // Increase dev tools zoom
-user_pref("devtools.toolbox.zoomValue", 1.05);
+user_pref("devtools.toolbox.zoomValue", 1.1);
 
 // Fonts
 user_pref("font.name.monospace.x-western", "Noto Sans Mono");

@@ -215,23 +215,6 @@ sudo dnf install -y \
   lpf-mscore-tahoma-fonts
 
 ################################################
-##### Font rendering
-################################################
-
-# Set antialiasing to subpixel
-gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'
-
-# Set hinting to none
-gsettings set org.gnome.desktop.interface font-hinting 'none'
-
-# Add font configs
-sudo ln -s /usr/share/fontconfig/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/
-
-# Rebuild font cache
-sudo fc-cache -f
-fc-cache -f
-
-################################################
 ##### Flatpak / Flathub
 ################################################
 
@@ -427,6 +410,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
+    "editor.fontSize": 13,
 }
 EOF
 
