@@ -64,6 +64,7 @@ sudo dnf install -y \
 mkdir -p \
   ${HOME}/.local/share/applications \
   ${HOME}/.local/share/themes \
+  ${HOME}/.local/share/fonts \
   ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart \
@@ -72,6 +73,16 @@ mkdir -p \
   ${HOME}/src
 
 chmod 700 ${HOME}/.ssh
+
+################################################
+##### Fonts
+################################################
+
+# Ubuntu fonts
+curl -sSL https://assets.ubuntu.com/v1/0cef8205-ubuntu-font-family-0.83.zip -o ubuntu-font.zip
+unzip -j ubuntu-font.zip ubuntu-font-family-0.83/*.ttf -d ${HOME}/.local/share/fonts
+rm -f ubuntu-font.zip
+fc-cache ${HOME}/.local/share/fonts
 
 ################################################
 ##### Mounts
@@ -388,7 +399,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
     "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Noto Sans Mono'",
+    "editor.fontFamily": "'Ubuntu Mono','Noto Sans Mono'",
     "editor.fontLigatures": true,
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
@@ -410,7 +421,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
-    "editor.fontSize": 13,
+    "editor.fontSize": 15,
 }
 EOF
 
@@ -573,10 +584,10 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
+gsettings set org.gnome.desktop.interface font-name 'Ubuntu Regular 10'
+gsettings set org.gnome.desktop.interface document-font-name 'Ubuntu 10'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 10'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Ubuntu Mono Regular 11'
 
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
