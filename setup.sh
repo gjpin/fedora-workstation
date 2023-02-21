@@ -414,7 +414,6 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "window.titleBarStyle": "native",
     "workbench.preferredDarkColorTheme": "Adwaita Dark",
     "workbench.preferredLightColorTheme": "Adwaita Light",
-    "editor.fontWeight": "500",
     "files.associations": {
       "*.j2": "terraform",
       "*.hcl": "terraform",
