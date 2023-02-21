@@ -22,6 +22,9 @@ user_pref("browser.shell.checkDefaultBrowser", false);
 // Enable scrolling with middle mouse button
 user_pref("general.autoScroll", true);
 
+// Dev tools zoom
+user_pref("devtools.toolbox.zoomValue", 1.1);
+
 // Fonts
 user_pref("font.name.monospace.x-western", "Ubuntu Mono");
 user_pref("font.name.sans-serif.x-western", "Ubuntu");
