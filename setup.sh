@@ -208,6 +208,29 @@ sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-ap
 # Install Steam devices
 sudo dnf install -y steam-devices
 
+# Install Microsoft fonts
+sudo dnf install -y \
+  lpf-cleartype-fonts \
+  lpf-mscore-fonts \
+  lpf-mscore-tahoma-fonts
+
+################################################
+##### Font rendering
+################################################
+
+# Set antialiasing to subpixel
+gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'
+
+# Set hinting to none
+gsettings set org.gnome.desktop.interface font-hinting 'none'
+
+# Add font configs
+sudo ln -s /usr/share/fontconfig/conf.avail/10-sub-pixel-rgb.conf /etc/fonts/conf.d/
+
+# Rebuild font cache
+sudo fc-cache -f
+fc-cache -f
+
 ################################################
 ##### Flatpak / Flathub
 ################################################
@@ -669,7 +692,7 @@ sudo dracut --regenerate-all --force
 ##### Cleanup
 ################################################
 
-APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify' 'syncthing-start' 'syncthing-ui')
+APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify' 'lpf-mscore-tahoma-fonts' 'syncthing-start' 'syncthing-ui')
 for APPLICATION in "${APPLICATIONS[@]}"
 do
     # Create a local copy of the desktop files and append properties

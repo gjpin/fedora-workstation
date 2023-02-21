@@ -30,6 +30,10 @@ sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
 sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 
+# Steam Adwaita theme
+# https://github.com/tkashkin/Adwaita-for-Steam
+# mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/.local/share/Steam/skins
+
 # Heroic Games Launcher
 sudo flatpak install -y flathub com.heroicgameslauncher.hgl
 
