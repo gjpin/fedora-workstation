@@ -416,7 +416,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
       "*.service": "ini"
     },
     "extensions.ignoreRecommendations": true,
-    "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",
+    "workbench.colorTheme": "Adwaita Dark",
     "editor.formatOnSave": true,
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
