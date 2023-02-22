@@ -54,3 +54,4 @@ sudo flatpak install -y flathub org.flycast.Flycast # dreamcast
 sudo flatpak install -y flathub app.xemu.xemu # xbox
 sudo flatpak install -y flathub com.snes9x.Snes9x # snes
 sudo flatpak install -y flathub net.kuribo64.melonDS # ds
+sudo flatpak install -y flathub net.rpcs3.RPCS3 # ps3
