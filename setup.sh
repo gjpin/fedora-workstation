@@ -421,7 +421,8 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
-    "editor.fontSize": 16
+    "editor.fontSize": 16,
+    "terminal.integrated.fontSize": 16
 }
 EOF
 
