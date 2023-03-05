@@ -88,11 +88,12 @@ fc-cache ${HOME}/.local/share/fonts
 ##### Mounts
 ################################################
 
-# Enable additional BTRFS options
-if grep -E 'noatime|space_cache|discard' /etc/fstab; then
+# Enable additional BTRFS options and change ZSTD compression level
+if grep -E 'noatime|space_cache|discard|ssd' /etc/fstab; then
   echo "Possible conflict. No changes have been made."
 else
-  sudo sed -i "s|compress=zstd:1|&,noatime,space_cache=v2,discard=async|" /etc/fstab
+  sudo sed -i "s|compress=zstd:1|&,noatime,ssd,space_cache=v2,discard=async|" /etc/fstab
+  sudo sed -i "s|compress=zstd:1|compress=zstd:3|g" /etc/fstab
   sudo systemctl daemon-reload
 fi
 
@@ -107,14 +108,14 @@ fi
 sudo mkdir -p /etc/systemd/system.conf.d
 sudo tee /etc/systemd/system.conf.d/default-timeout.conf << EOF
 [Manager]
-DefaultTimeoutStopSec=10s
+DefaultTimeoutStopSec=5s
 EOF
 
 # Configure default timeout to stop user units
 sudo mkdir -p /etc/systemd/user.conf.d
 sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
 [Manager]
-DefaultTimeoutStopSec=10s
+DefaultTimeoutStopSec=5s
 EOF
 
 ################################################
@@ -629,7 +630,7 @@ mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
 # AppIndicator and KStatusNotifierItem Support
 # https://extensions.gnome.org/extension/615/appindicator-support/
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v46.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v49.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
