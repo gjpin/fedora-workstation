@@ -58,7 +58,7 @@ sudo dnf install -y \
   kernel-tools \
   unzip \
   htop \
-  git-extras
+  "@Development Tools"
 
 # Create common user directories
 mkdir -p \
@@ -144,6 +144,9 @@ update-all() {
 
   # Update Volta
   update-volta
+
+  # Update pyenv
+  update-pyenv
 }
 EOF
 
@@ -361,7 +364,7 @@ tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
 
 # Update Firefox theme
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
-git-force-clone https://github.com/rafaelmardojai/firefox-gnome-theme.git ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme
+git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
 EOF
 
 chmod +x ${HOME}/.local/bin/update-firefox-theme
@@ -463,6 +466,36 @@ source ~/.bash_profile
 
 # Install NodeJS LTS
 volta install node
+
+################################################
+##### pyenv
+################################################
+
+# References:
+# https://github.com/pyenv/pyenv
+# https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+
+# Install build dependencies
+sudo dnf install -y make gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel libuuid-devel gdbm-devel libnsl2-devel
+
+# Install pyenv and pyenv-virtualenv
+git clone https://github.com/pyenv/pyenv.git ${HOME}/.pyenv
+git clone https://github.com/pyenv/pyenv-virtualenv.git ${HOME}/.pyenv/plugins/pyenv-virtualenv
+
+# Configure environment
+tee ${HOME}/.bashrc.d/pyenv << 'EOF'
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+EOF
+
+# pyenv updater
+tee ${HOME}/.local/bin/update-pyenv << 'EOF'
+#!/usr/bin/bash
+
+git -C ${HOME}/.pyenv pull
+EOF
 
 ################################################
 ##### Syncthing
