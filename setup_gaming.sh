@@ -30,28 +30,11 @@ sudo flatpak install -y flathub com.valvesoftware.Steam
 sudo flatpak install -y flathub com.valvesoftware.Steam.Utility.gamescope
 sudo flatpak install -y flathub com.valvesoftware.Steam.CompatibilityTool.Proton-GE
 
-# Steam Adwaita theme
-# https://github.com/tkashkin/Adwaita-for-Steam
-# mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/.local/share/Steam/skins
-
 # Heroic Games Launcher
 sudo flatpak install -y flathub com.heroicgameslauncher.hgl
 
 # Lutris
 sudo flatpak install -y flathub net.lutris.Lutris
 
-################################################
-##### Emulators
-################################################
-
-sudo flatpak install -y flathub org.duckstation.DuckStation # psx
-sudo flatpak install -y flathub net.pcsx2.PCSX2 # ps2
-sudo flatpak install -y flathub org.ppsspp.PPSSPP # psp
-sudo flatpak install -y flathub org.DolphinEmu.dolphin-emu # gamecube / wii
-sudo flatpak install -y flathub org.yuzu_emu.yuzu # switch
-sudo flatpak install -y flathub org.citra_emu.citra # 3ds
-sudo flatpak install -y flathub org.flycast.Flycast # dreamcast
-sudo flatpak install -y flathub app.xemu.xemu # xbox
-sudo flatpak install -y flathub com.snes9x.Snes9x # snes
-sudo flatpak install -y flathub net.kuribo64.melonDS # ds
-sudo flatpak install -y flathub net.rpcs3.RPCS3 # ps3
+# ProtonUp-Qt
+sudo flatpak install -y flathub net.davidotek.pupgui2

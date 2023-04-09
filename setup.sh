@@ -46,7 +46,9 @@ sudo hostnamectl set-hostname --static "${NEW_HOSTNAME}"
 
 # Configure DNF
 sudo tee -a /etc/dnf/dnf.conf << EOF
+fastestmirror=True
 max_parallel_downloads=10
+keepcache=True
 EOF
 
 # Update system
@@ -57,9 +59,8 @@ sudo dnf install -y \
   bind-utils \
   kernel-tools \
   unzip \
-  htop \
-  "@Development Tools"
-
+  htop
+  
 # Create common user directories
 mkdir -p \
   ${HOME}/.local/share/applications \
@@ -141,12 +142,6 @@ update-all() {
 
   # Update GTK theme
   update-gtk-theme
-
-  # Update Volta
-  update-volta
-
-  # Update pyenv
-  update-pyenv
 }
 EOF
 
@@ -403,7 +398,7 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "telemetry.telemetryLevel": "off",
     "window.menuBarVisibility": "toggle",
     "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Ubuntu Mono','Noto Sans Mono'",
+    "editor.fontFamily": "'Noto Sans Mono', 'Ubuntu Mono'",
     "editor.fontLigatures": true,
     "workbench.enableExperiments": false,
     "workbench.settings.enableNaturalLanguageSearch": false,
@@ -428,73 +423,6 @@ tee ${HOME}/.config/Code/User/settings.json << EOF
     "editor.fontSize": 16,
     "terminal.integrated.fontSize": 16
 }
-EOF
-
-################################################
-##### Volta (Node.js version manager)
-################################################
-
-# Create Volta's directory
-mkdir -p ${HOME}/.volta/bin
-
-# Download and install latest Volta release
-URL=$(curl -s https://api.github.com/repos/volta-cli/volta/releases/latest | awk -F\" '/browser_download_url.*-linux.tar.gz/{print $(NF-1)}')
-curl -sSL ${URL} -O
-tar -xf volta-*-linux.tar.gz -C ${HOME}/.volta/bin
-rm -f volta-*-linux.tar.gz
-
-# Volta updater
-tee ${HOME}/.local/bin/update-volta << 'EOF'
-#!/usr/bin/bash
-
-URL=$(curl -s https://api.github.com/repos/volta-cli/volta/releases/latest | awk -F\" '/browser_download_url.*-linux.tar.gz/{print $(NF-1)}')
-curl -sSL ${URL} -O
-tar -xf volta-*-linux.tar.gz -C ${HOME}/.volta/bin
-rm -f volta-*-linux.tar.gz
-EOF
-
-chmod +x ${HOME}/.local/bin/update-volta
-
-# Set environment variables and path
-tee -a ${HOME}/.bash_profile << 'EOF'
-# Volta
-VOLTA_HOME="${HOME}/.volta"
-PATH="${VOLTA_HOME}/bin:${PATH}"
-EOF
-
-source ~/.bash_profile
-
-# Install NodeJS LTS
-volta install node
-
-################################################
-##### pyenv
-################################################
-
-# References:
-# https://github.com/pyenv/pyenv
-# https://github.com/pyenv/pyenv/wiki#suggested-build-environment
-
-# Install build dependencies
-sudo dnf install -y make gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel libuuid-devel gdbm-devel libnsl2-devel
-
-# Install pyenv and pyenv-virtualenv
-git clone https://github.com/pyenv/pyenv.git ${HOME}/.pyenv
-git clone https://github.com/pyenv/pyenv-virtualenv.git ${HOME}/.pyenv/plugins/pyenv-virtualenv
-
-# Configure environment
-tee ${HOME}/.bashrc.d/pyenv << 'EOF'
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-EOF
-
-# pyenv updater
-tee ${HOME}/.local/bin/update-pyenv << 'EOF'
-#!/usr/bin/bash
-
-git -C ${HOME}/.pyenv pull
 EOF
 
 ################################################
@@ -526,7 +454,7 @@ tee ${HOME}/.local/bin/update-gtk-theme << 'EOF'
 #!/usr/bin/bash
 
 URL=$(curl -s https://api.github.com/repos/lassekongo83/adw-gtk3/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
-curl -sSL ${URL} -O
+curl -sSL ${URL} -O || exit 1
 rm -rf ${HOME}/.local/share/themes/adw-gtk3*
 tar -xf adw-*.tar.xz -C ${HOME}/.local/share/themes/
 rm -f adw-*.tar.xz
@@ -618,10 +546,10 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
 
 # Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Ubuntu Regular 11'
-gsettings set org.gnome.desktop.interface document-font-name 'Ubuntu Regular 11'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Ubuntu Bold 11'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Ubuntu Mono Regular 12'
+gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
+gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
 
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
@@ -663,7 +591,7 @@ mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
 # AppIndicator and KStatusNotifierItem Support
 # https://extensions.gnome.org/extension/615/appindicator-support/
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v49.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v53.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
@@ -671,7 +599,7 @@ rm -f *.shell-extension.zip
 # https://extensions.gnome.org/extension/1319/gsconnect/
 sudo dnf install -y openssl
 
-curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v54.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v55.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
@@ -679,7 +607,7 @@ rm -f *.shell-extension.zip
 # https://extensions.gnome.org/extension/4488/dark-variant/
 sudo dnf install -y xprop
 
-curl -sSL https://extensions.gnome.org/extension-data/dark-varianthardpixel.eu.v8.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/dark-varianthardpixel.eu.v9.shell-extension.zip -O
 gnome-extensions install dark-varianthardpixel.eu.v8.shell-extension.zip
 rm -f *.shell-extension.zip
 
@@ -687,13 +615,13 @@ gsettings --schemadir ~/.local/share/gnome-shell/extensions/dark-variant@hardpix
 
 # Rounded Window Corners
 # https://extensions.gnome.org/extension/5237/rounded-window-corners/
-curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v10.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v11.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Legacy (GTK3) Theme Scheme Auto Switcher
 # https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
-curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v4.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v5.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
