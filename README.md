@@ -85,6 +85,7 @@ rm -rf ${HOME}/aseprite
 # https://github.com/flathub/com.google.AndroidStudio/blob/master/com.google.AndroidStudio.json
 # https://developer.android.com/studio/releases/cmdline-tools
 # https://developer.android.com/studio/releases/platform-tools
+# https://plugins.jetbrains.com/plugin/19177-vscode-theme/versions
 
 # Install dependencies
 sudo dnf install -y \
@@ -93,44 +94,29 @@ sudo dnf install -y \
   bzip2-libs.i686
 
 # Download and install Android Studio
-curl -sSL https://dl.google.com/dl/android/studio/ide-zips/2021.3.1.17/android-studio-2021.3.1.17-linux.tar.gz -O
+curl -sSL https://dl.google.com/dl/android/studio/ide-zips/2022.2.1.18/android-studio-2022.2.1.18-linux.tar.gz -O
 sudo tar -xzf android-studio-*-linux.tar.gz -C /opt
 rm -f android-studio-*-linux.tar.gz
 
 # Create desktop entry
-tee ${HOME}/.local/share/applications/android-studio.desktop << EOF
+sudo tee /usr/share/applications/jetbrains-studio.desktop << 'EOF'
 [Desktop Entry]
+Version=1.0
 Type=Application
 Name=Android Studio
+Icon=/opt/android-studio/bin/studio.svg
 Exec="/opt/android-studio/bin/studio.sh" %f
-Icon=/opt/android-studio/bin/studio.png
+Comment=The Drive to Develop
 Categories=Development;IDE;
 Terminal=false
+StartupWMClass=jetbrains-studio
 StartupNotify=true
-StartupWMClass=android-studio
 EOF
 
-chmod +x ${HOME}/.local/share/applications/android-studio.desktop
-
-# Download and install Android CLI and platform tools
-sudo mkdir -p /opt/android-sdk/cmdline-tools
-curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-9123335_latest.zip -O
-sudo unzip commandlinetools-linux-*.zip -d /opt/android-sdk/cmdline-tools
-rm -f commandlinetools-linux-*.zip
-sudo mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
-
-curl -sSL  https://dl.google.com/android/repository/platform-tools-latest-linux.zip -O
-sudo unzip platform-tools-latest-linux.zip -d /opt/android-sdk
-rm -f platform-tools-latest-linux.zip
-
-tee ${HOME}/.bashrc.d/android-sdk-platform-tools << EOF
-export ANDROID_HOME=/opt/android-sdk/cmdline-tools/latest/bin
-export PATH=\$PATH:/opt/android-sdk/cmdline-tools/latest/bin
-export PATH=\$PATH:/opt/android-sdk/platform-tools
-EOF
-
-# Accept Android SDK licenses
-yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+# Download and install VSCode Theme
+curl -sSL https://plugins.jetbrains.com/files/19177/311822/VSCode_Theme-1.7.8-signed.zip -O
+sudo unzip VSCode_Theme-*-signed.zip -d /opt/android-studio/plugins
+rm -f VSCode_Theme-*-signed.zip
 ```
 
 ## .NET SDK
