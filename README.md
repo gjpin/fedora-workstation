@@ -86,6 +86,7 @@ rm -rf ${HOME}/aseprite
 # https://developer.android.com/studio/releases/cmdline-tools
 # https://developer.android.com/studio/releases/platform-tools
 # https://plugins.jetbrains.com/plugin/19177-vscode-theme/versions
+# https://developer.android.com/tools/variables#android_home
 
 # Install dependencies
 sudo dnf install -y \
@@ -117,6 +118,13 @@ EOF
 curl -sSL https://plugins.jetbrains.com/files/19177/311822/VSCode_Theme-1.7.8-signed.zip -O
 sudo unzip VSCode_Theme-*-signed.zip -d /opt/android-studio/plugins
 rm -f VSCode_Theme-*-signed.zip
+
+# Set environment
+tee ${HOME}/.bashrc.d/android << EOF
+export ANDROID_HOME=${HOME}/Android/Sdk
+export ANDROID_USER_HOME=${HOME}/.android
+export PATH=\$PATH:${HOME}/Android/Sdk/platform-tools
+EOF
 ```
 
 ## .NET SDK
