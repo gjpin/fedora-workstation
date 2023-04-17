@@ -209,9 +209,6 @@ if lspci | grep VGA | grep "AMD" > /dev/null; then
   sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
 fi
 
-# Install chromium with non-free multimedia formats support
-sudo dnf install -y chromium-freeworld
-
 # Install additional codecs
 sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-aptx libmediainfo mediainfo compat-ffmpeg4
 
@@ -223,6 +220,9 @@ sudo dnf install -y \
   lpf-cleartype-fonts \
   lpf-mscore-fonts \
   lpf-mscore-tahoma-fonts
+
+# Install chromium
+sudo dnf install -y chromium
 
 ################################################
 ##### Flatpak / Flathub
