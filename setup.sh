@@ -80,23 +80,23 @@ chmod 700 ${HOME}/.ssh
 ################################################
 
 # Ubuntu fonts
-curl -sSL https://assets.ubuntu.com/v1/0cef8205-ubuntu-font-family-0.83.zip -o ubuntu-font.zip
-unzip -j ubuntu-font.zip ubuntu-font-family-0.83/*.ttf -d ${HOME}/.local/share/fonts
-rm -f ubuntu-font.zip
-fc-cache ${HOME}/.local/share/fonts
+# curl -sSL https://assets.ubuntu.com/v1/0cef8205-ubuntu-font-family-0.83.zip -o ubuntu-font.zip
+# unzip -j ubuntu-font.zip ubuntu-font-family-0.83/*.ttf -d ${HOME}/.local/share/fonts
+# rm -f ubuntu-font.zip
+# fc-cache ${HOME}/.local/share/fonts
 
 ################################################
 ##### Mounts
 ################################################
 
 # Enable additional BTRFS options and change ZSTD compression level
-if grep -E 'noatime|space_cache|discard|ssd' /etc/fstab; then
-  echo "Possible conflict. No changes have been made."
-else
-  sudo sed -i "s|compress=zstd:1|&,noatime,ssd,space_cache=v2,discard=async|" /etc/fstab
-  sudo sed -i "s|compress=zstd:1|compress=zstd:3|g" /etc/fstab
-  sudo systemctl daemon-reload
-fi
+# if grep -E 'noatime|space_cache|discard|ssd' /etc/fstab; then
+#   echo "Possible conflict. No changes have been made."
+# else
+#   sudo sed -i "s|compress=zstd:1|&,noatime,ssd,space_cache=v2,discard=async|" /etc/fstab
+#   sudo sed -i "s|compress=zstd:1|compress=zstd:3|g" /etc/fstab
+#   sudo systemctl daemon-reload
+# fi
 
 ################################################
 ##### systemd
@@ -195,7 +195,7 @@ sudo dnf install -y \
 sudo dnf groupupdate -y core
 
 # Install additional codecs
-sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin --allowerasing
 sudo dnf groupupdate -y sound-and-video
 
 # Install Intel hardware accelerated codecs
@@ -216,10 +216,10 @@ sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-ap
 sudo dnf install -y steam-devices
 
 # Install Microsoft fonts
-sudo dnf install -y \
-  lpf-cleartype-fonts \
-  lpf-mscore-fonts \
-  lpf-mscore-tahoma-fonts
+# sudo dnf install -y \
+#   lpf-cleartype-fonts \
+#   lpf-mscore-fonts \
+#   lpf-mscore-tahoma-fonts
 
 # Install chromium
 sudo dnf install -y chromium
@@ -253,14 +253,14 @@ sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git/x86_
 sudo flatpak install -y flathub org.gnome.Platform.Compat.i386/x86_64/43
 
 # Better Qt integration
-sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/5.15-22.08
-sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/6.4
+# sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/5.15-22.08
+# sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/6.4
 
-sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/5.15-22.08
-sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/6.4
+# sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/5.15-22.08
+# sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/6.4
 
-sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/6.4
-sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/5.15-22.08
+# sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/6.4
+# sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/5.15-22.08
 
 ################################################
 ##### Flatpak applications
@@ -284,23 +284,23 @@ sudo flatpak install -y flathub com.github.marhkb.Pods
 
 # Bitwarden
 sudo flatpak install -y flathub com.bitwarden.desktop
-sudo flatpak override --socket=wayland com.bitwarden.desktop
-cp /var/lib/flatpak/app/com.bitwarden.desktop/current/active/files/share/applications/com.bitwarden.desktop.desktop ${HOME}/.local/share/applications
-sed -i "s|Exec=bitwarden|Exec=flatpak run com.bitwarden.desktop --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/com.bitwarden.desktop.desktop
+# sudo flatpak override --socket=wayland com.bitwarden.desktop
+# cp /var/lib/flatpak/app/com.bitwarden.desktop/current/active/files/share/applications/com.bitwarden.desktop.desktop ${HOME}/.local/share/applications
+# sed -i "s|Exec=bitwarden|Exec=flatpak run com.bitwarden.desktop --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/com.bitwarden.desktop.desktop
 
 # Insomnia
 sudo flatpak install -y flathub rest.insomnia.Insomnia
 sudo flatpak override --env=GTK_THEME=adw-gtk3-dark rest.insomnia.Insomnia
-sudo flatpak override --socket=wayland rest.insomnia.Insomnia
-cp /var/lib/flatpak/app/rest.insomnia.Insomnia/current/active/files/share/applications/rest.insomnia.Insomnia.desktop ${HOME}/.local/share/applications
-sed -i "s|Exec=/app/bin/insomnia|Exec=flatpak run rest.insomnia.Insomnia --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/rest.insomnia.Insomnia.desktop
+# sudo flatpak override --socket=wayland rest.insomnia.Insomnia
+# cp /var/lib/flatpak/app/rest.insomnia.Insomnia/current/active/files/share/applications/rest.insomnia.Insomnia.desktop ${HOME}/.local/share/applications
+# sed -i "s|Exec=/app/bin/insomnia|Exec=flatpak run rest.insomnia.Insomnia --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/rest.insomnia.Insomnia.desktop
 
-# GIMP beta (has native wayland support)
-sudo flatpak install -y flathub-beta org.gimp.GIMP
+# GIMP
+sudo flatpak install -y flathub org.gimp.GIMP
 
 # Blender
 sudo flatpak install -y flathub org.blender.Blender
-sudo flatpak override --socket=wayland org.blender.Blender
+# sudo flatpak override --socket=wayland org.blender.Blender
 
 # Bottles
 sudo flatpak install -y flathub com.usebottles.bottles
