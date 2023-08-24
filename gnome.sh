@@ -49,6 +49,9 @@ flatpak install -y flathub org.gnome.gitg
 ##### Firefox
 ################################################
 
+# References:
+# https://github.com/rafaelmardojai/firefox-gnome-theme
+
 # Set Firefox profile path
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
@@ -82,6 +85,7 @@ user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 user_pref("browser.uidensity", 0);
 user_pref("svg.context-properties.content.enabled", true);
 user_pref("browser.theme.dark-private-windows", false);
+user_pref("gnomeTheme.activeTabContrast", true);
 EOF
 
 ################################################
@@ -100,17 +104,11 @@ sed -i '2 i \ \ \ \ "workbench.preferredLightColorTheme": "Adwaita Light",' ${HO
 sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",' ${HOME}/.config/Code/User/settings.json
 
 ################################################
-##### Utilities
-################################################
-
-# Install gnome-randr
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/apps/gnome-randr.py -O
-chmod +x gnome-randr.py
-sudo mv gnome-randr.py /usr/local/bin/gnome-randr.py
-
-################################################
 ##### GTK theme
 ################################################
+
+# References:
+# https://github.com/lassekongo83/adw-gtk3
 
 # Install adw-gtk3 flatpak
 flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
@@ -143,6 +141,15 @@ sed -i '2 i \ \ # Update GTK theme' ${HOME}/.bashrc.d/update-all
 # Set adw-gtk3 theme
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
 gsettings set org.gnome.desktop.interface color-scheme 'default'
+
+################################################
+##### Utilities
+################################################
+
+# Install gnome-randr
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/apps/gnome-randr.py -O
+chmod +x gnome-randr.py
+sudo mv gnome-randr.py /usr/local/bin/gnome-randr
 
 ################################################
 ##### Gnome shortcuts
@@ -283,6 +290,12 @@ rm -f *.shell-extension.zip
 
 gsettings --schemadir ~/.local/share/gnome-shell/extensions/dark-variant@hardpixel.eu/schemas set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'app.xemu.xemu.desktop']"
 
+# Grand Theft Focus
+# # https://extensions.gnome.org/extension/5410/grand-theft-focus
+curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v5.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
 # GSConnect
 # https://extensions.gnome.org/extension/1319/gsconnect/
 sudo dnf install -y openssl
@@ -304,7 +317,7 @@ gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Gnome misc configurations

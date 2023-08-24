@@ -166,6 +166,7 @@ sudo flatpak remote-modify flathub --enable
 
 # Global override to deny all applications the permission to access certain directories
 # sudo flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem='xdg-cache' --nofilesystem='xdg-config' --nofilesystem='xdg-data'
+# flatpak override --filesystem=xdg-download
 
 # Allow read-only access to GTK configs
 sudo flatpak override --filesystem=xdg-config/gtk-3.0:ro
@@ -255,10 +256,10 @@ EOF
 # Create python sandbox virtualenv and alias
 mkdir -p ${HOME}/.python
 
-python -m venv ${HOME}/.python/sandbox
+python -m venv ${HOME}/.python/play
 
 tee ${HOME}/.bashrc.d/python << 'EOF'
-alias pythonsandbox="source ${HOME}/.python/sandbox/bin/activate"
+alias pythonplay="source ${HOME}/.python/play/bin/activate"
 EOF
 
 # Install go
@@ -284,6 +285,21 @@ sudo dnf install -y butane
 
 # Install Kubernetes client tools
 sudo dnf install -y kubernetes-client
+
+# Install Neovim and set as default editor
+sudo dnf install -y neovim
+
+tee ${HOME}/.bashrc.d/neovim << 'EOF'
+alias vi=nvim
+alias vim=nvim
+EOF
+
+sudo tee -a /etc/environment << EOF
+
+# Editor
+EDITOR=nvim
+VISUAL=nvim
+EOF
 
 ################################################
 ##### VSCode
@@ -313,10 +329,12 @@ sudo dnf install -y code
 code --install-extension golang.Go
 code --install-extension ms-python.python
 code --install-extension redhat.vscode-yaml
+code --install-extension esbenp.prettier-vscode
+code --install-extension dbaeumer.vscode-eslint
 
 # Configure VSCode
 mkdir -p ${HOME}/.config/Code/User
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.js -o ${HOME}/.config/Code/User/settings.json
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
 
 ################################################
 ##### Utilities
@@ -367,9 +385,9 @@ fi
 
 # Install and configure gaming with Flatpak
 if [ ${GAMING} = "yes" ]; then
-  curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/setup_gaming.sh -O
-  chmod +x ./setup_gaming.sh
-  ./setup_gaming.sh
+  curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/gaming.sh -O
+  chmod +x ./gaming.sh
+  ./gaming.sh
 fi
 
 ################################################
@@ -377,4 +395,4 @@ fi
 ################################################
 
 # Delete downloaded scripts
-rm -f {gnome,plasma,setup_gaming}.sh
+rm -f {gnome,plasma,gaming}.sh
