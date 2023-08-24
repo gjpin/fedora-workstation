@@ -10,31 +10,37 @@ export NEW_HOSTNAME
 read -p "Gaming (yes / no): " GAMING
 export GAMING
 
+read -p "Desktop environment (gnome / plasma): " DESKTOP_ENVIRONMENT
+export DESKTOP_ENVIRONMENT
+
 ################################################
 ##### Remove unneeded packages and services
 ################################################
 
-# Remove packages
-sudo dnf remove -y \
-    gnome-software \
-    gnome-weather \
-    gnome-contacts \
-    gnome-maps \
-    gnome-photos \
-    gnome-tour \
-    gnome-connections \
-    simple-scan \
-    rhythmbox \
-    cheese \
-    totem \
-    mediawriter \
-    yelp \
-    abrt
+# Mark applications as manually installed
+sudo dnf mark install \
+  flatpak \
+  flatpak-selinux \
+  flatpak-session-helper \
+  ibus-gtk4
 
-# Mask services
-sudo systemctl mask \
-  ModemManager.service \
-  pcscd.service
+# Remove applications
+sudo dnf remove -y \
+    abrt \
+    mediawriter
+
+# Remove libreoffice
+sudo dnf group remove -y libreoffice
+sudo dnf remove -y *libreoffice*
+
+# Disable mobile broadband modem management service
+sudo systemctl mask ModemManager.service
+
+# Disable PC/SC Smart Card service
+sudo systemctl mask pcscd.service
+
+# Disable location lookup service
+sudo systemctl mask geoclue.service
 
 ################################################
 ##### General
@@ -59,6 +65,8 @@ sudo dnf install -y \
   bind-utils \
   kernel-tools \
   unzip \
+  p7zip \
+  p7zip-plugins \
   htop
   
 # Create common user directories
@@ -76,29 +84,6 @@ mkdir -p \
 chmod 700 ${HOME}/.ssh
 
 ################################################
-##### Fonts
-################################################
-
-# Ubuntu fonts
-# curl -sSL https://assets.ubuntu.com/v1/0cef8205-ubuntu-font-family-0.83.zip -o ubuntu-font.zip
-# unzip -j ubuntu-font.zip ubuntu-font-family-0.83/*.ttf -d ${HOME}/.local/share/fonts
-# rm -f ubuntu-font.zip
-# fc-cache ${HOME}/.local/share/fonts
-
-################################################
-##### Mounts
-################################################
-
-# Enable additional BTRFS options and change ZSTD compression level
-# if grep -E 'noatime|space_cache|discard|ssd' /etc/fstab; then
-#   echo "Possible conflict. No changes have been made."
-# else
-#   sudo sed -i "s|compress=zstd:1|&,noatime,ssd,space_cache=v2,discard=async|" /etc/fstab
-#   sudo sed -i "s|compress=zstd:1|compress=zstd:3|g" /etc/fstab
-#   sudo systemctl daemon-reload
-# fi
-
-################################################
 ##### systemd
 ################################################
 
@@ -109,14 +94,14 @@ chmod 700 ${HOME}/.ssh
 sudo mkdir -p /etc/systemd/system.conf.d
 sudo tee /etc/systemd/system.conf.d/default-timeout.conf << EOF
 [Manager]
-DefaultTimeoutStopSec=5s
+DefaultTimeoutStopSec=10s
 EOF
 
 # Configure default timeout to stop user units
 sudo mkdir -p /etc/systemd/user.conf.d
 sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
 [Manager]
-DefaultTimeoutStopSec=5s
+DefaultTimeoutStopSec=10s
 EOF
 
 ################################################
@@ -127,21 +112,15 @@ EOF
 tee ${HOME}/.bashrc.d/update-all << EOF
 update-all() {
   # Update system
-  sudo dnf clean all
   sudo dnf upgrade -y --refresh
+
+  # Update Flatpak apps
+  flatpak update -y
+  flatpak uninstall -y --unused
 
   # Update firmware
   sudo fwupdmgr refresh
   sudo fwupdmgr update
-
-  # Update Flatpak apps
-  flatpak update -y
-
-  # Update Firefox theme
-  update-firefox-theme
-
-  # Update GTK theme
-  update-gtk-theme
 }
 EOF
 
@@ -178,148 +157,73 @@ sudo mkdir -p /etc/wireguard/
 sudo chmod 700 /etc/wireguard/
 
 ################################################
-##### RPM Fusion
+##### Flatpak
 ################################################
 
-# References:
-# https://rpmfusion.org/Configuration/
-# https://rpmfusion.org/Howto/Multimedia
-# https://copr-dist-git.fedorainfracloud.org/cgit/gloriouseggroll/nobara/nobara-login.git/tree/codeccheck.sh?h=f37
-
-# Enable free and nonfree repositories
-sudo dnf install -y \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-
-# Install Appstream metadata
-sudo dnf groupupdate -y core
-
-# Install additional codecs
-sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin --allowerasing
-sudo dnf groupupdate -y sound-and-video
-
-# Install Intel hardware accelerated codecs
-if lspci | grep VGA | grep "Intel" > /dev/null; then
-  sudo dnf install -y intel-media-driver
-fi
-
-# Install AMD hardware accelerated codecs
-if lspci | grep VGA | grep "AMD" > /dev/null; then
-  sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld
-  sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
-fi
-
-# Install additional codecs
-sudo dnf install -y x264 x265 gpac-libs libheif libftl live555 pipewire-codec-aptx libmediainfo mediainfo compat-ffmpeg4
-
-# Install Steam devices
-sudo dnf install -y steam-devices
-
-# Install Microsoft fonts
-# sudo dnf install -y \
-#   lpf-cleartype-fonts \
-#   lpf-mscore-fonts \
-#   lpf-mscore-tahoma-fonts
-
-# Install chromium
-sudo dnf install -y chromium
-
-################################################
-##### Flatpak / Flathub
-################################################
-
-# Add Flathub repos
+# Add Flathub repo
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-modify flathub --enable
 
-sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-repo/flathub-beta.flatpakrepo
-sudo flatpak remote-modify flathub-beta --enable
-
 # Global override to deny all applications the permission to access certain directories
-sudo flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem='xdg-cache' --nofilesystem='xdg-config' --nofilesystem='xdg-data'
+# sudo flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem='xdg-cache' --nofilesystem='xdg-config' --nofilesystem='xdg-data'
 
-################################################
-##### Flatpak runtimes
-################################################
+# Allow read-only access to GTK configs
+sudo flatpak override --filesystem=xdg-config/gtk-3.0:ro
+sudo flatpak override --filesystem=xdg-config/gtk-4.0:ro
+sudo flatpak override --filesystem=${HOME}/.local/share/themes:ro
 
 # Install Flatpak runtimes
-sudo flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
-sudo flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
-sudo flatpak install -y flathub org.freedesktop.Platform.GL32.default/x86_64/22.08
-sudo flatpak install -y flathub org.freedesktop.Platform.GL.default/x86_64/22.08
-sudo flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
-sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git/x86_64/22.08
-sudo flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git/x86_64/22.08
-sudo flatpak install -y flathub org.gnome.Platform.Compat.i386/x86_64/43
+flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
+flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
 
-# Better Qt integration
-# sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/5.15-22.08
-# sudo flatpak install -y flathub org.kde.WaylandDecoration.QGnomePlatform-decoration/x86_64/6.4
+if lspci | grep VGA | grep "Intel" > /dev/null; then
+  flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
+fi
 
-# sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/5.15-22.08
-# sudo flatpak install -y flathub org.kde.PlatformTheme.QGnomePlatform/x86_64/6.4
+# Install applications
+flatpak install -y flathub com.bitwarden.desktop
+flatpak install -y flathub com.belmoussaoui.Authenticator
+flatpak install -y flathub org.keepassxc.KeePassXC
+flatpak install -y flathub com.github.tchx84.Flatseal
+flatpak install -y flathub com.spotify.Client
+flatpak install -y flathub org.libreoffice.LibreOffice
+flatpak install -y flathub rest.insomnia.Insomnia
+flatpak install -y flathub org.gimp.GIMP
+flatpak install -y flathub org.blender.Blender
+flatpak install -y flathub md.obsidian.Obsidian
+flatpak install -y flathub org.chromium.Chromium
+flatpak install -y flathub com.github.marhkb.Pods
+flatpak install -y flathub com.usebottles.bottles
 
-# sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/6.4
-# sudo flatpak install -y flathub org.kde.KStyle.Adwaita/x86_64/5.15-22.08
-
-################################################
-##### Flatpak applications
-################################################
-
-# Install common applications
-sudo flatpak install -y flathub com.mattjakeman.ExtensionManager
-sudo flatpak install -y flathub com.belmoussaoui.Authenticator
-sudo flatpak install -y flathub org.keepassxc.KeePassXC
-sudo flatpak install -y flathub com.github.tchx84.Flatseal
-
-sudo flatpak install -y flathub com.spotify.Client
-sudo flatpak install -y flathub io.github.celluloid_player.Celluloid
-sudo flatpak install -y flathub io.github.seadve.Kooha
-
-sudo flatpak install -y flathub org.gaphor.Gaphor
-sudo flatpak install -y flathub com.github.flxzt.rnote
-
-sudo flatpak install -y flathub org.gnome.gitg
-sudo flatpak install -y flathub com.github.marhkb.Pods
-
-# Bitwarden
-sudo flatpak install -y flathub com.bitwarden.desktop
-# sudo flatpak override --socket=wayland com.bitwarden.desktop
-# cp /var/lib/flatpak/app/com.bitwarden.desktop/current/active/files/share/applications/com.bitwarden.desktop.desktop ${HOME}/.local/share/applications
-# sed -i "s|Exec=bitwarden|Exec=flatpak run com.bitwarden.desktop --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/com.bitwarden.desktop.desktop
-
-# Insomnia
-sudo flatpak install -y flathub rest.insomnia.Insomnia
-sudo flatpak override --env=GTK_THEME=adw-gtk3-dark rest.insomnia.Insomnia
-# sudo flatpak override --socket=wayland rest.insomnia.Insomnia
-# cp /var/lib/flatpak/app/rest.insomnia.Insomnia/current/active/files/share/applications/rest.insomnia.Insomnia.desktop ${HOME}/.local/share/applications
-# sed -i "s|Exec=/app/bin/insomnia|Exec=flatpak run rest.insomnia.Insomnia --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform=wayland|g" ${HOME}/.local/share/applications/rest.insomnia.Insomnia.desktop
-
-# GIMP
-sudo flatpak install -y flathub org.gimp.GIMP
-
-# Blender
-sudo flatpak install -y flathub org.blender.Blender
-# sudo flatpak override --socket=wayland org.blender.Blender
-
-# Bottles
-sudo flatpak install -y flathub com.usebottles.bottles
+# Allow Bottles to create application shortcuts
 sudo flatpak override --filesystem=xdg-data/applications com.usebottles.bottles
-
-# Obsidian
-sudo flatpak install -y flathub md.obsidian.Obsidian
-sudo flatpak override --env=OBSIDIAN_USE_WAYLAND=1 md.obsidian.Obsidian
-sudo flatpak override --env=GTK_THEME=adw-gtk3-dark md.obsidian.Obsidian
 
 ################################################
 ##### Firefox
 ################################################
 
-# Open Firefox to create profile folder
-timeout 5 firefox --headless
+# References:
+# https://github.com/rafaelmardojai/firefox-gnome-theme
+
+# Remove native firefox
+sudo dnf remove -y firefox
+
+# Install Firefox from Flathub
+flatpak install -y flathub org.mozilla.firefox
+
+# Enable wayland support
+sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
+
+# Set Firefox Flatpak as default browser and handler for https(s)
+xdg-settings set default-web-browser org.mozilla.firefox.desktop
+xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/http
+xdg-mime default firefox.desktop x-scheme-handler/https
+
+# Temporarily open Firefox to create profiles
+timeout 5 flatpak run org.mozilla.firefox --headless
 
 # Set Firefox profile path
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
 # Import extensions
 mkdir -p ${FIREFOX_PROFILE_PATH}/extensions
@@ -329,40 +233,57 @@ curl https://addons.mozilla.org/firefox/downloads/file/3998783/floccus-latest.xp
 curl https://addons.mozilla.org/firefox/downloads/file/3932862/multi_account_containers-latest.xpi -o ${FIREFOX_PROFILE_PATH}/extensions/@testpilot-containers.xpi
 
 # Import Firefox configs
-cp ./configs/firefox.js ${FIREFOX_PROFILE_PATH}/user.js
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox/user.js -o ${FIREFOX_PROFILE_PATH}/user.js
 
-# Install Firefox Gnome theme
-mkdir -p ${FIREFOX_PROFILE_PATH}/chrome
-git clone https://github.com/rafaelmardojai/firefox-gnome-theme.git ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme
-echo "@import \"firefox-gnome-theme/userChrome.css\"" > ${FIREFOX_PROFILE_PATH}/chrome/userChrome.css
-echo "@import \"firefox-gnome-theme/userContent.css\"" > ${FIREFOX_PROFILE_PATH}/chrome/userContent.css
-tee -a ${FIREFOX_PROFILE_PATH}/user.js << EOF
-// Enable customChrome.css
-user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+################################################
+##### Development
+################################################
 
-// Set UI density to normal
-user_pref("browser.uidensity", 0);
+# References:
+# https://developer.fedoraproject.org/tech/languages/python/python-installation.html
+# https://developer.fedoraproject.org/tech/languages/rust/rust-installation.html
+# https://www.hashicorp.com/official-packaging-guide
 
-// Enable SVG context-propertes
-user_pref("svg.context-properties.content.enabled", true);
+# Set git configurations
+git config --global init.defaultBranch main
 
-// Disable private window dark theme
-user_pref("browser.theme.dark-private-windows", false);
-
-// Add more contrast to the active tab
-user_pref("gnomeTheme.activeTabContrast", true);
+# Set podman alias
+tee ${HOME}/.bashrc.d/podman << EOF
+alias docker="podman"
 EOF
 
-# Firefox theme updater
-tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
-#!/usr/bin/bash
+# Create python sandbox virtualenv and alias
+mkdir -p ${HOME}/.python
 
-# Update Firefox theme
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
-git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
+python -m venv ${HOME}/.python/sandbox
+
+tee ${HOME}/.bashrc.d/python << 'EOF'
+alias pythonsandbox="source ${HOME}/.python/sandbox/bin/activate"
 EOF
 
-chmod +x ${HOME}/.local/bin/update-firefox-theme
+# Install go
+sudo dnf install -y golang
+
+mkdir -p ${HOME}/.go
+
+tee ${HOME}/.bashrc.d/go << 'EOF'
+export GOPATH="$HOME/.go"
+EOF
+
+# Install nodejs
+sudo dnf install -y nodejs npm
+
+# Install cfssl
+sudo dnf install -y golang-github-cloudflare-cfssl
+
+# Install make
+sudo dnf install -y make
+
+# Install butane
+sudo dnf install -y butane
+
+# Install Kubernetes client tools
+sudo dnf install -y kubernetes-client
 
 ################################################
 ##### VSCode
@@ -375,7 +296,7 @@ chmod +x ${HOME}/.local/bin/update-firefox-theme
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Add VSCode repository
-sudo tee /etc/yum.repos.d/vscode.repo << EOF
+sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
 [code]
 name=Visual Studio Code
 baseurl=https://packages.microsoft.com/yumrepos/vscode
@@ -389,277 +310,56 @@ dnf check-update
 sudo dnf install -y code
 
 # Install extensions
-code --install-extension piousdeer.adwaita-theme
+code --install-extension golang.Go
+code --install-extension ms-python.python
+code --install-extension redhat.vscode-yaml
 
 # Configure VSCode
 mkdir -p ${HOME}/.config/Code/User
-tee ${HOME}/.config/Code/User/settings.json << EOF
-{
-    "telemetry.telemetryLevel": "off",
-    "window.menuBarVisibility": "toggle",
-    "workbench.startupEditor": "none",
-    "editor.fontFamily": "'Noto Sans Mono', 'Ubuntu Mono'",
-    "editor.fontLigatures": true,
-    "workbench.enableExperiments": false,
-    "workbench.settings.enableNaturalLanguageSearch": false,
-    "workbench.iconTheme": null,
-    "workbench.tree.indent": 12,
-    "window.titleBarStyle": "native",
-    "workbench.preferredDarkColorTheme": "Adwaita Dark",
-    "workbench.preferredLightColorTheme": "Adwaita Light",
-    "files.associations": {
-      "*.j2": "terraform",
-      "*.hcl": "terraform",
-      "*.bu": "yaml",
-      "*.ign": "json",
-      "*.service": "ini"
-    },
-    "extensions.ignoreRecommendations": true,
-    "workbench.colorTheme": "Adwaita Dark",
-    "editor.formatOnSave": true,
-    "git.enableSmartCommit": true,
-    "git.confirmSync": false,
-    "git.autofetch": true,
-    "editor.fontSize": 16,
-    "terminal.integrated.fontSize": 16
-}
-EOF
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.js -o ${HOME}/.config/Code/User/settings.json
 
 ################################################
-##### Syncthing
+##### Utilities
 ################################################
 
-# Install syncthing
+# Install syncthing and enable service
 sudo dnf install -y syncthing
-
-# Enable syncthing service
 systemctl --user enable syncthing.service
-
-################################################
-##### GTK theme
-################################################
-
-# Install adw-gtk3 flatpak
-sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
-sudo flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
-
-# Download and install latest adw-gtk3 release
-URL=$(curl -s https://api.github.com/repos/lassekongo83/adw-gtk3/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
-curl -sSL ${URL} -O
-tar -xf adw-*.tar.xz -C ${HOME}/.local/share/themes/
-rm -f adw-*.tar.xz
-
-# GTK theme updater
-tee ${HOME}/.local/bin/update-gtk-theme << 'EOF'
-#!/usr/bin/bash
-
-URL=$(curl -s https://api.github.com/repos/lassekongo83/adw-gtk3/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
-curl -sSL ${URL} -O || exit 1
-rm -rf ${HOME}/.local/share/themes/adw-gtk3*
-tar -xf adw-*.tar.xz -C ${HOME}/.local/share/themes/
-rm -f adw-*.tar.xz
-EOF
-
-chmod +x ${HOME}/.local/bin/update-gtk-theme
-
-# Set adw-gtk3 theme
-gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
-gsettings set org.gnome.desktop.interface color-scheme 'default'
-
-################################################
-##### Gnome shortcuts
-################################################
-
-# Terminal
-gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/ next-tab '<Primary>Tab'
-
-# Windows management
-gsettings set org.gnome.desktop.wm.keybindings close "['<Shift><Super>q']"
-
-# Screenshots
-gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Shift><Super>s']"
-
-# Applications
-gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/']"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Super>Return'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'gnome-terminal'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'gnome-terminal'
-
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Super>E'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'nautilus'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'nautilus'
-
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ binding '<Shift><Control>Escape'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ command 'gnome-system-monitor'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ name 'gnome-system-monitor'
-
-# Change alt+tab behaviour
-gsettings set org.gnome.desktop.wm.keybindings switch-applications "@as []"
-gsettings set org.gnome.desktop.wm.keybindings switch-applications-backward "@as []"
-gsettings set org.gnome.desktop.wm.keybindings switch-windows "['<Alt>Tab']"
-gsettings set org.gnome.desktop.wm.keybindings switch-windows-backward "['<Shift><Alt>Tab']"
-
-# Switch to workspace
-gsettings set org.gnome.shell.keybindings switch-to-application-1 "@as []"
-gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Super>1']"
-gsettings set org.gnome.shell.keybindings switch-to-application-2 "@as []"
-gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Super>2']"
-gsettings set org.gnome.shell.keybindings switch-to-application-3 "@as []"
-gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Super>3']"
-gsettings set org.gnome.shell.keybindings switch-to-application-4 "@as []"
-gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Super>4']"
-
-# Move window to workspace
-gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-1 "['<Shift><Super>exclam']"
-gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-2 "['<Shift><Super>at']"
-gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-3 "['<Shift><Super>numbersign']"
-gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Super>dollar']"
-
-################################################
-##### UI / UX changes
-################################################
-
-# Set dash applications
-gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.TextEditor.desktop', 'code.desktop']"
-
-# Volume
-gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
-
-# Calendar
-gsettings set org.gnome.desktop.calendar show-weekdate true
-
-# Nautilus
-gsettings set org.gtk.Settings.FileChooser sort-directories-first true
-gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
-
-# Laptop specific
-if cat /sys/class/dmi/id/chassis_type | grep 10 > /dev/null; then
-  gsettings set org.gnome.desktop.interface show-battery-percentage true
-  gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
-  gsettings set org.gnome.desktop.peripherals.touchpad disable-while-typing false
-fi
-
-# Configure terminal color scheme
-dconf write /org/gnome/terminal/legacy/theme-variant "'dark'"
-GNOME_TERMINAL_PROFILE=`gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'`
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ default-size-columns 110
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
-
-# Set fonts
-gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10'
-
-# Folders
-gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
-
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ name 'Office'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ apps "['libreoffice-calc.desktop', 'libreoffice-impress.desktop', 'libreoffice-writer.desktop', 'com.github.flxzt.rnote.desktop', 'org.gnome.Evince.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.clocks.desktop', 'md.obsidian.Obsidian.desktop']"
-
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ name 'Dev'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ apps "['code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.github.marhkb.Pods.desktop', 'org.gaphor.Gaphor.desktop', 'org.gnome.gitg.desktop', 'org.gnome.Boxes.desktop']"
-
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ name 'Media'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ apps "['io.github.celluloid_player.Celluloid.desktop', 'io.github.seadve.Kooha.desktop', 'com.spotify.Client.desktop', 'org.blender.Blender.desktop', 'org.gimp.GIMP.desktop', 'org.gnome.eog.desktop']"
-
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ name 'System'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/System/ apps "['org.gnome.baobab.desktop', 'firewall-config.desktop', 'com.mattjakeman.ExtensionManager.desktop', 'org.gnome.Settings.desktop', 'gnome-system-monitor.desktop', 'org.gnome.Characters.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.font-viewer.desktop', 'org.gnome.Logs.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'kvantummanager.desktop']"
-
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Gaming/ name 'Gaming'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Gaming/ apps "['com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'net.lutris.Lutris.desktop']"
-
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ name 'Emulators'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ apps "['org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'org.DolphinEmu.dolphin-emu.desktop', 'org.yuzu_emu.yuzu.desktop', 'org.citra_emu.citra.desktop', 'org.flycast.Flycast.desktop', 'app.xemu.xemu.desktop', 'com.snes9x.Snes9x.desktop', 'net.kuribo64.melonDS.desktop', 'net.rpcs3.RPCS3.desktop']"
-
-gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, 'Emulators': <{'position': <1>}>, 'Gaming': <{'position': <2>}>, 'Media': <{'position': <3>}>, 'Office': <{'position': <4>}>, 'System': <{'position': <5>}>, 'com.belmoussaoui.Authenticator.desktop': <{'position': <6>}>, 'com.bitwarden.desktop.desktop': <{'position': <7>}>, 'com.usebottles.bottles.desktop': <{'position': <8>}>, 'chromium-freeworld.desktop': <{'position': <9>}>, 'com.github.tchx84.Flatseal.desktop': <{'position': <10>}>}]"
-
-# Wallpaper and screensaver
-gsettings set org.gnome.desktop.background picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'
-gsettings set org.gnome.desktop.background picture-uri-dark 'file:///usr/share/backgrounds/gnome/blobs-d.svg'
-gsettings set org.gnome.desktop.background primary-color '#241f31'
-
-gsettings set org.gnome.desktop.screensaver picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'
-gsettings set org.gnome.desktop.screensaver primary-color '#241f31'
-
-################################################
-##### Gnome Shell Extensions
-################################################
-
-# Create Gnome shell extensions folder
-mkdir -p ${HOME}/.local/share/gnome-shell/extensions
-
-# AppIndicator and KStatusNotifierItem Support
-# https://extensions.gnome.org/extension/615/appindicator-support/
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v53.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
-# GSConnect
-# https://extensions.gnome.org/extension/1319/gsconnect/
-sudo dnf install -y openssl
-
-curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v55.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
-# Dark Variant
-# https://extensions.gnome.org/extension/4488/dark-variant/
-sudo dnf install -y xprop
-
-curl -sSL https://extensions.gnome.org/extension-data/dark-varianthardpixel.eu.v9.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
-gsettings --schemadir ~/.local/share/gnome-shell/extensions/dark-variant@hardpixel.eu/schemas set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'app.xemu.xemu.desktop']"
-
-# Rounded Window Corners
-# https://extensions.gnome.org/extension/5237/rounded-window-corners/
-curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v11.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
-# Legacy (GTK3) Theme Scheme Auto Switcher
-# https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
-curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v5.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
-# Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Unlock LUKS2 with TPM2 token
 ################################################
 
-# Install tpm2-tools
-sudo dnf install -y tpm2-tools
+# References:
+# https://fedoramagazine.org/use-systemd-cryptenroll-with-fido-u2f-or-tpm2-to-decrypt-your-disk/
+# https://www.freedesktop.org/software/systemd/man/systemd-cryptenroll.html
 
-# Enroll TPM2 key
-sudo systemd-cryptenroll --tpm2-pcrs=0+1+7 --tpm2-device=auto /dev/nvme0n1p3
+# Add tpm2-tss module to dracut
+echo 'add_dracutmodules+=" tpm2-tss "' | sudo tee /etc/dracut.conf.d/tpm2.conf
+
+# Enroll TPM2 as LUKS' decryption factor
+sudo systemd-cryptenroll --wipe-slot tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3
 
 # Update crypttab
-sudo sed -i "s|discard|&,tpm2-device=auto|" /etc/crypttab
+sudo sed -i "s|discard|&,tpm2-device=auto,tpm2-pcrs=0+1+2+3+4+5+7+9|" /etc/crypttab
 
 # Regenerate initramfs
 sudo dracut --regenerate-all --force
 
 ################################################
-##### Cleanup
+##### Desktop Environment
 ################################################
 
-APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify' 'lpf-mscore-tahoma-fonts' 'syncthing-start' 'syncthing-ui')
-for APPLICATION in "${APPLICATIONS[@]}"
-do
-    # Create a local copy of the desktop files and append properties
-    cp /usr/share/applications/${APPLICATION}.desktop ${HOME}/.local/share/applications/${APPLICATION}.desktop 2>/dev/null || : 
-
-    if test -f "${HOME}/.local/share/applications/${APPLICATION}.desktop"; then
-        echo "NoDisplay=true" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
-        echo "Hidden=true" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
-        echo "NotShowIn=KDE;GNOME;" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
-    fi
-done
+# Install and configure desktop environment
+if [ ${DESKTOP_ENVIRONMENT} = "gnome" ]; then
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/gnome.sh -O
+    chmod +x ./gnome.sh
+    ./gnome.sh
+elif [ ${DESKTOP_ENVIRONMENT} = "plasma" ]; then
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/plasma.sh -O
+    chmod +x ./plasma.sh
+    ./plasma.sh
+fi
 
 ################################################
 ##### Gaming
@@ -667,5 +367,14 @@ done
 
 # Install and configure gaming with Flatpak
 if [ ${GAMING} = "yes" ]; then
-    ./setup_gaming.sh
+  curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/setup_gaming.sh -O
+  chmod +x ./setup_gaming.sh
+  ./setup_gaming.sh
 fi
+
+################################################
+##### Cleanup
+################################################
+
+# Delete downloaded scripts
+rm -f {gnome,plasma,setup_gaming}.sh
