@@ -121,6 +121,9 @@ update-all() {
   # Update firmware
   sudo fwupdmgr refresh
   sudo fwupdmgr update
+
+  # Update Deno
+  deno upgrade
 }
 EOF
 
@@ -274,6 +277,16 @@ EOF
 # Install nodejs
 sudo dnf install -y nodejs npm
 
+# Install deno
+mkdir -p ${HOME}/.deno/bin
+curl https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -L -O
+unzip -o deno-x86_64-unknown-linux-gnu.zip -d ${HOME}/.deno/bin
+rm -f deno-x86_64-unknown-linux-gnu.zip
+tee ${HOME}/.bashrc.d/deno << 'EOF'
+export DENO_INSTALL=${HOME}/.deno
+export PATH="$PATH:$DENO_INSTALL/bin"
+EOF
+
 # Install cfssl
 sudo dnf install -y golang-github-cloudflare-cfssl
 
@@ -331,6 +344,7 @@ code --install-extension ms-python.python
 code --install-extension redhat.vscode-yaml
 code --install-extension esbenp.prettier-vscode
 code --install-extension dbaeumer.vscode-eslint
+code --install-extension denoland.vscode-deno
 
 # Configure VSCode
 mkdir -p ${HOME}/.config/Code/User
