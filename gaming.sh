@@ -47,6 +47,10 @@ flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope
 # Allow Steam to access external directory
 sudo flatpak override --filesystem=/data/games/steam com.valvesoftware.Steam
 
+# Steam controllers udev rules
+sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
+sudo udevadm control --reload-rules
+
 ################################################
 ##### Heroic Games Launcher
 ################################################
