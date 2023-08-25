@@ -220,6 +220,9 @@ gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10' # de
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10' # default: Cantarell Bold 11
 gsettings set org.gnome.desktop.interface monospace-font-name 'Source Code Pro 10' # default: Source Code Pro 10
 
+# Set text editor font
+gsettings set org.gnome.TextEditor custom-font 'Source Code Pro 10'
+
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
 
@@ -252,7 +255,7 @@ mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
 # Grand Theft Focus
 # # https://extensions.gnome.org/extension/5410/grand-theft-focus
-curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v5.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v3.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
@@ -264,7 +267,7 @@ rm -f *.shell-extension.zip
 
 # Legacy (GTK3) Theme Scheme Auto Switcher
 # https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
-curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v7.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v5.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 

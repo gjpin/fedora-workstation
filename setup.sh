@@ -226,7 +226,7 @@ sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.fi
 # Set Firefox Flatpak as default browser and handler for https(s)
 xdg-settings set default-web-browser org.mozilla.firefox.desktop
 xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/http
-xdg-mime default firefox.desktop x-scheme-handler/https
+xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/https
 
 # Temporarily open Firefox to create profiles
 timeout 5 flatpak run org.mozilla.firefox --headless
@@ -310,13 +310,6 @@ sudo dnf install -y neovim
 tee ${HOME}/.bashrc.d/neovim << 'EOF'
 alias vi=nvim
 alias vim=nvim
-EOF
-
-sudo tee -a /etc/environment << EOF
-
-# Editor
-EDITOR=nvim
-VISUAL=nvim
 EOF
 
 ################################################
