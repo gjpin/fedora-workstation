@@ -68,6 +68,10 @@ sudo dnf install -y \
   p7zip \
   p7zip-plugins \
   htop
+
+# Install fonts
+sudo dnf install -y \
+  source-foundry-hack-fonts
   
 # Create common user directories
 mkdir -p \

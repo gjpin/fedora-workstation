@@ -35,6 +35,27 @@ if lspci | grep VGA | grep "AMD" > /dev/null; then
 fi
 
 ################################################
+##### Gnome Shell Extensions
+################################################
+
+# AppIndicator and KStatusNotifierItem Support
+# https://extensions.gnome.org/extension/615/appindicator-support/
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v56.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
+# GSConnect
+# https://extensions.gnome.org/extension/1319/gsconnect/
+sudo dnf install -y openssl
+
+curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v55.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
+# Enable extensions
+gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+
+################################################
 ##### Virtualization
 ################################################
 

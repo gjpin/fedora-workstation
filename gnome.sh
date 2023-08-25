@@ -114,33 +114,12 @@ sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highl
 flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
 flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3-dark
 
-# Download and install latest adw-gtk3 release
-URL=$(curl -s https://api.github.com/repos/lassekongo83/adw-gtk3/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
-curl -sSL ${URL} -O
-tar -xf adw-*.tar.xz -C ${HOME}/.local/share/themes/
-rm -f adw-*.tar.xz
-
-# GTK theme updater
-tee ${HOME}/.local/bin/update-gtk-theme << 'EOF'
-#!/usr/bin/bash
-
-URL=$(curl -s https://api.github.com/repos/lassekongo83/adw-gtk3/releases/latest | awk -F\" '/browser_download_url.*.tar.xz/{print $(NF-1)}')
-curl -sSL ${URL} -O || exit 1
-rm -rf ${HOME}/.local/share/themes/adw-gtk3*
-tar -xf adw-*.tar.xz -C ${HOME}/.local/share/themes/
-rm -f adw-*.tar.xz
-EOF
-
-chmod +x ${HOME}/.local/bin/update-gtk-theme
-
-# Add gnome theme updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-gtk-theme' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update GTK theme' ${HOME}/.bashrc.d/update-all
+# Install adw-gtk3 theme
+sudo dnf install -y adw-gtk3-theme
 
 # Set adw-gtk3 theme
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
-gsettings set org.gnome.desktop.interface color-scheme 'default'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 
 ################################################
 ##### Utilities
@@ -234,7 +213,7 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10' # default: Cantarell 11
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10' # default: Cantarell 11
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10' # default: Cantarell Bold 11
-gsettings set org.gnome.desktop.interface monospace-font-name 'Noto Sans Mono 10' # default: Source Code Pro 10
+gsettings set org.gnome.desktop.interface monospace-font-name 'Hack 10' # default: Source Code Pro 10
 
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
@@ -274,12 +253,6 @@ gsettings set org.gnome.desktop.screensaver primary-color '#241f31'
 # Create Gnome shell extensions folder
 mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
-# AppIndicator and KStatusNotifierItem Support
-# https://extensions.gnome.org/extension/615/appindicator-support/
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v56.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
 # Dark Variant
 # https://extensions.gnome.org/extension/4488/dark-variant/
 sudo dnf install -y xprop
@@ -296,14 +269,6 @@ curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.g
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
-# GSConnect
-# https://extensions.gnome.org/extension/1319/gsconnect/
-sudo dnf install -y openssl
-
-curl -sSL https://extensions.gnome.org/extension-data/gsconnectandyholmes.github.io.v55.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
 # Rounded Window Corners
 # https://extensions.gnome.org/extension/5237/rounded-window-corners/
 curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v11.shell-extension.zip -O
@@ -317,7 +282,7 @@ gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+gsettings set org.gnome.shell enabled-extensions "['dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Gnome misc configurations
