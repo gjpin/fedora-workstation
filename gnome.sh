@@ -34,11 +34,6 @@ systemctl --user mask \
   tracker-miner-rss-3.service \
   tracker-xdg-portal-3.service
 
-# Disable speec dispatcher
-sudo tee -a /etc/speech-dispatcher/speechd.conf << EOF
-DisableAutoSpawn
-EOF
-
 ################################################
 ##### Flatpak
 ################################################

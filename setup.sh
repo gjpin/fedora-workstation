@@ -42,6 +42,9 @@ sudo systemctl mask pcscd.service
 # Disable location lookup service
 sudo systemctl mask geoclue.service
 
+# Disable speech dispatcher
+sudo sed -i "s|^# DisableAutoSpawn|DisableAutoSpawn|g" /etc/speech-dispatcher/speechd.conf
+
 ################################################
 ##### General
 ################################################
