@@ -81,6 +81,7 @@ mkdir -p \
   ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart \
+  ${HOME}/.config/systemd/user \
   ${HOME}/.ssh \
   ${HOME}/.config/environment.d \
   ${HOME}/src

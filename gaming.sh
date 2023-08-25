@@ -79,8 +79,18 @@ echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="
 # Allow Sunshine to start apps and games
 sudo flatpak override --talk-name=org.freedesktop.Flatpak dev.lizardbyte.app.Sunshine
 
-# KMS Grab
-sudo flatpak override --socket=wayland --env=PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') dev.lizardbyte.app.Sunshine
+# Create Sunshine wrapper
+sudo tee /usr/local/bin/sunshine << EOF
+#!/usr/bin/bash
+
+if [ -n "$1" ]; then
+        /usr/bin/flatpak kill dev.lizardbyte.app.Sunshine
+else
+    	PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run dev.lizardbyte.app.Sunshine
+fi
+EOF
+
+sudo chmod +x /usr/local/bin/sunshine
 
 # Create Sunshine service
 sudo tee /etc/systemd/system/sunshine.service << EOF
@@ -93,7 +103,7 @@ Wants=xdg-desktop-autostart.target
 After=xdg-desktop-autostart.target
 
 [Service]
-ExecStart=flatpak run --command=sunshine dev.lizardbyte.app.Sunshine
+ExecStart=/usr/local/bin/sunshine
 ExecStop=flatpak kill dev.lizardbyte.app.Sunshine
 Restart=on-failure
 RestartSec=5s
@@ -108,13 +118,10 @@ sudo systemctl enable sunshine.service
 # Import configs
 sudo mkdir -p /root/.config/sunshine
 
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -O
-sudo mv sunshine.conf /root/.config/sunshine/sunshine.conf
+sudo curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o /root/.config/sunshine/sunshine.conf
 
-if [ ${DESKTOP_ENVIRONMENT} = "gnome" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -O
-    sudo mv apps-gnome.json /root/.config/sunshine/apps.json
-elif [ ${DESKTOP_ENVIRONMENT} = "plasma" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -O
-    sudo mv apps-plasma.json /root/.config/sunshine/apps.json
+if [ ${DESKTOP_ENVIRONMENT} == "gnome" ]; then
+    sudo curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o /root/.config/sunshine/apps.json
+elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
+    sudo curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o /root/.config/sunshine/apps.json
 fi

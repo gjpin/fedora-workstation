@@ -2,7 +2,10 @@
 1. Clone project: `git clone https://github.com/gjpin/fedora-workstation.git`
 2. Run setup.sh: `fedora-workstation/setup.sh`
 3. Choose between Gnome and Plasma configurations
-4. Reboot and enjoy
+4. Reboot
+5. Copy wireguard config to /etc/wireguard/wg0.conf
+6. Import wireguard connection to networkmanager: sudo nmcli con import type wireguard file /etc/wireguard/wg0.conf
+7. Set wg0's firewalld zone: `sudo firewall-cmd --permanent --zone=trusted --add-interface=wg0`
 
 # Guides
 
