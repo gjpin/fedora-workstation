@@ -22,7 +22,7 @@ sudo dnf remove -y \
     yelp
 
 # Disable Tracker (indexing) and search providers
-gsettings set org.gnome.desktop.search-provers disable-external true
+gsettings set org.gnome.desktop.search-providers disabled "['org.gnome.Nautilus.desktop', 'org.gnome.Boxes.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Characters.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Terminal.desktop']"
 gsettings set org.freedesktop.Tracker3.Miner.Files index-single-directories "@as []"
 gsettings set org.freedesktop.Tracker3.Miner.Files index-recursive-directories "@as []"
 
@@ -184,7 +184,7 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Su
 ################################################
 
 # Set dash applications
-gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'firefox.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.TextEditor.desktop', 'code.desktop']"
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.TextEditor.desktop', 'code.desktop']"
 
 # Volume
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
@@ -213,7 +213,7 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10' # default: Cantarell 11
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10' # default: Cantarell 11
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10' # default: Cantarell Bold 11
-gsettings set org.gnome.desktop.interface monospace-font-name 'Hack 10' # default: Source Code Pro 10
+gsettings set org.gnome.desktop.interface monospace-font-name 'Source Code Pro 10' # default: Source Code Pro 10
 
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Office', 'Dev', 'Media', 'System', 'Gaming', 'Emulators']"
@@ -237,14 +237,6 @@ gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folder
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ apps "['org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'org.DolphinEmu.dolphin-emu.desktop', 'org.yuzu_emu.yuzu.desktop', 'org.citra_emu.citra.desktop', 'org.flycast.Flycast.desktop', 'app.xemu.xemu.desktop', 'com.snes9x.Snes9x.desktop', 'net.kuribo64.melonDS.desktop', 'net.rpcs3.RPCS3.desktop']"
 
 gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, 'Emulators': <{'position': <1>}>, 'Gaming': <{'position': <2>}>, 'Media': <{'position': <3>}>, 'Office': <{'position': <4>}>, 'System': <{'position': <5>}>, 'com.belmoussaoui.Authenticator.desktop': <{'position': <6>}>, 'com.bitwarden.desktop.desktop': <{'position': <7>}>, 'com.usebottles.bottles.desktop': <{'position': <8>}>, 'chromium-freeworld.desktop': <{'position': <9>}>, 'com.github.tchx84.Flatseal.desktop': <{'position': <10>}>}]"
-
-# Wallpaper and screensaver
-gsettings set org.gnome.desktop.background picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'
-gsettings set org.gnome.desktop.background picture-uri-dark 'file:///usr/share/backgrounds/gnome/blobs-d.svg'
-gsettings set org.gnome.desktop.background primary-color '#241f31'
-
-gsettings set org.gnome.desktop.screensaver picture-uri 'file:///usr/share/backgrounds/gnome/blobs-l.svg'
-gsettings set org.gnome.desktop.screensaver primary-color '#241f31'
 
 ################################################
 ##### Gnome Shell Extensions
