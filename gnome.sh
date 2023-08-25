@@ -186,8 +186,8 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Su
 # Set dash applications
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.TextEditor.desktop', 'code.desktop']"
 
-# Volume
-gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
+# Volume - It seems to lead to increase in CPU for some reason
+# gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
 
 # Calendar
 gsettings set org.gnome.desktop.calendar show-weekdate true
