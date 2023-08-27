@@ -72,12 +72,14 @@ sudo flatpak override --filesystem=/data/games/heroic com.heroicgameslauncher.hg
 # Install Sunshine
 flatpak install -y flathub dev.lizardbyte.app.Sunshine
 
-# Allow Sunshine Virtual Input
-sudo chown $USER /dev/uinput
-echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/85-sunshine-input.rules
-
 # Allow Sunshine to start apps and games
 sudo flatpak override --talk-name=org.freedesktop.Flatpak dev.lizardbyte.app.Sunshine
+
+# Enable wayland support
+sudo flatpak override --socket=wayland dev.lizardbyte.app.Sunshine
+
+# Allow Sunshine Virtual Input
+echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/85-sunshine-input.rules
 
 # Create Sunshine wrapper
 sudo tee /usr/local/bin/sunshine << EOF
@@ -86,7 +88,8 @@ sudo tee /usr/local/bin/sunshine << EOF
 if [ -n "$1" ]; then
         /usr/bin/flatpak kill dev.lizardbyte.app.Sunshine
 else
-    	PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run dev.lizardbyte.app.Sunshine
+    PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run --socket=wayland dev.lizardbyte.app.Sunshine
+    	sudo -i PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run dev.lizardbyte.app.Sunshine
 fi
 EOF
 
