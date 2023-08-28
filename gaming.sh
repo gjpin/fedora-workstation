@@ -66,65 +66,70 @@ sudo flatpak override --filesystem=/data/games/heroic com.heroicgameslauncher.hg
 ################################################
 
 # References:
-# https://flathub.org/apps/dev.lizardbyte.app.Sunshine
-# https://github.com/LizardByte/Sunshine/blob/master/sunshine.service.in
+# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/installation.html#rpm-package
+# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/usage.html#linux
+# https://github.com/LizardByte/Sunshine
+
+# Download Sunshine
+curl https://github.com/LizardByte/Sunshine/releases/latest/download/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
 
 # Install Sunshine
-flatpak install -y flathub dev.lizardbyte.app.Sunshine
+sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
 
-# Allow Sunshine to start apps and games
-sudo flatpak override --talk-name=org.freedesktop.Flatpak dev.lizardbyte.app.Sunshine
-
-# Enable wayland support
-sudo flatpak override --socket=wayland dev.lizardbyte.app.Sunshine
+# Clean rpm
+rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
 
 # Allow Sunshine Virtual Input
 echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/85-sunshine-input.rules
 
-# Create Sunshine wrapper
-sudo tee /usr/local/bin/sunshine << EOF
-#!/usr/bin/bash
-
-if [ -n "$1" ]; then
-        /usr/bin/flatpak kill dev.lizardbyte.app.Sunshine
-else
-    PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run --socket=wayland dev.lizardbyte.app.Sunshine
-    	sudo -i PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run dev.lizardbyte.app.Sunshine
-fi
-EOF
-
-sudo chmod +x /usr/local/bin/sunshine
-
 # Create Sunshine service
-sudo tee /etc/systemd/system/sunshine.service << EOF
+tee ${HOME}/.config/systemd/user/sunshine.service << EOF
 [Unit]
-Description=Sunshine is a self-hosted game stream host for Moonlight.
+Description=Sunshine self-hosted game stream host for Moonlight.
 StartLimitIntervalSec=500
 StartLimitBurst=5
-PartOf=graphical-session.target
-Wants=xdg-desktop-autostart.target
-After=xdg-desktop-autostart.target
 
 [Service]
-ExecStart=/usr/local/bin/sunshine
-ExecStop=flatpak kill dev.lizardbyte.app.Sunshine
+ExecStart=/usr/bin/sunshine
 Restart=on-failure
 RestartSec=5s
 
 [Install]
-WantedBy=xdg-desktop-autostart.target
+WantedBy=graphical-session.target
 EOF
 
 # Enable Sunshine service
-sudo systemctl enable sunshine.service
+systemctl --user enable sunshine.service
+
+# Allow Sunshine to use KMS
+sudo setcap cap_sys_admin+p $(readlink -f $(which sunshine))
 
 # Import configs
-sudo mkdir -p /root/.config/sunshine
+mkdir -p ${HOME}/.config/sunshine
 
-sudo curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o /root/.config/sunshine/sunshine.conf
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o ${HOME}/.config/sunshine/sunshine.conf
 
 if [ ${DESKTOP_ENVIRONMENT} == "gnome" ]; then
-    sudo curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o /root/.config/sunshine/apps.json
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o ${HOME}/.config/sunshine/apps.json
 elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
-    sudo curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o /root/.config/sunshine/apps.json
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o ${HOME}/.config/sunshine/apps.json
 fi
+
+# Sunshine updater
+tee ${HOME}/.local/bin/update-sunshine << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/LizardByte/Sunshine/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(sunshine --version)
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl https://github.com/LizardByte/Sunshine/releases/latest/download/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
+  sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+  rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-sunshine
+
+# Add Sunshine updater to bash updater function
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ update-sunshine' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update Sunshine' ${HOME}/.bashrc.d/update-all

@@ -1,15 +1,16 @@
 {
     "env": {
-        "PATH": "$(PATH):$(HOME)\/.local\/bin"
+        "PATH": "$(PATH):$(HOME)/.local/bin"
     },
     "apps": [
         {
             "name": "Steam - 1280x800",
-            "detached": [
-                "flatpak-spawn --host setsid steam steam:\/\/open\/bigpicture"
-            ],
-            "image-path": "",
+            "cmd": "flatpak run com.valvesoftware.Steam -bigpicture",
             "prep-cmd": [
+                {
+                    "do": "flatpak kill com.valvesoftware.Steam || /bin/true",
+                    "undo": ""
+                },
                 {
                     "do": "gnome-randr --output DP-1 --mode 1280x800 --rate 60",
                     "undo": "gnome-randr --output DP-1 --mode 3440x1440 --rate 144"
@@ -19,11 +20,12 @@
         },
         {
             "name": "Steam - 1920x1080",
-            "detached": [
-                "flatpak-spawn --host setsid steam steam:\/\/open\/bigpicture"
-            ],
-            "image-path": "",
+            "cmd": "flatpak run com.valvesoftware.Steam -bigpicture",
             "prep-cmd": [
+                {
+                    "do": "flatpak kill com.valvesoftware.Steam || /bin/true",
+                    "undo": ""
+                },
                 {
                     "do": "gnome-randr --output DP-1 --mode 1920x1080 --rate 60",
                     "undo": "gnome-randr --output DP-1 --mode 3440x1440 --rate 144"
@@ -42,8 +44,7 @@
                     "do": "gnome-randr --output DP-1 --mode 1280x800 --rate 60",
                     "undo": "gnome-randr --output DP-1 --mode 3440x1440 --rate 144"
                 }
-            ],
-            "image-path": ""
+            ]
         },
         {
             "name": "Desktop - 1920x1080",
@@ -56,8 +57,7 @@
                     "do": "gnome-randr --output DP-1 --mode 1920x1080 --rate 60",
                     "undo": "gnome-randr --output DP-1 --mode 3440x1440 --rate 144"
                 }
-            ],
-            "image-path": ""
+            ]
         }
     ]
 }
