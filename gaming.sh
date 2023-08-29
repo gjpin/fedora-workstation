@@ -98,6 +98,11 @@ RestartSec=5s
 WantedBy=graphical-session.target
 EOF
 
+# Fix Sunshine service in Gnome
+if [ ${DESKTOP_ENVIRONMENT} = "gnome" ]; then
+  sed -i '3 i After=gnome-session-wayland@gnome.target' ${HOME}/.config/systemd/user/sunshine.service
+fi
+
 # Enable Sunshine service
 systemctl --user enable sunshine.service
 

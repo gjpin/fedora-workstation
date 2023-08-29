@@ -4,12 +4,6 @@
 ##### Gnome Shell Extensions
 ################################################
 
-# AppIndicator and KStatusNotifierItem Support
-# https://extensions.gnome.org/extension/615/appindicator-support/
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v56.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
 # GSConnect
 # https://extensions.gnome.org/extension/1319/gsconnect/
 sudo dnf install -y openssl
