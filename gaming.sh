@@ -68,6 +68,7 @@ sudo flatpak override --filesystem=/data/games/heroic com.heroicgameslauncher.hg
 # References:
 # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/installation.html#rpm-package
 # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/usage.html#linux
+# https://github.com/LizardByte/Sunshine/blob/master/sunshine.service.in
 # https://github.com/LizardByte/Sunshine
 
 # Download Sunshine

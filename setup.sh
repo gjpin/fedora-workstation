@@ -18,11 +18,13 @@ export DESKTOP_ENVIRONMENT
 ################################################
 
 # Mark applications as manually installed
-sudo dnf mark install \
-  flatpak \
-  flatpak-selinux \
-  flatpak-session-helper \
-  ibus-gtk4
+if [ ${DESKTOP_ENVIRONMENT} = "plasma" ]; then
+  sudo dnf mark install \
+    flatpak \
+    flatpak-selinux \
+    flatpak-session-helper \
+    ibus-gtk4
+fi
 
 # Remove applications
 sudo dnf remove -y \
@@ -435,10 +437,3 @@ if [ ${GAMING} = "yes" ]; then
   chmod +x ./gaming.sh
   ./gaming.sh
 fi
-
-################################################
-##### Cleanup
-################################################
-
-# Delete downloaded scripts
-rm -f {gnome,plasma,gaming}.sh
