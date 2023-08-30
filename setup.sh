@@ -17,23 +17,12 @@ export DESKTOP_ENVIRONMENT
 ##### Remove unneeded packages and services
 ################################################
 
-# Mark applications as manually installed
-if [ ${DESKTOP_ENVIRONMENT} = "plasma" ]; then
-  sudo dnf mark install \
-    flatpak \
-    flatpak-selinux \
-    flatpak-session-helper \
-    ibus-gtk4
-fi
-
-# Remove applications
-sudo dnf remove -y \
-    abrt \
-    mediawriter
-
 # Remove libreoffice
 sudo dnf group remove -y libreoffice
 sudo dnf remove -y *libreoffice*
+
+# Disable ABRT service
+sudo systemctl mask abrtd.service
 
 # Disable mobile broadband modem management service
 sudo systemctl mask ModemManager.service

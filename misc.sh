@@ -338,3 +338,37 @@ export ANDROID_HOME=${HOME}/Android/Sdk
 export ANDROID_USER_HOME=${HOME}/.android
 export PATH=\$PATH:${HOME}/Android/Sdk/platform-tools
 EOF
+
+################################################
+##### Gnome - Remove unneeded packages and services
+################################################
+
+# Remove applications
+sudo dnf remove -y \
+    abrt \
+    mediawriter
+
+# GNOME - Remove packages
+sudo dnf remove -y \
+    gnome-software \
+    gnome-weather \
+    gnome-contacts \
+    gnome-maps \
+    gnome-photos \
+    gnome-tour \
+    gnome-connections \
+    simple-scan \
+    rhythmbox \
+    cheese \
+    totem \
+    yelp
+
+# PLASMA - Remove discover
+sudo dnf remove -y \
+    plasma-discover \
+    plasma-discover-flatpak \
+    plasma-discover-libs \
+    plasma-discover-notifier \
+    plasma-discover-offline-updates \
+    plasma-discover-packagekit \
+    fedora-appstream-metadata

@@ -4,19 +4,6 @@
 ##### Remove unneeded packages and services
 ################################################
 
-# Mark applications as manually installed
-sudo dnf mark install qt
-
-# Remove discover
-sudo dnf remove -y \
-    plasma-discover \
-    plasma-discover-flatpak \
-    plasma-discover-libs \
-    plasma-discover-notifier \
-    plasma-discover-offline-updates \
-    plasma-discover-packagekit \
-    fedora-appstream-metadata
-
 # Remove media players
 sudo dnf remove -y \
     dragon \
