@@ -61,6 +61,9 @@ flatpak install -y flathub com.heroicgameslauncher.hgl
 # Allow Heroic to access external directory
 sudo flatpak override --filesystem=/data/games/heroic com.heroicgameslauncher.hgl
 
+# Deny Heroic access to 'Games' diretory
+sudo flatpak override --nofilesystem=home/Games com.heroicgameslauncher.hgl
+
 ################################################
 ##### Sunshine
 ################################################
