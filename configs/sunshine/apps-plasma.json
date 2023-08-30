@@ -8,7 +8,7 @@
             "cmd": "flatpak run com.valvesoftware.Steam -bigpicture",
             "prep-cmd": [
                 {
-                    "do": "flatpak kill com.valvesoftware.Steam || /bin/true",
+                    "do": "/usr/bin/bash -c \"flatpak kill com.valvesoftware.Steam &>/dev/null || /usr/bin/true\"",
                     "undo": ""
                 },
                 {
@@ -23,7 +23,7 @@
             "cmd": "flatpak run com.valvesoftware.Steam -bigpicture",
             "prep-cmd": [
                 {
-                    "do": "flatpak kill com.valvesoftware.Steam || /bin/true",
+                    "do": "/usr/bin/bash -c \"flatpak kill com.valvesoftware.Steam &>/dev/null || /usr/bin/true\"",
                     "undo": ""
                 },
                 {
