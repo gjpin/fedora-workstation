@@ -61,6 +61,7 @@ sudo dnf install -y \
   unzip \
   p7zip \
   p7zip-plugins \
+  unrar \
   htop
 
 # Install fonts
@@ -193,18 +194,26 @@ sudo chmod 700 /etc/wireguard/
 ##### Flatpak
 ################################################
 
+# References:
+# https://docs.flatpak.org/en/latest/sandbox-permissions-reference.html
+# https://docs.flatpak.org/en/latest/sandbox-permissions-reference.html#filesystem-permissions
+
 # Add Flathub repo
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-modify flathub --enable
 
-# Global override to deny all applications the permission to access certain directories
-# sudo flatpak override --nofilesystem='home' --nofilesystem='host' --nofilesystem='xdg-cache' --nofilesystem='xdg-config' --nofilesystem='xdg-data'
-# flatpak override --filesystem=xdg-download
+# Restrict filesystem access
+sudo flatpak override --nofilesystem=home
+sudo flatpak override --nofilesystem=host
+sudo flatpak override --nofilesystem=host-etc
+sudo flatpak override --nofilesystem=xdg-config
+sudo flatpak override --nofilesystem=xdg-cache
+sudo flatpak override --nofilesystem=xdg-data
 
-# Allow read-only access to GTK configs
+# Filesystem access exemptions
+sudo flatpak override --filesystem=xdg-download
 sudo flatpak override --filesystem=xdg-config/gtk-3.0:ro
 sudo flatpak override --filesystem=xdg-config/gtk-4.0:ro
-sudo flatpak override --filesystem=${HOME}/.local/share/themes:ro
 
 # Install Flatpak runtimes
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
@@ -231,6 +240,9 @@ flatpak install -y flathub com.usebottles.bottles
 
 # Allow Bottles to create application shortcuts
 sudo flatpak override --filesystem=xdg-data/applications com.usebottles.bottles
+
+# Allow Obsidian to access vault folder
+sudo flatpak override --filesystem=home/.obsidian md.obsidian.Obsidian
 
 ################################################
 ##### Firefox
