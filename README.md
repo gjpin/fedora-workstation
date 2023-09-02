@@ -81,8 +81,10 @@ EOF
 
 sudo tee -a /etc/crypttab << EOF
 
-data UUID=$(blkid -s UUID -o value /dev/nvme1n1p1) none
+data UUID=$(sudo blkid -s UUID -o value /dev/nvme1n1p1) none
 EOF
+
+sudo systemctl daemon-reload
 
 # Change ownership to user
 sudo chown -R $USER:$USER /data
