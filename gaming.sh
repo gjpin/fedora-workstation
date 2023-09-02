@@ -58,8 +58,9 @@ sudo udevadm control --reload-rules
 # Install Heroic Games Launcher
 flatpak install -y flathub com.heroicgameslauncher.hgl
 
-# Allow Heroic to access external directory
+# Allow Heroic to access external directory and steam folder
 sudo flatpak override --filesystem=/data/games/heroic com.heroicgameslauncher.hgl
+sudo flatpak override --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.heroicgameslauncher.hgl
 
 # Deny Heroic access to 'Games' diretory
 sudo flatpak override --nofilesystem=home/Games com.heroicgameslauncher.hgl

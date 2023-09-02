@@ -195,7 +195,7 @@ sudo chmod 700 /etc/wireguard/
 ################################################
 
 # References:
-# https://docs.flatpak.org/en/latest/sandbox-permissions-reference.html
+# https://docs.flatpak.org/en/latest/sandbox-permissions.html
 # https://docs.flatpak.org/en/latest/sandbox-permissions-reference.html#filesystem-permissions
 
 # Add Flathub repo
@@ -238,8 +238,9 @@ flatpak install -y flathub org.chromium.Chromium
 flatpak install -y flathub com.github.marhkb.Pods
 flatpak install -y flathub com.usebottles.bottles
 
-# Allow Bottles to create application shortcuts
+# Allow Bottles to create application shortcuts and access Steam folder
 sudo flatpak override --filesystem=xdg-data/applications com.usebottles.bottles
+sudo flatpak override --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.usebottles.bottles
 
 # Allow Obsidian to access vault folder
 sudo flatpak override --filesystem=home/.obsidian md.obsidian.Obsidian
