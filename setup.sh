@@ -204,11 +204,16 @@ sudo flatpak remote-modify flathub --enable
 
 # Restrict filesystem access
 flatpak override --user --nofilesystem=home
+flatpak override --user --nofilesystem=home/.ssh
+flatpak override --user --nofilesystem=home/Sync
 flatpak override --user --nofilesystem=host
+flatpak override --user --nofilesystem=host-os
 flatpak override --user --nofilesystem=host-etc
 flatpak override --user --nofilesystem=xdg-config
 flatpak override --user --nofilesystem=xdg-cache
 flatpak override --user --nofilesystem=xdg-data
+flatpak override --user --nofilesystem=xdg-data/flatpak
+flatpak override --user --nofilesystem=xdg-documents
 
 # Filesystem access exemptions
 flatpak override --user --filesystem=xdg-download

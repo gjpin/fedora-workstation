@@ -63,7 +63,7 @@ flatpak override --user --filesystem=/data/games/heroic com.heroicgameslauncher.
 flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.heroicgameslauncher.hgl
 
 # Deny Heroic access to 'Games' diretory
-flatpak override --user --nofilesystem=home/Games com.heroicgameslauncher.hgl
+flatpak override --user --nofilesystem=home/Games/Heroic com.heroicgameslauncher.hgl
 
 ################################################
 ##### Lutris
@@ -77,9 +77,6 @@ flatpak override --user --filesystem=xdg-data/applications net.lutris.Lutris
 
 # Allow Lutris access to its folder
 flatpak override --user --filesystem=/data/lutris net.lutris.Lutris 
-
-# Deny Lutris access to 'Games' diretory
-flatpak override --user --nofilesystem=home/Games net.lutris.Lutris 
 
 ################################################
 ##### Sunshine
