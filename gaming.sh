@@ -51,6 +51,9 @@ flatpak override --user --filesystem=/data/games/steam com.valvesoftware.Steam
 sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
 sudo udevadm control --reload-rules
 
+# Allow Steam to open other applications (eg. Lutris or Heroic)
+flatpak override --user --talk-name=org.freedesktop.Flatpak com.valvesoftware.Steam
+
 ################################################
 ##### Heroic Games Launcher
 ################################################
@@ -77,6 +80,13 @@ flatpak override --user --filesystem=xdg-data/applications net.lutris.Lutris
 
 # Allow Lutris access to its folder
 flatpak override --user --filesystem=/data/lutris net.lutris.Lutris 
+
+# Allow Lutris access to Steam (Lutris expects to find Steam at ~/.steam)
+ln -s ${HOME}/.var/app/com.valvesoftware.Steam/.steam ${HOME}/.steam
+flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam net.lutris.Lutris
+
+# Deny Lutris talk
+flatpak override --user --no-talk-name=org.freedesktop.Flatpak net.lutris.Lutris
 
 ################################################
 ##### Sunshine
