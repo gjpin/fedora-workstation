@@ -203,17 +203,17 @@ sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub
 sudo flatpak remote-modify flathub --enable
 
 # Restrict filesystem access
-sudo flatpak override --nofilesystem=home
-sudo flatpak override --nofilesystem=host
-sudo flatpak override --nofilesystem=host-etc
-sudo flatpak override --nofilesystem=xdg-config
-sudo flatpak override --nofilesystem=xdg-cache
-sudo flatpak override --nofilesystem=xdg-data
+flatpak override --user --nofilesystem=home
+flatpak override --user --nofilesystem=host
+flatpak override --user --nofilesystem=host-etc
+flatpak override --user --nofilesystem=xdg-config
+flatpak override --user --nofilesystem=xdg-cache
+flatpak override --user --nofilesystem=xdg-data
 
 # Filesystem access exemptions
-sudo flatpak override --filesystem=xdg-download
-sudo flatpak override --filesystem=xdg-config/gtk-3.0:ro
-sudo flatpak override --filesystem=xdg-config/gtk-4.0:ro
+flatpak override --user --filesystem=xdg-download
+flatpak override --user --filesystem=xdg-config/gtk-3.0:ro
+flatpak override --user --filesystem=xdg-config/gtk-4.0:ro
 
 # Install Flatpak runtimes
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
@@ -239,11 +239,11 @@ flatpak install -y flathub com.github.marhkb.Pods
 flatpak install -y flathub com.usebottles.bottles
 
 # Allow Bottles to create application shortcuts and access Steam folder
-sudo flatpak override --filesystem=xdg-data/applications com.usebottles.bottles
-sudo flatpak override --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.usebottles.bottles
+flatpak override --user --filesystem=xdg-data/applications com.usebottles.bottles
+flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.usebottles.bottles
 
 # Allow Obsidian to access vault folder
-sudo flatpak override --filesystem=home/.obsidian md.obsidian.Obsidian
+flatpak override --user --filesystem=home/.obsidian md.obsidian.Obsidian
 
 ################################################
 ##### Firefox
@@ -259,7 +259,7 @@ sudo dnf remove -y firefox
 flatpak install -y flathub org.mozilla.firefox
 
 # Enable wayland support
-sudo flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
+flatpak override --user --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
 
 # Set Firefox Flatpak as default browser and handler for https(s)
 xdg-settings set default-web-browser org.mozilla.firefox.desktop

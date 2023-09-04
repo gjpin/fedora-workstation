@@ -45,7 +45,7 @@ flatpak install -y flathub com.valvesoftware.Steam
 flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope
 
 # Allow Steam to access external directory
-sudo flatpak override --filesystem=/data/games/steam com.valvesoftware.Steam
+flatpak override --user --filesystem=/data/games/steam com.valvesoftware.Steam
 
 # Steam controllers udev rules
 sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
@@ -59,11 +59,27 @@ sudo udevadm control --reload-rules
 flatpak install -y flathub com.heroicgameslauncher.hgl
 
 # Allow Heroic to access external directory and steam folder
-sudo flatpak override --filesystem=/data/games/heroic com.heroicgameslauncher.hgl
-sudo flatpak override --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.heroicgameslauncher.hgl
+flatpak override --user --filesystem=/data/games/heroic com.heroicgameslauncher.hgl
+flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.heroicgameslauncher.hgl
 
 # Deny Heroic access to 'Games' diretory
-sudo flatpak override --nofilesystem=home/Games com.heroicgameslauncher.hgl
+flatpak override --user --nofilesystem=home/Games com.heroicgameslauncher.hgl
+
+################################################
+##### Lutris
+################################################
+
+# Install Lutris
+flatpak install -y flathub net.lutris.Lutris
+
+# Allow Lutris to create application shortcuts
+flatpak override --user --filesystem=xdg-data/applications net.lutris.Lutris
+
+# Allow Lutris access to its folder
+flatpak override --user --filesystem=/data/lutris net.lutris.Lutris 
+
+# Deny Lutris access to 'Games' diretory
+flatpak override --user --nofilesystem=home/Games net.lutris.Lutris 
 
 ################################################
 ##### Sunshine

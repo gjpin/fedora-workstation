@@ -81,10 +81,10 @@ flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git//22.08
 flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git//22.08
 
 # Make Steam use mesa-git
-sudo flatpak override --env=FLATPAK_GL_DRIVERS=mesa-git com.valvesoftware.Steam
+flatpak override --user --env=FLATPAK_GL_DRIVERS=mesa-git com.valvesoftware.Steam
 
 # Make Heroic use mesa-git
-sudo flatpak override --env=FLATPAK_GL_DRIVERS=mesa-git com.heroicgameslauncher.hgl
+flatpak override --user --env=FLATPAK_GL_DRIVERS=mesa-git com.heroicgameslauncher.hgl
 
 ################################################
 ##### Hashicorp tools
