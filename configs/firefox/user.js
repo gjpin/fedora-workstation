@@ -10,7 +10,7 @@
 /****************************************************************************
  * Betterfox                                                                *
  * "Ad meliora"                                                             *
- * version: 116                                                             *
+ * version: 116.1                                                           *
  * url: https://github.com/yokoffing/Betterfox                              *
  ****************************************************************************/
 
@@ -35,12 +35,9 @@ user_pref("gfx.content.skia-font-cache-size", 20);
 
 /** BROWSER CACHE ***/
 user_pref("browser.cache.disk.enable", false);
-user_pref("browser.cache.memory.capacity", 1048576);
-user_pref("browser.cache.memory.max_entry_size", 65536);
 
 /** MEDIA CACHE ***/
-user_pref("media.memory_cache_max_size", 196608);
-user_pref("media.memory_caches_combined_limit_kb", 1572864);
+user_pref("media.memory_cache_max_size", 65536);
 user_pref("media.cache_readahead_limit", 7200);
 user_pref("media.cache_resume_threshold", 3600);
 
@@ -54,12 +51,11 @@ user_pref("network.http.max-connections", 1800);
 user_pref("network.http.max-persistent-connections-per-server", 10);
 user_pref("network.http.max-urgent-start-excessive-connections-per-host", 5);
 user_pref("network.websocket.max-connections", 400);
-user_pref("network.http.pacing.requests.min-parallelism", 12);
-user_pref("network.http.pacing.requests.burst", 18);
+user_pref("network.http.pacing.requests.enabled", false);
 user_pref("network.dnsCacheEntries", 10000);
 user_pref("network.dnsCacheExpiration", 86400);
 user_pref("network.dns.max_high_priority_threads", 8);
-user_pref("network.ssl_tokens_cache_capacity", 32768);
+user_pref("network.ssl_tokens_cache_capacity", 20480);
 
 /** SPECULATIVE CONNECTIONS ***/
 user_pref("network.http.speculative-parallel-limit", 0);
@@ -95,7 +91,6 @@ user_pref("security.cert_pinning.enforcement_level", 2);
 
 /** SSL / TLS ***/
 user_pref("security.ssl.treat_unsafe_negotiation_as_broken", true);
-user_pref("security.ssl.require_safe_negotiation", true);
 user_pref("browser.xul.error_pages.expert_bad_cert", true);
 user_pref("security.tls.enable_0rtt_data", false);
 
@@ -213,6 +208,9 @@ user_pref("browser.preferences.moreFromMozilla", false);
 user_pref("browser.tabs.tabmanager.enabled", false);
 user_pref("browser.aboutConfig.showWarning", false);
 user_pref("browser.aboutwelcome.enabled", false);
+user_pref("browser.display.focus_ring_on_anything", true);
+user_pref("browser.display.focus_ring_style", 0);
+user_pref("browser.display.focus_ring_width", 0);
 user_pref("browser.privateWindowSeparation.enabled", false); // WINDOWS
 user_pref("browser.privatebrowsing.enable-new-indicator", false);
 user_pref("cookiebanners.service.mode", 2);
@@ -240,9 +238,9 @@ user_pref("extensions.pocket.enabled", false);
 
 /** DOWNLOADS ***/
 user_pref("browser.download.useDownloadDir", false);
+user_pref("browser.download.always_ask_before_handling_new_types", true);
 user_pref("browser.download.alwaysOpenPanel", false);
 user_pref("browser.download.manager.addToRecentDocs", false);
-user_pref("browser.download.always_ask_before_handling_new_types", true);
 
 /** PDF ***/
 user_pref("browser.download.open_pdf_attachments_inline", true);
