@@ -8,7 +8,7 @@
 flatpak install -y flathub net.davidotek.pupgui2
 
 ################################################
-##### MangoHud
+##### MangoHud (Flatpak)
 ################################################
 
 # References:
@@ -18,10 +18,8 @@ flatpak install -y flathub net.davidotek.pupgui2
 flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//22.08
 
 # Configure MangoHud
-mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud/MangoHud.conf
-
+mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud
 tee ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud/MangoHud.conf << EOF
-control=mangohud
 legacy_layout=0
 horizontal
 gpu_stats
@@ -79,7 +77,7 @@ flatpak install -y flathub net.lutris.Lutris
 flatpak override --user --filesystem=xdg-data/applications net.lutris.Lutris
 
 # Allow Lutris access to its folder
-flatpak override --user --filesystem=/data/lutris net.lutris.Lutris 
+flatpak override --user --filesystem=/data/lutris net.lutris.Lutris
 
 # Allow Lutris access to Steam (Lutris expects to find Steam at ~/.steam)
 ln -s ${HOME}/.var/app/com.valvesoftware.Steam/.steam ${HOME}/.steam
@@ -87,6 +85,26 @@ flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/
 
 # Deny Lutris talk
 flatpak override --user --no-talk-name=org.freedesktop.Flatpak net.lutris.Lutris
+
+# Deny Lutris internet access
+flatpak override --user --unshare=network net.lutris.Lutris
+
+# Configure MangoHud
+mkdir -p ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud
+tee ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
 
 ################################################
 ##### Sunshine

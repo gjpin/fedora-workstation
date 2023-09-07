@@ -217,6 +217,10 @@ flatpak override --user --nofilesystem=xdg-cache
 flatpak override --user --nofilesystem=xdg-data
 flatpak override --user --nofilesystem=xdg-data/flatpak
 flatpak override --user --nofilesystem=xdg-documents
+flatpak override --user --nofilesystem=xdg-videos
+flatpak override --user --nofilesystem=xdg-music
+flatpak override --user --nofilesystem=xdg-pictures
+flatpak override --user --nofilesystem=xdg-desktop
 
 # Restrict talk
 flatpak override --user --no-talk-name=org.freedesktop.Flatpak
@@ -247,14 +251,39 @@ flatpak install -y flathub org.blender.Blender
 flatpak install -y flathub md.obsidian.Obsidian
 flatpak install -y flathub org.chromium.Chromium
 flatpak install -y flathub com.github.marhkb.Pods
-flatpak install -y flathub com.usebottles.bottles
-
-# Allow Bottles to create application shortcuts and access Steam folder
-flatpak override --user --filesystem=xdg-data/applications com.usebottles.bottles
-flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.usebottles.bottles
 
 # Allow Obsidian to access vault folder
 flatpak override --user --filesystem=home/.obsidian md.obsidian.Obsidian
+
+################################################
+##### Bottles
+################################################
+
+# Install Bottles
+flatpak install -y flathub com.usebottles.bottles
+
+# Allow Bottles to create application shortcuts
+flatpak override --user --filesystem=xdg-data/applications com.usebottles.bottles
+
+# Allow Bottles to access Steam folder
+flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.usebottles.bottles
+
+# Configure MangoHud
+mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
+tee ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
 
 ################################################
 ##### Firefox

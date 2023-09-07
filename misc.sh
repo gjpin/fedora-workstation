@@ -1,6 +1,70 @@
 #!/usr/bin/bash
 
 ################################################
+##### Wine
+################################################
+
+# References:
+# https://github.com/Winetricks/winetricks/blob/master/files/verbs/download.txt
+# https://github.com/FanderWasTaken/wine-dependency-hell-solver
+# https://github.com/Matoking/protontricks
+
+# Install Wine
+flatpak install flathub app/org.winehq.Wine/x86_64/stable-22.08
+
+# Set wine alias
+tee ${HOME}/.bashrc.d/wine << 'EOF'
+alias wine="flatpak run org.winehq.Wine"
+alias winetricks="flatpak run --command=winetricks org.winehq.Wine"
+alias winemango="MANGOHUD=1 flatpak run org.winehq.Wine"
+EOF
+
+# Install dependencies
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx9
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx10
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx11_43
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_42
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_43
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_46
+flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_47
+flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet40
+flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet40_kb2468871
+flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet48
+flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnetdesktop6
+flatpak run --command=winetricks org.winehq.Wine --unattended --force xna40
+flatpak run --command=winetricks org.winehq.Wine --unattended --force faudio
+flatpak run --command=winetricks org.winehq.Wine --unattended --force corefonts
+flatpak run --command=winetricks org.winehq.Wine --unattended --force mf
+flatpak run --command=winetricks org.winehq.Wine --unattended --force physx
+flatpak run --command=winetricks org.winehq.Wine --unattended --force vcrun2022
+flatpak run --command=winetricks org.winehq.Wine --unattended --force dxvk
+flatpak run --command=winetricks org.winehq.Wine --unattended --force vkd3d
+
+################################################
+##### MangoHud (native)
+################################################
+
+# Install MangoHud
+sudo dnf install -y mangohud
+
+# Configure MangoHud
+mkdir -p ${HOME}/.config/MangoHud
+tee ${HOME}/.config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
+
+################################################
 ##### Gnome Shell Extensions
 ################################################
 
