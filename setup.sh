@@ -206,8 +206,8 @@ sudo flatpak remote-modify flathub --enable
 flatpak override --user --nofilesystem=home
 flatpak override --user --nofilesystem=home/.ssh
 flatpak override --user --nofilesystem=home/.bashrc
+flatpak override --user --nofilesystem=home/.bashrc.d
 flatpak override --user --nofilesystem=home/.config
-flatpak override --user --nofilesystem=home/.zshrc
 flatpak override --user --nofilesystem=home/Sync
 flatpak override --user --nofilesystem=host
 flatpak override --user --nofilesystem=host-os
