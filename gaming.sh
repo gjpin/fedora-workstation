@@ -86,9 +86,6 @@ flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/
 # Deny Lutris talk
 flatpak override --user --no-talk-name=org.freedesktop.Flatpak net.lutris.Lutris
 
-# Deny Lutris internet access
-flatpak override --user --unshare=network net.lutris.Lutris
-
 # Configure MangoHud
 mkdir -p ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud
 tee ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud/MangoHud.conf << EOF
