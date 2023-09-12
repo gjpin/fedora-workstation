@@ -62,6 +62,7 @@ sudo dnf install -y \
   p7zip \
   p7zip-plugins \
   unrar \
+  zstd \
   htop
 
 # Install fonts
