@@ -7,17 +7,30 @@
 # Install ProtonUp-Qt
 flatpak install -y flathub net.davidotek.pupgui2
 
-################################################
-##### MangoHud (Flatpak)
-################################################
-
-# References:
-# https://github.com/flathub/com.valvesoftware.Steam.Utility.MangoHud
-
 # Install MangoHud
-flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//22.08
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
 
-# Configure MangoHud
+# Install Gamescope
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//23.08
+
+################################################
+##### Steam
+################################################
+
+# Install Steam
+flatpak install -y flathub com.valvesoftware.Steam
+
+# Allow Steam to access external directory
+flatpak override --user --filesystem=/data/games/steam com.valvesoftware.Steam
+
+# Steam controllers udev rules
+sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
+sudo udevadm control --reload-rules
+
+# Allow Steam to open other applications (eg. Lutris or Heroic)
+flatpak override --user --talk-name=org.freedesktop.Flatpak com.valvesoftware.Steam
+
+# Configure MangoHud for Steam
 mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud
 tee ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud/MangoHud.conf << EOF
 legacy_layout=0
@@ -33,24 +46,6 @@ frame_timing=1
 engine_version
 vulkan_driver
 EOF
-
-################################################
-##### Steam
-################################################
-
-# Install Steam
-flatpak install -y flathub com.valvesoftware.Steam
-flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope
-
-# Allow Steam to access external directory
-flatpak override --user --filesystem=/data/games/steam com.valvesoftware.Steam
-
-# Steam controllers udev rules
-sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
-sudo udevadm control --reload-rules
-
-# Allow Steam to open other applications (eg. Lutris or Heroic)
-flatpak override --user --talk-name=org.freedesktop.Flatpak com.valvesoftware.Steam
 
 ################################################
 ##### Heroic Games Launcher
@@ -86,7 +81,7 @@ flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/
 # Deny Lutris talk
 flatpak override --user --no-talk-name=org.freedesktop.Flatpak net.lutris.Lutris
 
-# Configure MangoHud
+# Configure MangoHud for Lutris
 mkdir -p ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud
 tee ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud/MangoHud.conf << EOF
 legacy_layout=0

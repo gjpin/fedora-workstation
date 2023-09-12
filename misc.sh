@@ -9,36 +9,107 @@
 # https://github.com/FanderWasTaken/wine-dependency-hell-solver
 # https://github.com/Matoking/protontricks
 
-# Install Wine
-flatpak install flathub app/org.winehq.Wine/x86_64/stable-22.08
+# Install Wine and dependencies
+flatpak install -y flathub app/org.winehq.Wine/x86_64/stable-22.08
+flatpak install -y flathub runtime/org.winehq.Wine.gecko/x86_64/stable-22.08
+flatpak install -y flathub runtime/org.winehq.Wine.mono/x86_64/stable-22.08
+
+# Deny Wine internet access
+flatpak override --user --unshare=network org.winehq.Wine
+
+# Prevent installing Mono/Gecko
+flatpak override --user --env='WINEDLLOVERRIDES=mscoree=d;mshtml=d' org.winehq.Wine
 
 # Set wine alias
 tee ${HOME}/.bashrc.d/wine << 'EOF'
 alias wine="flatpak run org.winehq.Wine"
+alias wineuninstaller="flatpak run org.winehq.Wine uninstaller"
+alias winecfg="flatpak run --command=winecfg org.winehq.Wine"
 alias winetricks="flatpak run --command=winetricks org.winehq.Wine"
-alias winemango="MANGOHUD=1 flatpak run org.winehq.Wine"
+alias winemango="flatpak run --command=mangohud org.winehq.Wine wine"
+alias winegamescope="flatpak run --command=gamescope org.winehq.Wine -f -- wine"
 EOF
 
+# Disable Large Address Aware
+flatpak override --user --env='WINE_LARGE_ADDRESS_AWARE=0' org.winehq.Wine
+
 # Install dependencies
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx9
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx10
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx11_43
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_42
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_43
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_46
-flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_47
-flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet40
-flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet40_kb2468871
-flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet48
-flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnetdesktop6
-flatpak run --command=winetricks org.winehq.Wine --unattended --force xna40
-flatpak run --command=winetricks org.winehq.Wine --unattended --force faudio
-flatpak run --command=winetricks org.winehq.Wine --unattended --force corefonts
-flatpak run --command=winetricks org.winehq.Wine --unattended --force mf
-flatpak run --command=winetricks org.winehq.Wine --unattended --force physx
 flatpak run --command=winetricks org.winehq.Wine --unattended --force vcrun2022
-flatpak run --command=winetricks org.winehq.Wine --unattended --force dxvk
-flatpak run --command=winetricks org.winehq.Wine --unattended --force vkd3d
+sleep 5
+flatpak run --command=winetricks org.winehq.Wine --unattended --force faudio
+sleep 5
+
+# Create wine directories
+mkdir -p ${HOME}/.var/app/org.winehq.Wine/data/wine/drive_c/windows/system32
+mkdir -p ${HOME}/.var/app/org.winehq.Wine/data/wine/drive_c/windows/syswow64
+
+# Install DXVK
+LATEST_DXVK_VERSION=$(curl -s https://api.github.com/repos/doitsujin/dxvk/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/^.//')
+curl https://github.com/doitsujin/dxvk/releases/latest/download/dxvk-${LATEST_DXVK_VERSION}.tar.gz -L -O
+tar -xzf dxvk-${LATEST_DXVK_VERSION}.tar.gz -C ${HOME}/.var/app/org.winehq.Wine/data/wine/drive_c/windows/system32 dxvk-${LATEST_DXVK_VERSION}/x64/* --strip-components 2
+tar -xzf dxvk-${LATEST_DXVK_VERSION}.tar.gz -C ${HOME}/.var/app/org.winehq.Wine/data/wine/drive_c/windows/syswow64 dxvk-${LATEST_DXVK_VERSION}/x32/* --strip-components 2
+rm -f tar -xzf dxvk-${LATEST_DXVK_VERSION}.tar.gz
+
+flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverrides' /v d3d11 /d native /f
+sleep 5
+flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverrides' /v d3d10core /d native /f
+sleep 5
+flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverrides' /v dxgi /d native /f
+sleep 5
+flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverrides' /v d3d9 /d native /f
+sleep 5
+
+# Install VKD3D
+LATEST_VKD3D_VERSION=$(curl -s https://api.github.com/repos/HansKristian-Work/vkd3d-proton/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/^.//')
+curl https://github.com/HansKristian-Work/vkd3d-proton/releases/latest/download/vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst -L -O
+tar -xf vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst -C ${HOME}/.var/app/org.winehq.Wine/data/wine/drive_c/windows/system32 vkd3d-proton-${LATEST_VKD3D_VERSION}/x64/* --strip-components 2
+tar -xf vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst -C ${HOME}/.var/app/org.winehq.Wine/data/wine/drive_c/windows/syswow64 vkd3d-proton-${LATEST_VKD3D_VERSION}/x86/* --strip-components 2
+rm -f vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst
+
+flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverrides' /v d3d12 /d native /f
+sleep 5
+flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverrides' /v d3d12core /d native /f
+sleep 5
+
+# Install and configure MangoHud and Gamescope
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//23.08
+flatpak override --user --env='PATH=/app/bin:/usr/bin:/usr/lib/extensions/vulkan/MangoHud/bin:/usr/lib/extensions/vulkan/gamescope/bin' org.winehq.Wine
+
+mkdir -p ${HOME}/.var/app/org.winehq.Wine/config/MangoHud
+tee ${HOME}/.var/app/org.winehq.Wine/config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
+
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx9
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx10
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dx11_43
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_42
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_43
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_46
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force d3dcompiler_47
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet40
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet40_kb2468871
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnet48
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force dotnetdesktop6
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force xna40
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force faudio
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force corefonts
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force physx
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force dxvk
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force vkd3d
+# flatpak run --command=winetricks org.winehq.Wine --unattended --force mf
 
 ################################################
 ##### MangoHud (native)
