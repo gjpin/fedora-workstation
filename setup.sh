@@ -369,6 +369,12 @@ flatpak install -y flathub com.visualstudio.code
 # Allow VSCode access to src folder
 flatpak override --user --filesystem=home/src com.visualstudio.code
 
+# Allow VSCode access to .ssh folder
+flatpak override --user --filesystem=home/.ssh:ro com.visualstudio.code
+
+# Allow VSCode access to .gitconfig file
+flatpak override --user --filesystem=home/.gitconfig:ro com.visualstudio.code
+
 # Allow VSCode to read /etc (/etc/shells is required)
 flatpak override --user --filesystem=host-etc:ro com.visualstudio.code
 
