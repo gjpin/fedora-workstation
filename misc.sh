@@ -1,6 +1,98 @@
 #!/usr/bin/bash
 
 ################################################
+##### VSCode (Native)
+################################################
+
+# References:
+# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+
+# Import Microsoft key
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Add VSCode repository
+sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
+
+# Install VSCode
+dnf check-update
+sudo dnf install -y code
+
+# Install extensions
+code --install-extension golang.Go
+code --install-extension ms-python.python
+code --install-extension redhat.vscode-yaml
+code --install-extension esbenp.prettier-vscode
+code --install-extension dbaeumer.vscode-eslint
+
+# Configure VSCode
+mkdir -p ${HOME}/.config/Code/User
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
+
+# Change VSCode config to use theme
+sed -i '2 i \ \ \ \ "workbench.preferredDarkColorTheme": "Adwaita Dark",' ${HOME}/.config/Code/User/settings.json
+sed -i '2 i \ \ \ \ "workbench.preferredLightColorTheme": "Adwaita Light",' ${HOME}/.config/Code/User/settings.json
+sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",' ${HOME}/.config/Code/User/settings.json
+
+################################################
+##### Development
+################################################
+
+# Create python sandbox virtualenv and alias
+mkdir -p ${HOME}/.python
+
+python -m venv ${HOME}/.python/play
+
+tee ${HOME}/.bashrc.d/python << 'EOF'
+alias pythonplay="source ${HOME}/.python/play/bin/activate"
+EOF
+
+# Install go
+sudo dnf install -y golang
+
+mkdir -p ${HOME}/.go
+
+tee ${HOME}/.bashrc.d/go << 'EOF'
+export GOPATH="$HOME/.go"
+EOF
+
+# Install nodejs
+sudo dnf install -y nodejs npm
+
+# Install cfssl
+sudo dnf install -y golang-github-cloudflare-cfssl
+
+################################################
+##### Deno
+################################################
+
+# Install deno
+mkdir -p ${HOME}/.deno/bin
+curl https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -L -O
+unzip -o deno-x86_64-unknown-linux-gnu.zip -d ${HOME}/.deno/bin
+rm -f deno-x86_64-unknown-linux-gnu.zip
+
+# Add Deno to path
+tee ${HOME}/.bashrc.d/deno << 'EOF'
+export DENO_INSTALL=${HOME}/.deno
+export PATH="$PATH:$DENO_INSTALL/bin"
+EOF
+  
+# Add Deno updater to bash updater function
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ deno upgrade' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update Deno' ${HOME}/.bashrc.d/update-all
+
+# Install Deno VSCode extension
+code --install-extension denoland.vscode-deno
+
+################################################
 ##### Wine
 ################################################
 

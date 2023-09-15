@@ -153,9 +153,6 @@ update-all() {
   # Update firmware
   sudo fwupdmgr refresh
   sudo fwupdmgr update
-
-  # Update Deno
-  deno upgrade
 }
 EOF
 
@@ -238,6 +235,11 @@ flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x8
 if lspci | grep VGA | grep "Intel" > /dev/null; then
   flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
 fi
+
+# Install support for additional languages in Flatpak
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/22.08
 
 # Install applications
 flatpak install -y flathub com.bitwarden.desktop
@@ -340,40 +342,6 @@ tee ${HOME}/.bashrc.d/podman << EOF
 alias docker="podman"
 EOF
 
-# Create python sandbox virtualenv and alias
-mkdir -p ${HOME}/.python
-
-python -m venv ${HOME}/.python/play
-
-tee ${HOME}/.bashrc.d/python << 'EOF'
-alias pythonplay="source ${HOME}/.python/play/bin/activate"
-EOF
-
-# Install go
-sudo dnf install -y golang
-
-mkdir -p ${HOME}/.go
-
-tee ${HOME}/.bashrc.d/go << 'EOF'
-export GOPATH="$HOME/.go"
-EOF
-
-# Install nodejs
-sudo dnf install -y nodejs npm
-
-# Install deno
-mkdir -p ${HOME}/.deno/bin
-curl https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip -L -O
-unzip -o deno-x86_64-unknown-linux-gnu.zip -d ${HOME}/.deno/bin
-rm -f deno-x86_64-unknown-linux-gnu.zip
-tee ${HOME}/.bashrc.d/deno << 'EOF'
-export DENO_INSTALL=${HOME}/.deno
-export PATH="$PATH:$DENO_INSTALL/bin"
-EOF
-
-# Install cfssl
-sudo dnf install -y golang-github-cloudflare-cfssl
-
 # Install make
 sudo dnf install -y make
 
@@ -392,40 +360,44 @@ alias vim=nvim
 EOF
 
 ################################################
-##### VSCode
+##### VSCode (Flatpak)
 ################################################
 
-# References:
-# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
-
-# Import Microsoft key
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# Add VSCode repository
-sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
-[code]
-name=Visual Studio Code
-baseurl=https://packages.microsoft.com/yumrepos/vscode
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
-
 # Install VSCode
-dnf check-update
-sudo dnf install -y code
+flatpak install -y flathub com.visualstudio.code
+
+# Allow VSCode access to src folder
+flatpak override --user --filesystem=home/src com.visualstudio.code
+
+# Allow VSCode to read /etc (/etc/shells is required)
+flatpak override --user --filesystem=host-etc:ro com.visualstudio.code
+
+# Add Flatpak specific configurations
+sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
+        "LD_PRELOAD": null,\
+    },\
+    "terminal.integrated.defaultProfile.linux": "bash",\
+    "terminal.integrated.profiles.linux": {\
+        "bash": {\
+          "path": "/usr/bin/bash",\
+          "icon": "terminal-bash",\
+          "overrideName": true\
+        }\
+      },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 # Install extensions
-code --install-extension golang.Go
-code --install-extension ms-python.python
-code --install-extension redhat.vscode-yaml
-code --install-extension esbenp.prettier-vscode
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension denoland.vscode-deno
+flatpak run com.visualstudio.code --install-extension golang.Go
+flatpak run com.visualstudio.code --install-extension ms-python.python
+flatpak run com.visualstudio.code --install-extension redhat.vscode-yaml
+flatpak run com.visualstudio.code --install-extension esbenp.prettier-vscode
+flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
+
+# Enable support for additional languages
+flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=node18,typescript,golang' com.visualstudio.code
 
 # Configure VSCode
-mkdir -p ${HOME}/.config/Code/User
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
+mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 ################################################
 ##### Utilities
