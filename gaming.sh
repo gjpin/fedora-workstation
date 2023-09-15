@@ -167,6 +167,7 @@ if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
   curl https://github.com/LizardByte/Sunshine/releases/latest/download/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
   sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
   rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+  systemctl --user restart sunshine.service
 fi
 EOF
 
