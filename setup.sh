@@ -405,6 +405,11 @@ flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=node18,typescript,golang' 
 mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
+# Create alias
+tee ${HOME}/.bashrc.d/vscode << EOF
+alias code="flatpak run com.visualstudio.code"
+EOF
+
 ################################################
 ##### Utilities
 ################################################
