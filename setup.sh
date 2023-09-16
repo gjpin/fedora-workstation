@@ -359,6 +359,15 @@ alias vi=nvim
 alias vim=nvim
 EOF
 
+# Node and NPM
+tee ${HOME}/.bashrc.d/node << 'EOF'
+node_image='node:slim'
+node_ports='-p 3000:3000 -p 8080:8080 -p 8000:8000'
+
+alias npm='podman run -it --rm --userns=keep-id --init -v "$PWD":/usr/src/app:Z -w /usr/src/app $node_image npm'
+alias node='podman run -it --rm --userns=keep-id --init -v "$PWD":/usr/src/app:Z -w /usr/src/app $node_ports $node_image node'
+EOF
+
 ################################################
 ##### VSCode (Flatpak)
 ################################################
