@@ -72,7 +72,7 @@ flatpak install -y flathub net.lutris.Lutris
 flatpak override --user --filesystem=xdg-data/applications net.lutris.Lutris
 
 # Allow Lutris access to its folder
-flatpak override --user --filesystem=/data/lutris net.lutris.Lutris
+flatpak override --user --filesystem=/data/games/lutris net.lutris.Lutris
 
 # Allow Lutris access to Steam (Lutris expects to find Steam at ~/.steam)
 ln -s ${HOME}/.var/app/com.valvesoftware.Steam/.steam ${HOME}/.steam
