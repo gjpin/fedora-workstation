@@ -297,6 +297,7 @@ EOF
 
 # Remove native firefox
 sudo dnf remove -y firefox
+rm -rf ${HOME}/.mozilla
 
 # Install Firefox from Flathub
 flatpak install -y flathub org.mozilla.firefox
