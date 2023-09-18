@@ -93,6 +93,43 @@ sed -i '2 i \ \ # Update Deno' ${HOME}/.bashrc.d/update-all
 code --install-extension denoland.vscode-deno
 
 ################################################
+##### Lutris
+################################################
+
+# Install Lutris
+flatpak install -y flathub net.lutris.Lutris
+
+# Allow Lutris to create application shortcuts
+flatpak override --user --filesystem=xdg-data/applications net.lutris.Lutris
+
+# Allow Lutris access to its folder
+flatpak override --user --filesystem=/data/games/lutris net.lutris.Lutris
+
+# Allow Lutris access to Steam (Lutris expects to find Steam at ~/.steam)
+ln -s ${HOME}/.var/app/com.valvesoftware.Steam/.steam ${HOME}/.steam
+flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam net.lutris.Lutris
+
+# Deny Lutris talk
+flatpak override --user --no-talk-name=org.freedesktop.Flatpak net.lutris.Lutris
+
+# Configure MangoHud for Lutris
+mkdir -p ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud
+tee ${HOME}/.var/app/net.lutris.Lutris/config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
+
+################################################
 ##### Wine
 ################################################
 
