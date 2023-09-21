@@ -186,6 +186,9 @@ gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
 # Calendar
 gsettings set org.gnome.desktop.calendar show-weekdate true
 
+# Increase check-alive-timeout to 30 seconds
+gsettings set org.gnome.mutter check-alive-timeout 30000
+
 # Nautilus
 gsettings set org.gtk.Settings.FileChooser sort-directories-first true
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
