@@ -12,8 +12,8 @@
                     "undo": ""
                 },
                 {
-                    "do": "kscreen-doctor output.DP-1.mode.1280x800@60.001",
-                    "undo": "kscreen-doctor output.DP-1.mode.3440x1440@143.923"
+                    "do": "kscreen-doctor output.DP-3.mode.1280x800@60.001",
+                    "undo": "kscreen-doctor output.DP-3.mode.3440x1440@143.923"
                 }
             ],
             "exclude-global-prep-cmd": "false"
@@ -27,8 +27,8 @@
                     "undo": ""
                 },
                 {
-                    "do": "kscreen-doctor output.DP-1.mode.1920x1080@60.001",
-                    "undo": "kscreen-doctor output.DP-1.mode.3440x1440@143.923"
+                    "do": "kscreen-doctor output.DP-3.mode.1920x1080@60.001",
+                    "undo": "kscreen-doctor output.DP-3.mode.3440x1440@143.923"
                 }
             ],
             "exclude-global-prep-cmd": "false"
@@ -41,8 +41,8 @@
             "elevated": "false",
             "prep-cmd": [
                 {
-                    "do": "kscreen-doctor output.DP-1.mode.1280x800@60.001",
-                    "undo": "kscreen-doctor output.DP-1.mode.3440x1440@143.923"
+                    "do": "kscreen-doctor output.DP-3.mode.1280x800@60.001",
+                    "undo": "kscreen-doctor output.DP-3.mode.3440x1440@143.923"
                 }
             ]
         },
@@ -54,8 +54,8 @@
             "elevated": "false",
             "prep-cmd": [
                 {
-                    "do": "kscreen-doctor output.DP-1.mode.1920x1080@60.001",
-                    "undo": "kscreen-doctor output.DP-1.mode.3440x1440@143.923"
+                    "do": "kscreen-doctor output.DP-3.mode.1920x1080@60.001",
+                    "undo": "kscreen-doctor output.DP-3.mode.3440x1440@143.923"
                 }
             ]
         }
