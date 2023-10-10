@@ -388,19 +388,6 @@ flatpak override --user --filesystem=home/.gitconfig:ro com.visualstudio.code
 # Allow VSCode to read /etc (/etc/shells is required)
 flatpak override --user --filesystem=host-etc:ro com.visualstudio.code
 
-# Add Flatpak specific configurations
-sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
-        "LD_PRELOAD": null,\
-    },\
-    "terminal.integrated.defaultProfile.linux": "bash",\
-    "terminal.integrated.profiles.linux": {\
-        "bash": {\
-          "path": "/usr/bin/bash",\
-          "icon": "terminal-bash",\
-          "overrideName": true\
-        }\
-      },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
-
 # Install extensions
 flatpak run com.visualstudio.code --install-extension golang.Go
 flatpak run com.visualstudio.code --install-extension ms-python.python
@@ -414,6 +401,19 @@ flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=node18,typescript,golang' 
 # Configure VSCode
 mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+
+# Add Flatpak specific configurations
+sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
+        "LD_PRELOAD": null,\
+    },\
+    "terminal.integrated.defaultProfile.linux": "bash",\
+    "terminal.integrated.profiles.linux": {\
+        "bash": {\
+          "path": "/usr/bin/bash",\
+          "icon": "terminal-bash",\
+          "overrideName": true\
+        }\
+      },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 # Create alias
 tee ${HOME}/.bashrc.d/vscode << EOF
