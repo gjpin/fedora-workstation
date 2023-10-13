@@ -362,11 +362,20 @@ EOF
 
 # Node and NPM
 tee ${HOME}/.bashrc.d/node << 'EOF'
-node_image='node:slim'
+node_image='docker.io/node:slim'
 node_ports='-p 3000:3000 -p 8080:8080 -p 8000:8000'
 
-alias npm='podman run -it --rm --userns=keep-id --init -v "$PWD":/usr/src/app:Z -w /usr/src/app $node_image npm'
-alias node='podman run -it --rm --userns=keep-id --init -v "$PWD":/usr/src/app:Z -w /usr/src/app $node_ports $node_image node'
+alias npm='podman run -it --rm --name=npm --init -v "$PWD":/usr/src/app:Z -w /usr/src/app $node_image npm'
+alias node='podman run -it --rm --name=node --init -v "$PWD":/usr/src/app:Z -w /usr/src/app $node_ports $node_image node'
+EOF
+
+# mitmproxy
+mkdir -p ${HOME}/.mitmproxy
+
+tee ${HOME}/.bashrc.d/mitmproxy << 'EOF'
+alias mitmproxy='podman run -it --rm --name=mitmproxy -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest'
+alias mitmdump='podman run -it --rm --name=mitmdump -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest mitmdump'
+alias mitmweb='podman run -it --rm --name=mitmweb -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 -p 127.0.0.1:8081:8081 docker.io/mitmproxy/mitmproxy:latest mitmweb --web-host 0.0.0.0'
 EOF
 
 ################################################

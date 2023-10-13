@@ -572,7 +572,7 @@ sudo dnf install -y \
   bzip2-libs.i686
 
 # Download and install Android Studio
-curl -sSL https://dl.google.com/dl/android/studio/ide-zips/2022.2.1.18/android-studio-2022.2.1.18-linux.tar.gz -O
+curl -sSL https://dl.google.com/dl/android/studio/ide-zips/2022.3.1.20/android-studio-2022.3.1.20-linux.tar.gz -O
 sudo tar -xzf android-studio-*-linux.tar.gz -C /opt
 rm -f android-studio-*-linux.tar.gz
 
@@ -601,6 +601,7 @@ tee ${HOME}/.bashrc.d/android << EOF
 export ANDROID_HOME=${HOME}/Android/Sdk
 export ANDROID_USER_HOME=${HOME}/.android
 export PATH=\$PATH:${HOME}/Android/Sdk/platform-tools
+export PATH=\$PATH:${HOME}/Android/Sdk/emulator
 EOF
 
 ################################################
