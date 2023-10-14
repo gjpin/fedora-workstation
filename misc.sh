@@ -290,23 +290,6 @@ gsettings --schemadir ~/.local/share/gnome-shell/extensions/dark-variant@hardpix
 gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
-##### Virtualization
-################################################
-
-# References:
-# https://docs.fedoraproject.org/en-US/quick-docs/getting-started-with-virtualization/
-# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/optimizing-virtual-machine-performance-in-rhel_configuring-and-managing-virtualization
-
-# Install virtualization group
-sudo dnf install -y @virtualization
-
-# Enable service
-sudo systemctl enable libvirtd
-
-# Install QEMU
-sudo dnf install -y qemu
-
-################################################
 ##### Fonts
 ################################################
 
@@ -437,25 +420,6 @@ EOF
 
 # Full AMD GPU controls
 sudo grubby --update-kernel=ALL --args=amdgpu.ppfeaturemask=0xffffffff
-
-################################################
-##### Java / OpenJDK
-################################################
-
-# References:
-# https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
-
-# Install OpenJDK
-sudo dnf install -y \
-  java-latest-openjdk \
-  java-latest-openjdk-devel
-
-# Set env vars
-tee ${HOME}/.bashrc.d/java << EOF
-export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which javac)))))
-export PATH=\$PATH:\$JAVA_HOME/bin
-export CLASSPATH=.:\$JAVA_HOME/jre/lib:\$JAVA_HOME/lib:\$JAVA_HOME/lib/tools.jar
-EOF
 
 ################################################
 ##### .NET SDK

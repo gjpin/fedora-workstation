@@ -63,7 +63,9 @@ sudo dnf install -y \
   p7zip-plugins \
   unrar \
   zstd \
-  htop
+  htop \
+  xq \
+  jq
 
 # Install fonts
 sudo dnf install -y \
@@ -237,6 +239,8 @@ if lspci | grep VGA | grep "Intel" > /dev/null; then
 fi
 
 # Install support for additional languages in Flatpak
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk17/x86_64/23.08
 flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/22.08
 flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/22.08
 flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/22.08
@@ -327,13 +331,27 @@ curl https://addons.mozilla.org/firefox/downloads/file/3932862/multi_account_con
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox/user.js -o ${FIREFOX_PROFILE_PATH}/user.js
 
 ################################################
+##### Virtualization
+################################################
+
+# References:
+# https://docs.fedoraproject.org/en-US/quick-docs/virtualization-getting-started/
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/optimizing-virtual-machine-performance-in-rhel_configuring-and-managing-virtualization
+
+# Install virtualization group
+sudo dnf install -y @virtualization
+
+# Enable libvirtd service
+sudo systemctl enable libvirtd
+
+################################################
 ##### Development
 ################################################
 
 # References:
 # https://developer.fedoraproject.org/tech/languages/python/python-installation.html
 # https://developer.fedoraproject.org/tech/languages/rust/rust-installation.html
-# https://www.hashicorp.com/official-packaging-guide
+# # https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
 
 # Set git configurations
 git config --global init.defaultBranch main
@@ -376,6 +394,139 @@ tee ${HOME}/.bashrc.d/mitmproxy << 'EOF'
 alias mitmproxy='podman run -it --rm --name=mitmproxy -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest'
 alias mitmdump='podman run -it --rm --name=mitmdump -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest mitmdump'
 alias mitmweb='podman run -it --rm --name=mitmweb -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 -p 127.0.0.1:8081:8081 docker.io/mitmproxy/mitmproxy:latest mitmweb --web-host 0.0.0.0'
+EOF
+
+# Install OpenJDK
+sudo dnf install -y \
+  java-latest-openjdk \
+  java-latest-openjdk-devel
+
+################################################
+##### IntelliJ IDEA Community
+################################################
+
+# Install IntelliJ IDEA Community
+flatpak install -y flathub com.jetbrains.IntelliJ-IDEA-Community
+
+# Create required folders
+mkdir -p \
+  .java \
+  .gradle
+
+# Allow IntelliJ access to required folders
+flatpak override --user --filesystem=home/.java com.jetbrains.IntelliJ-IDEA-Community
+flatpak override --user --filesystem=home/.gradle com.jetbrains.IntelliJ-IDEA-Community
+
+# Allow IntelliJ access to src folder
+flatpak override --user --filesystem=home/src com.jetbrains.IntelliJ-IDEA-Community
+
+# Allow IntelliJ access to .ssh folder
+flatpak override --user --filesystem=home/.ssh:ro com.jetbrains.IntelliJ-IDEA-Community
+
+# Allow IntelliJ access to .gitconfig file
+flatpak override --user --filesystem=home/.gitconfig:ro com.jetbrains.IntelliJ-IDEA-Community
+
+# Allow IntelliJ to read /etc (/etc/shells is required)
+flatpak override --user --filesystem=host-etc:ro com.jetbrains.IntelliJ-IDEA-Community
+
+# Enable support for additional languages
+flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=openjdk,openjdk17' com.jetbrains.IntelliJ-IDEA-Community
+
+################################################
+##### Android Studio
+################################################
+
+# References:
+# https://github.com/flathub/com.google.AndroidStudio/issues/81
+# https://issuetracker.google.com/issues/117641628
+
+# Install Android Studio
+flatpak install -y flathub com.google.AndroidStudio
+
+# Create required folders
+mkdir -p \
+  Android \
+  .android \
+  .m2 \
+  .java \
+  .gradle
+
+# Allow Android Studio access to required folders
+flatpak override --user --filesystem=home/Android com.google.AndroidStudio
+flatpak override --user --filesystem=home/AndroidStudioProjects com.google.AndroidStudio
+flatpak override --user --filesystem=home/.android com.google.AndroidStudio
+flatpak override --user --filesystem=home/.m2 com.google.AndroidStudio
+flatpak override --user --filesystem=home/.java com.google.AndroidStudio
+flatpak override --user --filesystem=home/.gradle com.google.AndroidStudio
+
+# Allow Android Studio access to src folder
+flatpak override --user --filesystem=home/src com.google.AndroidStudio
+
+# Allow Android Studio access to .ssh folder
+flatpak override --user --filesystem=home/.ssh:ro com.google.AndroidStudio
+
+# Allow Android Studio access to .gitconfig file
+flatpak override --user --filesystem=home/.gitconfig:ro com.google.AndroidStudio
+
+# Allow Android Studio to read /etc (/etc/shells is required)
+flatpak override --user --filesystem=host-etc:ro com.google.AndroidStudio
+
+# Workaround for incompatibility with BTRFS copy-on-write (see issue in references)
+tee ${HOME}/.android/advancedFeatures.ini << EOF
+QuickbootFileBacked = off
+EOF
+
+################################################
+##### Android SDK tools
+################################################
+
+# References:
+# https://developer.android.com/tools
+# https://developer.android.com/studio/emulator_archive
+# https://dl.google.com/android/repository/repository2-1.xml
+
+# Set Android SDK directory
+ANDROID_SDK_PATH=${HOME}/.android-sdk
+
+# Create Android SDK directory
+mkdir -p ${ANDROID_SDK_PATH}
+
+# Download and install Android SDK command line tools
+LATEST_CMDLINE_TOOLS_VERSION=$(curl -s https://formulae.brew.sh/api/cask/android-commandlinetools.json | jq -r .version)
+wget https://dl.google.com/android/repository/commandlinetools-linux-${LATEST_CMDLINE_TOOLS_VERSION}_latest.zip
+
+unzip commandlinetools-linux-*_latest.zip -d ${ANDROID_SDK_PATH}/cmdline-tools
+mv ${ANDROID_SDK_PATH}/cmdline-tools/* ${ANDROID_SDK_PATH}/cmdline-tools/latest
+rm -f commandlinetools-linux-*.zip
+
+# Android SDK build tools
+LATEST_BUILD_TOOLS_VERSION=$(curl -s https://aur.archlinux.org/rpc/v5/info/android-sdk-build-tools | jq -r .results[0].Version | awk -F[.] '{print $1}')
+wget https://dl.google.com/android/repository/build-tools_${LATEST_BUILD_TOOLS_VERSION}-linux.zip
+
+unzip build-tools_r*-linux.zip -d ${ANDROID_SDK_PATH}/build-tools
+mv ${ANDROID_SDK_PATH}/build-tools/* ${ANDROID_SDK_PATH}/build-tools/latest
+rm -f build-tools_r*-linux.zip
+
+# Android SDK platform tools
+LATEST_PLATFORM_TOOLS_VERSION=$(curl -s https://formulae.brew.sh/api/cask/android-platform-tools.json | jq -r .version)
+wget https://dl.google.com/android/repository/platform-tools_r${LATEST_PLATFORM_TOOLS_VERSION}-linux.zip
+
+unzip platform-tools_r*-linux.zip -d ${ANDROID_SDK_PATH}
+rm -f build-tools_r*-linux.zip
+
+# Android emulator
+wget https://dl.google.com/android/repository/emulator-linux_x64-10696886.zip
+
+unzip emulator-linux_x64-*.zip -d ${ANDROID_SDK_PATH}
+rm -f emulator-linux_x64-*.zip
+
+# Set env vars
+tee ${HOME}/.bashrc.d/android << EOF
+export ANDROID_HOME='${ANDROID_SDK_PATH}'
+export PATH="\${PATH}:\${ANDROID_HOME}/build-tools/latest"
+export PATH="\${PATH}:\${ANDROID_HOME}/cmdline-tools/latest/bin"
+export PATH="\${PATH}:\${ANDROID_HOME}/platform-tools"
+export PATH="\${PATH}:\${ANDROID_HOME}/emulator"
 EOF
 
 ################################################
