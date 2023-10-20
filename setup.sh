@@ -348,11 +348,6 @@ sudo systemctl enable libvirtd
 ##### Development
 ################################################
 
-# References:
-# https://developer.fedoraproject.org/tech/languages/python/python-installation.html
-# https://developer.fedoraproject.org/tech/languages/rust/rust-installation.html
-# # https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
-
 # Set git configurations
 git config --global init.defaultBranch main
 

@@ -44,6 +44,11 @@ sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highl
 ##### Development
 ################################################
 
+# References:
+# https://developer.fedoraproject.org/tech/languages/python/python-installation.html
+# https://developer.fedoraproject.org/tech/languages/rust/rust-installation.html
+# https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
+
 # Create python sandbox virtualenv and alias
 mkdir -p ${HOME}/.python
 
