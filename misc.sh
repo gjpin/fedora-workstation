@@ -41,6 +41,19 @@ sed -i '2 i \ \ \ \ "workbench.preferredLightColorTheme": "Adwaita Light",' ${HO
 sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",' ${HOME}/.config/Code/User/settings.json
 
 ################################################
+##### Cockpit
+################################################
+
+# References:
+# https://cockpit-project.org/running.html#fedora
+
+# Install cockpit
+sudo dnf install -y cockpit
+
+# Enable cockpit
+sudo systemctl enable cockpit.socket
+
+################################################
 ##### Development
 ################################################
 
