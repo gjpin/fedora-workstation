@@ -208,6 +208,7 @@ flatpak override --user --nofilesystem=home/.ssh
 flatpak override --user --nofilesystem=home/.bashrc
 flatpak override --user --nofilesystem=home/.bashrc.d
 flatpak override --user --nofilesystem=home/.config
+flatpak override --user --nofilesystem=home/.local/bin
 flatpak override --user --nofilesystem=home/Sync
 flatpak override --user --nofilesystem=host
 flatpak override --user --nofilesystem=host-os
