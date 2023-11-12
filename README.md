@@ -1,4 +1,5 @@
 # Installation guide
+
 1. Clone project: `git clone https://github.com/gjpin/fedora-workstation.git`
 2. Run setup.sh: `fedora-workstation/setup.sh`
 3. Choose between Gnome and Plasma configurations
@@ -10,9 +11,11 @@
 # Guides
 
 ## Re-enroll TPM2 as LUKS' decryption factor
-`sudo systemd-cryptenroll --wipe-slot tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3`
+
+`sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3`
 
 ## How to revert to a previous Flatpak commit
+
 ```bash
 # List available commits
 flatpak remote-info --log flathub org.godotengine.Godot
@@ -25,6 +28,7 @@ flatpak mask org.godotengine.Godot
 ```
 
 ### How to use Gamescope + MangoHud in Steam
+
 ```bash
 # MangoHud
 mangohud %command%
@@ -40,6 +44,7 @@ gamescope -h 1080 -H 1440 -U -f -- mangohud %command%
 ```
 
 ## How to install .deb package (eg. Aseprite)
+
 ```bash
 mkdir -p ${HOME}/aseprite
 mv ${HOME}/Downloads/Aseprite*.deb ${HOME}/aseprite
@@ -51,6 +56,7 @@ rm -rf ${HOME}/aseprite
 ```
 
 ## Auto-mount extra drive
+
 ```bash
 # Delete old partition layout and re-read partition table
 sudo wipefs -af /dev/nvme1n1
@@ -90,5 +96,5 @@ sudo systemctl daemon-reload
 sudo chown -R $USER:$USER /data
 
 # Auto unlock
-sudo systemd-cryptenroll --tpm2-device=auto /dev/nvme1n1p1
+sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device=auto /dev/nvme1n1p1
 ```

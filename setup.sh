@@ -65,7 +65,8 @@ sudo dnf install -y \
   zstd \
   htop \
   xq \
-  jq
+  jq \
+  fuse-sshfs
 
 # Install fonts
 sudo dnf install -y \
@@ -74,6 +75,7 @@ sudo dnf install -y \
 # Create common user directories
 mkdir -p \
   ${HOME}/.local/share/applications \
+  ${HOME}/.local/share/icons \
   ${HOME}/.local/share/themes \
   ${HOME}/.local/share/fonts \
   ${HOME}/.bashrc.d \
@@ -233,18 +235,24 @@ flatpak override --user --filesystem=xdg-config/gtk-4.0:ro
 
 # Install Flatpak runtimes
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
+flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
 flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
+flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/23.08
 
 if lspci | grep VGA | grep "Intel" > /dev/null; then
   flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
+  flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/23.08
 fi
 
 # Install support for additional languages in Flatpak
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk/x86_64/23.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk17/x86_64/23.08
 flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/23.08
 flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/23.08
 flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.rust-stable/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.rust-stable/x86_64/23.08
 
 # Install applications
 flatpak install -y flathub com.bitwarden.desktop
@@ -259,9 +267,135 @@ flatpak install -y flathub org.blender.Blender
 flatpak install -y flathub md.obsidian.Obsidian
 flatpak install -y flathub org.chromium.Chromium
 flatpak install -y flathub com.github.marhkb.Pods
+flatpak install -y flathub dev.k8slens.OpenLens
+
+# Allow OpenLens to access kubernetes folders
+flatpak override --user --filesystem=home/.kube/config dev.k8slens.OpenLens
+flatpak override --user --filesystem=home/.minikube dev.k8slens.OpenLens
 
 # Allow Obsidian to access vault folder
 flatpak override --user --filesystem=home/.obsidian md.obsidian.Obsidian
+
+################################################
+##### kubectl
+################################################
+
+# Install kubectl
+curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/kubectl
+
+# kubectl updater
+tee ${HOME}/.local/bin/update-kubectl << 'EOF'
+LATEST_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+INSTALLED_VERSION=$(kubectl version --client --output=json | jq -r .clientVersion.gitVersion)
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  chmod +x kubectl
+  sudo mv kubectl /usr/local/bin/kubectl
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-kubectl
+
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ update-kubectl' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update kubectl' ${HOME}/.bashrc.d/update-all
+
+# kubectl alias
+tee ${HOME}/.bashrc.d/kubectl << EOF
+alias k="kubectl"
+EOF
+
+# kubectl autocompletion
+echo "source <(kubectl completion bash)" >> ${HOME}/.bashrc.d/kubectl
+
+################################################
+##### Terraform
+################################################
+
+# Install Terraform
+LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
+curl -s -o terraform.zip https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
+unzip terraform.zip
+sudo mv terraform /usr/local/bin/terraform
+rm -f terraform.zip
+
+# Terraform updater
+tee ${HOME}/.local/bin/update-terraform << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
+INSTALLED_VERSION=$(terraform --version --json | jq -r .terraform_version)
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -o terraform.zip https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
+  unzip terraform.zip
+  sudo mv terraform /usr/local/bin/terraform
+  rm -f terraform.zip
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-terraform
+
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ update-terraform' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update Terraform' ${HOME}/.bashrc.d/update-all
+
+################################################
+##### Helm
+################################################
+
+# Install Helm
+LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
+sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
+rm -f helm.tar.gz
+
+# Helm updater
+tee ${HOME}/.local/bin/update-helm << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(helm version --template='{{.Version}}')
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
+  sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
+  rm -f helm.tar.gz
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-helm
+
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ update-helm' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update Helm' ${HOME}/.bashrc.d/update-all
+
+################################################
+##### Cilium
+################################################
+
+# Install Cilium
+LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
+sudo tar -xzf cilium.tar.gz -C /usr/local/bin
+rm -f cilium.tar.gz
+
+# Cilium updater
+tee ${HOME}/.local/bin/update-cilium << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(cilium version --client | grep -o -P '(?<=cilium-cli: ).*(?= compiled)')
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
+  sudo tar -xzf cilium.tar.gz -C /usr/local/bin
+  rm -f cilium.tar.gz
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-cilium
+
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ update-cilium' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update Cilium' ${HOME}/.bashrc.d/update-all
 
 ################################################
 ##### Bottles
@@ -296,9 +430,6 @@ EOF
 ################################################
 ##### Firefox
 ################################################
-
-# References:
-# https://github.com/rafaelmardojai/firefox-gnome-theme
 
 # Remove native firefox
 sudo dnf remove -y firefox
@@ -345,6 +476,9 @@ sudo dnf install -y @virtualization
 # Enable libvirtd service
 sudo systemctl enable libvirtd
 
+# Add user to libvirt group
+sudo usermod -a -G libvirt ${USER}
+
 ################################################
 ##### Development
 ################################################
@@ -359,12 +493,6 @@ EOF
 
 # Install make
 sudo dnf install -y make
-
-# Install butane
-sudo dnf install -y butane
-
-# Install Kubernetes client tools
-sudo dnf install -y kubernetes-client
 
 # Install Neovim and set as default editor
 sudo dnf install -y neovim
@@ -454,7 +582,7 @@ systemctl --user enable syncthing.service
 echo 'add_dracutmodules+=" tpm2-tss "' | sudo tee /etc/dracut.conf.d/tpm2.conf
 
 # Enroll TPM2 as LUKS' decryption factor
-sudo systemd-cryptenroll --wipe-slot tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3
+sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3
 
 # Update crypttab
 sudo sed -i "s|discard|&,tpm2-device=auto,tpm2-pcrs=0+1+2+3+4+5+7+9|" /etc/crypttab

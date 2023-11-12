@@ -1,6 +1,102 @@
 #!/usr/bin/bash
 
 ################################################
+##### Minikube (kubernetes)
+################################################
+
+# Install minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
+sudo rpm -Uvh minikube-latest.x86_64.rpm
+
+# todo: add auto updater
+# check current and latest versions: minikube update-check
+# if they are different, then download latest rpm, install it and remove rpm file
+
+# Set minikube default settings
+minikube config set driver kvm2
+minikube config set container-runtime containerd
+minikube config set memory 8192
+minikube config set cpus 4
+
+# Enable minikube ingress addon
+minikube addons enable ingress
+
+################################################
+##### Kind (kubernetes)
+################################################
+
+# Install kind
+# https://kind.sigs.k8s.io/docs/user/rootless/
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+
+tee ${HOME}/.bashrc.d/kind << 'EOF'
+# Enable podman backend in Kind
+KIND_EXPERIMENTAL_PROVIDER=podman
+
+# Alias
+alias kind-single-node="kind create cluster --name single-node"
+alias kind-multi-node="kind create cluster --name multi-node --config ${HOME}/.kind/kind-multi-node.yaml"
+EOF
+
+echo "source <(kind completion bash)" >> ${HOME}/.bashrc.d/kind
+
+mkdir -p ${HOME}/.kind
+tee ${HOME}/.kind/kind-multi-node.yaml << 'EOF'
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+- role: worker
+EOF
+
+# todo: add auto updater
+# check current and latest versions
+# if they are different, then download latest version
+
+################################################
+##### Icon theme
+################################################
+
+# References:
+# https://github.com/somepaulo/MoreWaita
+
+# Create MoreWaita directory
+mkdir -p ${HOME}/.local/share/icons/MoreWaita
+
+# Install MoreWaita icon theme
+git clone https://github.com/somepaulo/MoreWaita.git ${HOME}/.local/share/icons/MoreWaita
+
+# Update icon theme cache
+gtk-update-icon-cache -f -t ${HOME}/.local/share/icons/MoreWaita
+xdg-desktop-menu forceupdate
+
+# Set MoreWaita icon theme
+gsettings set org.gnome.desktop.interface icon-theme 'MoreWaita'
+
+# MoreWaita icon theme updater
+tee ${HOME}/.local/bin/update-morewaita-icon-theme << 'EOF'
+#!/usr/bin/bash
+
+# Update MoreWaita icon theme
+git -C ${HOME}/.local/share/icons/MoreWaita pull
+
+# Update Icon theme cache
+gtk-update-icon-cache -f -t ${HOME}/.local/share/icons/MoreWaita
+xdg-desktop-menu forceupdate
+EOF
+
+chmod +x ${HOME}/.local/bin/update-morewaita-icon-theme
+
+# Add MoreWaita icon theme updater to bash updater function
+sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ update-morewaita-icon-theme' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ \ # Update MoreWaita icon theme' ${HOME}/.bashrc.d/update-all
+
+################################################
 ##### VSCode (Native)
 ################################################
 
@@ -299,9 +395,9 @@ EOF
 # https://github.com/Matoking/protontricks
 
 # Install Wine and dependencies
-flatpak install -y flathub app/org.winehq.Wine/x86_64/stable-22.08
-flatpak install -y flathub runtime/org.winehq.Wine.gecko/x86_64/stable-22.08
-flatpak install -y flathub runtime/org.winehq.Wine.mono/x86_64/stable-22.08
+flatpak install -y flathub app/org.winehq.Wine/x86_64/stable-23.08
+flatpak install -y flathub runtime/org.winehq.Wine.gecko/x86_64/stable-23.08
+flatpak install -y flathub runtime/org.winehq.Wine.mono/x86_64/stable-23.08
 
 # Deny Wine internet access
 flatpak override --user --unshare=network org.winehq.Wine
@@ -484,8 +580,8 @@ sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-re
 sudo flatpak remote-modify flathub-beta --enable
 
 # Install Mesa git
-flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git//22.08
-flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git//22.08
+flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git//23.08
+flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git//23.08
 
 # Make Steam use mesa-git
 flatpak override --user --env=FLATPAK_GL_DRIVERS=mesa-git com.valvesoftware.Steam
