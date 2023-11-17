@@ -97,44 +97,77 @@ sed -i '2 i \ \ update-morewaita-icon-theme' ${HOME}/.bashrc.d/update-all
 sed -i '2 i \ \ # Update MoreWaita icon theme' ${HOME}/.bashrc.d/update-all
 
 ################################################
-##### VSCode (Native)
+##### VSCode (Flatpak)
 ################################################
 
-# References:
-# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
-
-# Import Microsoft key
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# Add VSCode repository
-sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
-[code]
-name=Visual Studio Code
-baseurl=https://packages.microsoft.com/yumrepos/vscode
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
+# Install support for additional languages in Flatpak
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk17/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk17/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.dotnet7/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.dotnet7/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/23.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.rust-stable/x86_64/22.08
+flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.rust-stable/x86_64/23.08
 
 # Install VSCode
-dnf check-update
-sudo dnf install -y code
+flatpak install -y flathub com.visualstudio.code
+
+# Allow VSCode access to src folder
+flatpak override --user --filesystem=home/src com.visualstudio.code
+
+# Allow VSCode access to .ssh folder
+flatpak override --user --filesystem=home/.ssh:ro com.visualstudio.code
+
+# Allow VSCode access to .gitconfig file
+flatpak override --user --filesystem=home/.gitconfig:ro com.visualstudio.code
+
+# Allow VSCode to read /etc (/etc/shells is required)
+flatpak override --user --filesystem=host-etc:ro com.visualstudio.code
 
 # Install extensions
-code --install-extension golang.Go
-code --install-extension ms-python.python
-code --install-extension redhat.vscode-yaml
-code --install-extension esbenp.prettier-vscode
-code --install-extension dbaeumer.vscode-eslint
+flatpak run com.visualstudio.code --install-extension golang.Go
+flatpak run com.visualstudio.code --install-extension ms-python.python
+flatpak run com.visualstudio.code --install-extension redhat.vscode-yaml
+flatpak run com.visualstudio.code --install-extension esbenp.prettier-vscode
+flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
+
+# Enable support for additional languages
+flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=node18,typescript,golang,openjdk17,dotnet7,rust-stable' com.visualstudio.code
 
 # Configure VSCode
-mkdir -p ${HOME}/.config/Code/User
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
+mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+
+# Add Flatpak specific configurations
+sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
+        "LD_PRELOAD": null,\
+    },\
+    "terminal.integrated.defaultProfile.linux": "bash",\
+    "terminal.integrated.profiles.linux": {\
+        "bash": {\
+          "path": "/usr/bin/bash",\
+          "icon": "terminal-bash",\
+          "overrideName": true\
+        }\
+      },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+
+# Create alias
+tee ${HOME}/.bashrc.d/vscode << EOF
+alias code="flatpak run com.visualstudio.code"
+EOF
+
+# Install VSCode Gnome theme
+flatpak run com.visualstudio.code --install-extension piousdeer.adwaita-theme
 
 # Change VSCode config to use theme
-sed -i '2 i \ \ \ \ "workbench.preferredDarkColorTheme": "Adwaita Dark",' ${HOME}/.config/Code/User/settings.json
-sed -i '2 i \ \ \ \ "workbench.preferredLightColorTheme": "Adwaita Light",' ${HOME}/.config/Code/User/settings.json
-sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",' ${HOME}/.config/Code/User/settings.json
+sed -i '2 i \ \ \ \ "workbench.preferredDarkColorTheme": "Adwaita Dark",' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+sed -i '2 i \ \ \ \ "workbench.preferredLightColorTheme": "Adwaita Light",' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 ################################################
 ##### Cockpit
