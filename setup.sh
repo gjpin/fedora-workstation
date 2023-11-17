@@ -473,6 +473,9 @@ sudo usermod -a -G libvirt ${USER}
 ##### Development
 ################################################
 
+# References:
+# https://developer.fedoraproject.org/tech/languages/python/python-installation.html
+
 # Set git configurations
 git config --global init.defaultBranch main
 
@@ -497,6 +500,27 @@ sudo dnf install -y nodejs npm
 
 # Golang
 sudo dnf install -y golang
+
+mkdir -p ${HOME}/.go
+
+tee ${HOME}/.bashrc.d/go << 'EOF'
+export GOPATH="$HOME/.go"
+EOF
+
+# .NET
+sudo dnf install -y dotnet-sdk-7.0
+
+# Create python dev sandbox virtualenv and alias
+mkdir -p ${HOME}/.python
+
+python -m venv ${HOME}/.python/dev
+
+tee ${HOME}/.bashrc.d/python << 'EOF'
+alias pydev="source ${HOME}/.python/dev/bin/activate"
+EOF
+
+# Install uvicorn (ASGI web server implementation for Python)
+sudo dnf install -y python3-uvicorn+standard
 
 ################################################
 ##### VSCode (Native)

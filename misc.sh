@@ -187,30 +187,8 @@ sudo systemctl enable cockpit.socket
 ################################################
 
 # References:
-# https://developer.fedoraproject.org/tech/languages/python/python-installation.html
 # https://developer.fedoraproject.org/tech/languages/rust/rust-installation.html
 # https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
-
-# Create python sandbox virtualenv and alias
-mkdir -p ${HOME}/.python
-
-python -m venv ${HOME}/.python/play
-
-tee ${HOME}/.bashrc.d/python << 'EOF'
-alias pythonplay="source ${HOME}/.python/play/bin/activate"
-EOF
-
-# Install go
-sudo dnf install -y golang
-
-mkdir -p ${HOME}/.go
-
-tee ${HOME}/.bashrc.d/go << 'EOF'
-export GOPATH="$HOME/.go"
-EOF
-
-# Install nodejs
-sudo dnf install -y nodejs npm
 
 # Install cfssl
 sudo dnf install -y golang-github-cloudflare-cfssl
