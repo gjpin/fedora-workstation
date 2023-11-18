@@ -475,6 +475,8 @@ sudo usermod -a -G libvirt ${USER}
 
 # References:
 # https://developer.fedoraproject.org/tech/languages/python/python-installation.html
+# https://fedoraproject.org/wiki/SIGs/HC
+# https://developer.fedoraproject.org/tech/languages/c/cpp_installation.html
 
 # Set git configurations
 git config --global init.defaultBranch main
@@ -521,6 +523,33 @@ EOF
 
 # Install uvicorn (ASGI web server implementation for Python)
 sudo dnf install -y python3-uvicorn+standard
+
+# Install C++ compilers
+sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+
+# Install ROCm packages
+if lspci | grep "VGA" | grep "AMD" > /dev/null; then
+sudo usermod -a -G video ${USER}
+sudo dnf install -y \
+  rocminfo rocm-clinfo \
+  rocm-opencl rocm-opencl-devel \
+  rocm-hip rocm-hip-devel \
+  rocm-runtime rocm-runtime-devel \
+  rocm-smi rocm-smi-devel \
+  rocm-cmake rocm-comgr rocm-comgr-devel rocm-device-libs
+
+tee ${HOME}/.bashrc.d/rocm << EOF
+# Confirm "Node:" of GPU with rocminfo
+export HIP_VISIBLE_DEVICES=1
+
+# If GPU is not officially supported, pretend to be 6900xt
+export HSA_OVERRIDE_GFX_VERSION=10.3.0
+export HCC_AMDGPU_TARGET=gfx1030
+EOF
+fi
+
+# Install CLBlast packages
+sudo dnf install -y clblast clblast-devel clblast-tuners
 
 ################################################
 ##### VSCode (Native)
