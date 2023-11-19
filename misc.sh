@@ -1,6 +1,63 @@
 #!/usr/bin/bash
 
 ################################################
+##### ROCm
+################################################
+
+# Install ROCm packages
+if lspci | grep "VGA" | grep "AMD" > /dev/null; then
+sudo usermod -a -G video ${USER}
+sudo usermod -a -G render ${USER}
+sudo dnf install -y \
+  rocminfo rocm-clinfo \
+  rocm-opencl rocm-opencl-devel \
+  rocm-hip rocm-hip-devel \
+  rocm-runtime rocm-runtime-devel \
+  rocm-smi rocm-smi-devel \
+  rocm-cmake rocm-comgr rocm-comgr-devel rocm-device-libs
+
+tee ${HOME}/.bashrc.d/rocm << EOF
+# Confirm "Node:" of GPU with rocminfo
+export HIP_VISIBLE_DEVICES=1
+
+# If GPU is not officially supported, pretend to be 6900xt
+export HSA_OVERRIDE_GFX_VERSION=10.3.0
+export HCC_AMDGPU_TARGET=gfx1030
+EOF
+fi
+
+# Install CLBlast packages
+sudo dnf install -y clblast clblast-devel clblast-tuners
+
+################################################
+##### PyTorch
+################################################
+
+# References:
+# Check supported python version at (eg. cp311 for python 3.11): https://download.pytorch.org/whl/rocm5.6/torch/
+
+# Install Python 3.11
+sudo dnf install -y python3.11
+
+# Create venv for pytorch
+python3.11 -m venv ${HOME}/.python/pytorch
+
+tee -a ${HOME}/.bashrc.d/python << 'EOF'
+alias pytorch="source ${HOME}/.python/pytorch/bin/activate"
+EOF
+
+# Enable pytorch venv
+source ${HOME}/.python/pytorch/bin/activate
+
+# Install pytorch
+if lspci | grep "VGA" | grep "AMD" > /dev/null; then
+  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm5.6
+fi
+
+# Deactivate pytorch venv
+deactivate
+
+################################################
 ##### Minikube (kubernetes)
 ################################################
 
@@ -206,6 +263,9 @@ EOF
 sudo dnf install -y \
   java-latest-openjdk \
   java-latest-openjdk-devel
+
+# Install C++ compilers
+sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
 
 ################################################
 ##### IntelliJ IDEA Community
