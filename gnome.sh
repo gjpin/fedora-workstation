@@ -37,7 +37,9 @@ flatpak install -y flathub com.mattjakeman.ExtensionManager
 flatpak install -y flathub io.github.celluloid_player.Celluloid
 flatpak install -y flathub org.gaphor.Gaphor
 flatpak install -y flathub com.github.flxzt.rnote
+
 flatpak install -y flathub org.gnome.gitg
+flatpak override --user --filesystem=home/src org.gnome.gitg
 
 ################################################
 ##### Firefox
