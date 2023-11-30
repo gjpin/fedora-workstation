@@ -525,6 +525,9 @@ EOF
 # Install uvicorn (ASGI web server implementation for Python)
 sudo dnf install -y python3-uvicorn+standard
 
+# Install C++ compilers
+sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+
 ################################################
 ##### VSCode (Native)
 ################################################

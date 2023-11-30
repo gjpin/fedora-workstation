@@ -264,9 +264,6 @@ sudo dnf install -y \
   java-latest-openjdk \
   java-latest-openjdk-devel
 
-# Install C++ compilers
-sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
-
 ################################################
 ##### IntelliJ IDEA Community
 ################################################
