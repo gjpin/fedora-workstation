@@ -69,9 +69,9 @@ EOF
 chmod +x ${HOME}/.local/bin/update-firefox-theme
 
 # Add Firefox theme updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-firefox-theme' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update Firefox theme' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-firefox-theme' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Firefox theme' ${HOME}/.zshrc.d/update-all
 
 # Gnome specific configurations
 tee -a ${FIREFOX_PROFILE_PATH}/user.js << 'EOF'

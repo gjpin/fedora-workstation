@@ -44,6 +44,23 @@ sudo sed -i "s|^# DisableAutoSpawn|DisableAutoSpawn|g" /etc/speech-dispatcher/sp
 sudo hostnamectl set-hostname --pretty "${NEW_HOSTNAME}"
 sudo hostnamectl set-hostname --static "${NEW_HOSTNAME}"
 
+# Create common user directories
+mkdir -p \
+  ${HOME}/.local/share/applications \
+  ${HOME}/.local/share/icons \
+  ${HOME}/.local/share/themes \
+  ${HOME}/.local/share/fonts \
+  ${HOME}/.zshrc.d \
+  ${HOME}/.local/bin \
+  ${HOME}/.config/autostart \
+  ${HOME}/.config/systemd/user \
+  ${HOME}/.ssh \
+  ${HOME}/.config/environment.d \
+  ${HOME}/src
+
+# Set SSH folder permissions
+chmod 700 ${HOME}/.ssh
+
 # Configure DNF
 sudo tee -a /etc/dnf/dnf.conf << EOF
 fastestmirror=True
@@ -66,27 +83,19 @@ sudo dnf install -y \
   htop \
   xq \
   jq \
-  fuse-sshfs
+  fuse-sshfs \
+  fd-find
 
 # Install fonts
 sudo dnf install -y \
   source-foundry-hack-fonts
-  
-# Create common user directories
-mkdir -p \
-  ${HOME}/.local/share/applications \
-  ${HOME}/.local/share/icons \
-  ${HOME}/.local/share/themes \
-  ${HOME}/.local/share/fonts \
-  ${HOME}/.bashrc.d \
-  ${HOME}/.local/bin \
-  ${HOME}/.config/autostart \
-  ${HOME}/.config/systemd/user \
-  ${HOME}/.ssh \
-  ${HOME}/.config/environment.d \
-  ${HOME}/src
 
-chmod 700 ${HOME}/.ssh
+# Install FiraCode Nerd font
+LATEST_NERDFONTS_VERSION=$(curl -s https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl https://github.com/ryanoasis/nerd-fonts/releases/download/${LATEST_NERDFONTS_VERSION}/FiraCode.tar.xz -L -O
+tar -xf FiraCode.tar.xz -C ${HOME}/.local/share/fonts
+rm -f FiraCode.tar.xz
+fc-cache -f
 
 ################################################
 ##### RPM Fusion
@@ -141,11 +150,48 @@ DefaultTimeoutStopSec=10s
 EOF
 
 ################################################
-##### bash
+##### ZSH
 ################################################
 
-# Updater bash function
-tee ${HOME}/.bashrc.d/update-all << EOF
+# Install ZSH and plugins
+sudo dnf install -y zsh zsh-autosuggestions zsh-syntax-highlighting
+
+# Install Oh-My-Zsh
+# https://github.com/ohmyzsh/ohmyzsh#manual-installation
+git clone https://github.com/ohmyzsh/ohmyzsh.git ${HOME}/.oh-my-zsh
+cp ${HOME}/.oh-my-zsh/templates/zshrc.zsh-template ${HOME}/.zshrc
+
+# Install powerlevel10k zsh theme
+# https://github.com/romkatv/powerlevel10k#oh-my-zsh
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${HOME}/.oh-my-zsh/custom/themes/powerlevel10k
+sed -i 's|^ZSH_THEME=".*|ZSH_THEME="powerlevel10k/powerlevel10k"|g' ${HOME}/.zshrc
+
+# Source from ~/.zshrc.d
+mkdir -p ${HOME}/.zshrc.d
+
+tee -a ${HOME}/.zshrc << 'EOF'
+
+# Source .zshrc.d files
+for file in ~/.zshrc.d/*; do
+    source "$file"
+done
+EOF
+
+# Add ~/.local/bin to the path
+tee ${HOME}/.zshrc.d/local-bin << 'EOF'
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+EOF
+
+# Change user default shell to ZSH
+chsh -s $(which zsh)
+
+# Updater zsh function
+tee ${HOME}/.zshrc.d/update-all << EOF
 update-all() {
   # Update system
   sudo dnf upgrade -y --refresh
@@ -161,14 +207,9 @@ update-all() {
 EOF
 
 # Create aliases
-tee ${HOME}/.bashrc.d/selinux << EOF
+tee ${HOME}/.zshrc.d/selinux << EOF
 alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
 alias selogs="sudo journalctl -t setroubleshoot"
-EOF
-
-# Configure bash prompt
-tee ${HOME}/.bashrc.d/prompt << EOF
-PROMPT_COMMAND="export PROMPT_COMMAND=echo"
 EOF
 
 ################################################
@@ -209,6 +250,8 @@ flatpak override --user --nofilesystem=home
 flatpak override --user --nofilesystem=home/.ssh
 flatpak override --user --nofilesystem=home/.bashrc
 flatpak override --user --nofilesystem=home/.bashrc.d
+flatpak override --user --nofilesystem=home/.zshrc
+flatpak override --user --nofilesystem=home/.zshrc.d
 flatpak override --user --nofilesystem=home/.config
 flatpak override --user --nofilesystem=home/.local/bin
 flatpak override --user --nofilesystem=home/Sync
@@ -289,17 +332,20 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-kubectl
 
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-kubectl' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update kubectl' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-kubectl' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update kubectl' ${HOME}/.zshrc.d/update-all
 
 # kubectl alias
-tee ${HOME}/.bashrc.d/kubectl << EOF
+tee ${HOME}/.zshrc.d/kubectl << EOF
+# Kubectl alias
 alias k="kubectl"
-EOF
 
-# kubectl autocompletion
-echo "source <(kubectl completion bash)" >> ${HOME}/.bashrc.d/kubectl
+# Autocompletion
+autoload -Uz compinit
+compinit
+source <(kubectl completion zsh)
+EOF
 
 ################################################
 ##### Terraform
@@ -327,9 +373,9 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-terraform
 
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-terraform' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update Terraform' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-terraform' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Terraform' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### Helm
@@ -355,9 +401,9 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-helm
 
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-helm' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update Helm' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-helm' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Helm' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### Cilium
@@ -383,9 +429,9 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-cilium
 
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-cilium' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update Cilium' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### Bottles
@@ -483,20 +529,12 @@ sudo usermod -a -G libvirt ${USER}
 git config --global init.defaultBranch main
 
 # Set podman alias
-tee ${HOME}/.bashrc.d/podman << EOF
+tee ${HOME}/.zshrc.d/podman << EOF
 alias docker="podman"
 EOF
 
 # Install make
 sudo dnf install -y make
-
-# Install Neovim and set as default editor
-sudo dnf install -y neovim
-
-tee ${HOME}/.bashrc.d/neovim << 'EOF'
-alias vi=nvim
-alias vim=nvim
-EOF
 
 # Node and NPM
 sudo dnf install -y nodejs npm
@@ -506,7 +544,7 @@ sudo dnf install -y golang
 
 mkdir -p ${HOME}/.go
 
-tee ${HOME}/.bashrc.d/go << 'EOF'
+tee ${HOME}/.zshrc.d/go << 'EOF'
 export GOPATH="$HOME/.go"
 EOF
 
@@ -518,7 +556,7 @@ mkdir -p ${HOME}/.python
 
 python -m venv ${HOME}/.python/dev
 
-tee ${HOME}/.bashrc.d/python << 'EOF'
+tee ${HOME}/.zshrc.d/python << 'EOF'
 alias pydev="source ${HOME}/.python/dev/bin/activate"
 EOF
 
@@ -527,6 +565,52 @@ sudo dnf install -y python3-uvicorn+standard
 
 # Install C++ compilers
 sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+
+################################################
+##### Neovim
+################################################
+
+# Install Neovim and set as default editor
+sudo dnf install -y neovim
+
+tee ${HOME}/.zshrc.d/neovim << 'EOF'
+# Set neovim alias
+alias vi=nvim
+alias vim=nvim
+
+# Set preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+  export VISUAL='vim'
+else
+  export EDITOR='mvim'
+  export VISUAL='nvim'
+fi
+EOF
+
+# Install LazyVim
+# https://www.lazyvim.org/installation
+git clone https://github.com/LazyVim/starter ${HOME}/.config/nvim
+rm -rf ${HOME}/.config/nvim/.git
+
+# Install arctic.nvim (Dark Modern) color scheme in neovim
+# https://github.com/rockyzhang24/arctic.nvim/tree/v2
+# https://www.lazyvim.org/plugins/colorscheme
+tee ${HOME}/.config/nvim/lua/plugins/colorscheme.lua << 'EOF'
+return {
+    {
+        "gjpin/arctic.nvim",
+        branch = "v2",
+        dependencies = { "rktjmp/lush.nvim" }
+    },
+    {
+        "LazyVim/LazyVim",
+        opts = {
+            colorscheme = "arctic",
+        }
+    }
+}
+EOF
 
 ################################################
 ##### VSCode (Native)

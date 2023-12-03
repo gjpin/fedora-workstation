@@ -137,6 +137,6 @@ EOF
 chmod +x ${HOME}/.local/bin/update-sunshine
 
 # Add Sunshine updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ update-sunshine' ${HOME}/.bashrc.d/update-all
-sed -i '2 i \ \ # Update Sunshine' ${HOME}/.bashrc.d/update-all
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-sunshine' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Sunshine' ${HOME}/.zshrc.d/update-all
