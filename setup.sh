@@ -549,7 +549,15 @@ EOF
 sudo dnf install -y make
 
 # Node and NPM
-sudo dnf install -y nodejs npm
+sudo dnf install -y nodejs npm yarnpkg
+
+# Change npm's default directory
+# https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
+mkdir ${HOME}/.npm-global
+npm config set prefix '~/.npm-global'
+tee ${HOME}/.zshrc.d/npm << 'EOF'
+export PATH=~/.npm-global/bin:$PATH
+EOF
 
 # Golang
 sudo dnf install -y golang

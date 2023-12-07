@@ -285,13 +285,13 @@ mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 # https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
 sudo dnf install -y libappindicator-gtk3
 
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v53.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v57.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Grand Theft Focus
 # # https://extensions.gnome.org/extension/5410/grand-theft-focus
-curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v3.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v5.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
@@ -303,7 +303,7 @@ rm -f *.shell-extension.zip
 
 # Legacy (GTK3) Theme Scheme Auto Switcher
 # https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
-curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v5.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v7.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
