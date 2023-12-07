@@ -40,3 +40,6 @@ if [ -d ~/.zshrc.d ]; then
 fi
 
 unset rc
+
+# Disable glob
+setopt noglob

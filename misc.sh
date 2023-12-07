@@ -378,7 +378,7 @@ unzip platform-tools_r*-linux.zip -d ${ANDROID_SDK_PATH}
 rm -f build-tools_r*-linux.zip
 
 # Android emulator
-wget https://dl.google.com/android/repository/emulator-linux_x64-10696886.zip
+wget https://dl.google.com/android/repository/emulator-linux_x64-11150993.zip
 
 unzip emulator-linux_x64-*.zip -d ${ANDROID_SDK_PATH}
 rm -f emulator-linux_x64-*.zip
