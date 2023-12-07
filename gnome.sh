@@ -44,6 +44,12 @@ sudo dnf config-manager --save --setopt="copr:copr.fedorainfracloud.org:kylegosp
 # Install Mutter VRR
 sudo dnf update -y --refresh
 
+sudo tee -a /etc/environment << 'EOF'
+
+# Gnome VRR
+MUTTER_DEBUG_FORCE_KMS_MODE=simple
+EOF
+
 ################################################
 ##### Flatpak
 ################################################
