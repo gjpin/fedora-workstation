@@ -29,6 +29,22 @@ systemctl --user mask \
   tracker-xdg-portal-3.service
 
 ################################################
+##### Gnome VRR
+################################################
+
+# References:
+# https://copr.fedorainfracloud.org/coprs/kylegospo/gnome-vrr/
+
+# Add gnome-vrr Copr
+sudo dnf copr enable -y kylegospo/gnome-vrr
+
+# Avoid upstream changes to mutter
+sudo dnf config-manager --save --setopt="copr:copr.fedorainfracloud.org:kylegospo:gnome-vrr.priority=1"
+
+# Install Mutter VRR
+sudo dnf update -y --refresh
+
+################################################
 ##### Flatpak
 ################################################
 
@@ -205,8 +221,13 @@ fi
 # Configure terminal color scheme
 dconf write /org/gnome/terminal/legacy/theme-variant "'dark'"
 GNOME_TERMINAL_PROFILE=`gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'`
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ background-color "rgb(24,24,24)"
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ font "FiraCode Nerd Font Mono Medium 10"
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ foreground-color "rgb(204,204,204)"
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ use-system-font false
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ use-theme-colors false
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ default-size-columns 110
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(34,209,139)', 'rgb(196,160,0)', 'rgb(51,142,250)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']"
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ palette "['rgb(24,24,24)', 'rgb(209,105,105)', 'rgb(106,153,85)', 'rgb(220,220,170)', 'rgb(79,193,255)', 'rgb(197,134,192)', 'rgb(78,201,176)', 'rgb(81,80,79)', 'rgb(81,80,79)', 'rgb(241,76,76)', 'rgb(137,209,133)', 'rgb(204,167,0)', 'rgb(55,148,255)', 'rgb(249,38,114)', 'rgb(181,206,168)', 'rgb(157,157,157)']"
 
 # Set fonts
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10' # default: Cantarell 11

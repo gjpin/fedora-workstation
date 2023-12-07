@@ -56,7 +56,7 @@ mkdir -p \
   ${HOME}/.config/systemd/user \
   ${HOME}/.ssh \
   ${HOME}/.config/environment.d \
-  ${HOME}/src
+  ${HOME}/src \
 
 # Set SSH folder permissions
 chmod 700 ${HOME}/.ssh
@@ -84,7 +84,8 @@ sudo dnf install -y \
   xq \
   jq \
   fuse-sshfs \
-  fd-find
+  fd-find \
+  fzf
 
 # Install fonts
 sudo dnf install -y \
@@ -159,23 +160,12 @@ sudo dnf install -y zsh zsh-autosuggestions zsh-syntax-highlighting
 # Install Oh-My-Zsh
 # https://github.com/ohmyzsh/ohmyzsh#manual-installation
 git clone https://github.com/ohmyzsh/ohmyzsh.git ${HOME}/.oh-my-zsh
-cp ${HOME}/.oh-my-zsh/templates/zshrc.zsh-template ${HOME}/.zshrc
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.zshrc -o ${HOME}/.zshrc
 
 # Install powerlevel10k zsh theme
 # https://github.com/romkatv/powerlevel10k#oh-my-zsh
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${HOME}/.oh-my-zsh/custom/themes/powerlevel10k
-sed -i 's|^ZSH_THEME=".*|ZSH_THEME="powerlevel10k/powerlevel10k"|g' ${HOME}/.zshrc
-
-# Source from ~/.zshrc.d
-mkdir -p ${HOME}/.zshrc.d
-
-tee -a ${HOME}/.zshrc << 'EOF'
-
-# Source .zshrc.d files
-for file in ~/.zshrc.d/*; do
-    source "$file"
-done
-EOF
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.p10k.zsh -o ${HOME}/.p10k.zsh
 
 # Add ~/.local/bin to the path
 tee ${HOME}/.zshrc.d/local-bin << 'EOF'
@@ -310,7 +300,7 @@ flatpak override --user --filesystem=home/.minikube dev.k8slens.OpenLens
 flatpak override --user --filesystem=home/.obsidian md.obsidian.Obsidian
 
 ################################################
-##### kubectl
+##### Kubernetes
 ################################################
 
 # Install kubectl
@@ -336,10 +326,32 @@ sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ update-kubectl' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update kubectl' ${HOME}/.zshrc.d/update-all
 
-# kubectl alias
-tee ${HOME}/.zshrc.d/kubectl << EOF
+# Install kubectx / kubens
+sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+
+# kubectx updater
+tee ${HOME}/.local/bin/update-kubectx << 'EOF'
+#!/usr/bin/bash
+
+# Update kubectx
+sudo git -C /opt/kubectx pull
+EOF
+
+chmod +x ${HOME}/.local/bin/update-kubectx
+
+# Add Firefox theme updater to bash updater function
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-kubectx' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update kubectx' ${HOME}/.zshrc.d/update-all
+
+# Kubernetes aliases and autocompletion
+tee ${HOME}/.zshrc.d/kubectl << 'EOF'
 # Kubectl alias
 alias k="kubectl"
+alias kx="kubectx"
+alias kn="kubens"
 
 # Autocompletion
 autoload -Uz compinit
@@ -547,9 +559,6 @@ mkdir -p ${HOME}/.go
 tee ${HOME}/.zshrc.d/go << 'EOF'
 export GOPATH="$HOME/.go"
 EOF
-
-# .NET
-sudo dnf install -y dotnet-sdk-7.0
 
 # Create python dev sandbox virtualenv and alias
 mkdir -p ${HOME}/.python
