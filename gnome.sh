@@ -59,6 +59,7 @@ flatpak install -y flathub com.mattjakeman.ExtensionManager
 flatpak install -y flathub io.github.celluloid_player.Celluloid
 flatpak install -y flathub org.gaphor.Gaphor
 flatpak install -y flathub com.github.flxzt.rnote
+flatpak install -y flathub nl.hjdskes.gcolor3
 
 flatpak install -y flathub org.gnome.gitg
 flatpak override --user --filesystem=home/src org.gnome.gitg
@@ -280,15 +281,6 @@ gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, '
 # Create Gnome shell extensions folder
 mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
-# AppIndicator and KStatusNotifierItem Support
-# https://extensions.gnome.org/extension/615/appindicator-support/
-# https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
-sudo dnf install -y libappindicator-gtk3
-
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v57.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
 # Grand Theft Focus
 # # https://extensions.gnome.org/extension/5410/grand-theft-focus
 curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v5.shell-extension.zip -O
@@ -308,7 +300,7 @@ gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'grand-theft-focus@zalckos.github.com', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+gsettings set org.gnome.shell enabled-extensions "['grand-theft-focus@zalckos.github.com', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Gnome misc configurations

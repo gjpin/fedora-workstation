@@ -592,6 +592,15 @@ EOF
 ##### Gnome Shell Extensions
 ################################################
 
+# AppIndicator and KStatusNotifierItem Support
+# https://extensions.gnome.org/extension/615/appindicator-support/
+# https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
+sudo dnf install -y libappindicator-gtk3
+
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v57.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
 # GSConnect
 # https://extensions.gnome.org/extension/1319/gsconnect/
 sudo dnf install -y openssl
