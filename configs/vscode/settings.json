@@ -10,7 +10,7 @@
     "workbench.iconTheme": null,
     "workbench.tree.indent": 12,
     "window.titleBarStyle": "native",
-    "editor.fontWeight": "600",
+    "editor.fontWeight": "500",
     "files.associations": {
         "*.j2": "terraform",
         "*.hcl": "terraform",
