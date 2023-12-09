@@ -91,11 +91,17 @@ sudo dnf install -y \
 sudo dnf install -y \
   source-foundry-hack-fonts
 
-# Install FiraCode Nerd font
+# Install Nerd fonts
 LATEST_NERDFONTS_VERSION=$(curl -s https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+
 curl https://github.com/ryanoasis/nerd-fonts/releases/download/${LATEST_NERDFONTS_VERSION}/FiraCode.tar.xz -L -O
 tar -xf FiraCode.tar.xz -C ${HOME}/.local/share/fonts
 rm -f FiraCode.tar.xz
+
+curl https://github.com/ryanoasis/nerd-fonts/releases/download/${LATEST_NERDFONTS_VERSION}/Noto.tar.xz -L -O
+tar -xf Noto.tar.xz -C ${HOME}/.local/share/fonts
+rm -f Noto.tar.xz
+
 fc-cache -f
 
 ################################################

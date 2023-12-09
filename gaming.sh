@@ -13,6 +13,9 @@ flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
 # Install Gamescope
 flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//23.08
 
+# Install Feral Gamemode
+sudo dnf install -y gamemode
+
 ################################################
 ##### Steam
 ################################################

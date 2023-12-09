@@ -229,7 +229,7 @@ fi
 dconf write /org/gnome/terminal/legacy/theme-variant "'dark'"
 GNOME_TERMINAL_PROFILE=`gsettings get org.gnome.Terminal.ProfilesList default | awk -F \' '{print $2}'`
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ background-color "rgb(24,24,24)"
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ font "FiraCode Nerd Font Mono Medium 10"
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ font "NotoSansM Nerd Font Mono Medium 10"
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ foreground-color "rgb(204,204,204)"
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ use-system-font false
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/ use-theme-colors false
@@ -240,10 +240,10 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.desktop.interface font-name 'Noto Sans 10' # default: Cantarell 11
 gsettings set org.gnome.desktop.interface document-font-name 'Noto Sans 10' # default: Cantarell 11
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Noto Sans Bold 10' # default: Cantarell Bold 11
-gsettings set org.gnome.desktop.interface monospace-font-name 'Source Code Pro 10' # default: Source Code Pro 10
+gsettings set org.gnome.desktop.interface monospace-font-name 'NotoSansM Nerd Font Mono Medium 10' # default: Source Code Pro 10
 
 # Set text editor font
-gsettings set org.gnome.TextEditor custom-font 'Source Code Pro 10'
+gsettings set org.gnome.TextEditor custom-font 'NotoSansM Nerd Font Mono Medium 10'
 
 # Folders
 gsettings set org.gnome.desktop.app-folders folder-children "['Dev', 'Emulators', 'Gaming', 'Gnome', 'Media', 'Office', 'Security', 'System']"
