@@ -273,13 +273,10 @@ flatpak override --user --filesystem=xdg-config/gtk-3.0:ro
 flatpak override --user --filesystem=xdg-config/gtk-4.0:ro
 
 # Install Flatpak runtimes
-flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/22.08
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
-flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/22.08
 flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/23.08
 
 if lspci | grep VGA | grep "Intel" > /dev/null; then
-  flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/22.08
   flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/23.08
 fi
 
