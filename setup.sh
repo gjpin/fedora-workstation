@@ -551,9 +551,6 @@ EOF
 # Install make
 sudo dnf install -y make
 
-# Node and NPM
-sudo dnf install -y nodejs npm yarnpkg
-
 # Change npm's default directory
 # https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
 mkdir ${HOME}/.npm-global
@@ -585,6 +582,67 @@ sudo dnf install -y python3-uvicorn+standard
 
 # Install C++ compilers
 sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+
+################################################
+##### Node.js
+################################################
+
+# References:
+# https://github.com/nvm-sh/nvm#manual-install
+
+# Install NVM
+git clone https://github.com/nvm-sh/nvm.git ${HOME}/.nvm
+cd ${HOME}/.nvm
+git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+cd
+
+# Source NVM temporarily
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Source NVM permanently
+tee ${HOME}/.zshrc.d/nvm << 'EOF'
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+EOF
+
+# NVM updater
+tee ${HOME}/.local/bin/update-nvm << 'EOF'
+#!/usr/bin/bash
+
+# Update NVM
+cd ${HOME}/.nvm
+git fetch --tags origin
+git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+EOF
+
+chmod +x ${HOME}/.local/bin/update-nvm
+
+# Add nvm updater to updater function
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-nvm' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update NVM' ${HOME}/.zshrc.d/update-all
+
+# Node updater
+tee ${HOME}/.local/bin/update-node << 'EOF'
+#!/usr/bin/bash
+
+# Update node
+nvm install --lts
+nvm install-latest-npm
+EOF
+
+chmod +x ${HOME}/.local/bin/update-node
+
+# Add node updater to updater function
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-node' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Node' ${HOME}/.zshrc.d/update-all
+
+# Install Node LTS and latest supported NPM version
+nvm install --lts
+nvm install-latest-npm
 
 ################################################
 ##### Neovim
