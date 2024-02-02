@@ -29,28 +29,6 @@ systemctl --user mask \
   tracker-xdg-portal-3.service
 
 ################################################
-##### Gnome VRR
-################################################
-
-# References:
-# https://copr.fedorainfracloud.org/coprs/kylegospo/gnome-vrr/
-
-# Add gnome-vrr Copr
-sudo dnf copr enable -y kylegospo/gnome-vrr
-
-# Avoid upstream changes to mutter
-sudo dnf config-manager --save --setopt="copr:copr.fedorainfracloud.org:kylegospo:gnome-vrr.priority=1"
-
-# Install Mutter VRR
-sudo dnf update -y --refresh
-
-sudo tee -a /etc/environment << 'EOF'
-
-# Gnome VRR
-MUTTER_DEBUG_FORCE_KMS_MODE=simple
-EOF
-
-################################################
 ##### Flatpak
 ################################################
 
@@ -61,8 +39,9 @@ flatpak install -y flathub org.gaphor.Gaphor
 flatpak install -y flathub com.github.flxzt.rnote
 flatpak install -y flathub com.github.finefindus.eyedropper
 
+# Install gitg
 flatpak install -y flathub org.gnome.gitg
-flatpak override --user --filesystem=home/src org.gnome.gitg
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gnome.gitg -o ${HOME}/.local/share/flatpak/overrides/org.gnome.gitg
 
 ################################################
 ##### Firefox
@@ -287,12 +266,6 @@ curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.g
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
-# Rounded Window Corners
-# https://extensions.gnome.org/extension/5237/rounded-window-corners/
-curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v11.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
 # Legacy (GTK3) Theme Scheme Auto Switcher
 # https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
 curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v7.shell-extension.zip -O
@@ -300,7 +273,7 @@ gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['grand-theft-focus@zalckos.github.com', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+gsettings set org.gnome.shell enabled-extensions "['grand-theft-focus@zalckos.github.com', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Gnome misc configurations

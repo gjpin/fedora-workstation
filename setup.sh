@@ -56,7 +56,8 @@ mkdir -p \
   ${HOME}/.config/systemd/user \
   ${HOME}/.ssh \
   ${HOME}/.config/environment.d \
-  ${HOME}/src \
+  ${HOME}/.devtools \
+  ${HOME}/src
 
 # Set SSH folder permissions
 chmod 700 ${HOME}/.ssh
@@ -241,36 +242,9 @@ sudo chmod 700 /etc/wireguard/
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-modify flathub --enable
 
-# Restrict filesystem access
-flatpak override --user --nofilesystem=home
-flatpak override --user --nofilesystem=home/.ssh
-flatpak override --user --nofilesystem=home/.bashrc
-flatpak override --user --nofilesystem=home/.bashrc.d
-flatpak override --user --nofilesystem=home/.zshrc
-flatpak override --user --nofilesystem=home/.zshrc.d
-flatpak override --user --nofilesystem=home/.config
-flatpak override --user --nofilesystem=home/.local/bin
-flatpak override --user --nofilesystem=home/Sync
-flatpak override --user --nofilesystem=host
-flatpak override --user --nofilesystem=host-os
-flatpak override --user --nofilesystem=host-etc
-flatpak override --user --nofilesystem=xdg-config
-flatpak override --user --nofilesystem=xdg-cache
-flatpak override --user --nofilesystem=xdg-data
-flatpak override --user --nofilesystem=xdg-data/flatpak
-flatpak override --user --nofilesystem=xdg-documents
-flatpak override --user --nofilesystem=xdg-videos
-flatpak override --user --nofilesystem=xdg-music
-flatpak override --user --nofilesystem=xdg-pictures
-flatpak override --user --nofilesystem=xdg-desktop
-
-# Restrict talk
-flatpak override --user --no-talk-name=org.freedesktop.Flatpak
-
-# Filesystem access exemptions
-flatpak override --user --filesystem=xdg-download
-flatpak override --user --filesystem=xdg-config/gtk-3.0:ro
-flatpak override --user --filesystem=xdg-config/gtk-4.0:ro
+# Import global Flatpak overrides
+mkdir -p ${HOME}/.local/share/flatpak/overrides
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/global -o ${HOME}/.local/share/flatpak/overrides/global
 
 # Install Flatpak runtimes
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
@@ -290,17 +264,12 @@ flatpak install -y flathub org.libreoffice.LibreOffice
 flatpak install -y flathub rest.insomnia.Insomnia
 flatpak install -y flathub org.gimp.GIMP
 flatpak install -y flathub org.blender.Blender
-flatpak install -y flathub md.obsidian.Obsidian
 flatpak install -y flathub org.chromium.Chromium
 flatpak install -y flathub com.github.marhkb.Pods
-flatpak install -y flathub dev.k8slens.OpenLens
 
-# Allow OpenLens to access kubernetes folders
-flatpak override --user --filesystem=home/.kube/config dev.k8slens.OpenLens
-flatpak override --user --filesystem=home/.minikube dev.k8slens.OpenLens
-
-# Allow Obsidian to access vault folder
-flatpak override --user --filesystem=home/.obsidian md.obsidian.Obsidian
+# Install Obsidian
+flatpak install -y flathub md.obsidian.Obsidian
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/md.obsidian.Obsidian -o ${HOME}/.local/share/flatpak/overrides/md.obsidian.Obsidian
 
 ################################################
 ##### Kubernetes
@@ -344,7 +313,6 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-kubectx
 
-# Add Firefox theme updater to bash updater function
 sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ update-kubectx' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update kubectx' ${HOME}/.zshrc.d/update-all
@@ -361,6 +329,58 @@ autoload -Uz compinit
 compinit
 source <(kubectl completion zsh)
 EOF
+
+# Install OpenLens
+flatpak install -y flathub dev.k8slens.OpenLens
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.k8slens.OpenLens -o ${HOME}/.local/share/flatpak/overrides/dev.k8slens.OpenLens
+
+# Install Helm
+LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
+sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
+rm -f helm.tar.gz
+
+# Helm updater
+tee ${HOME}/.local/bin/update-helm << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(helm version --template='{{.Version}}')
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
+  sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
+  rm -f helm.tar.gz
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-helm
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-helm' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Helm' ${HOME}/.zshrc.d/update-all
+
+# Install Cilium
+LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
+sudo tar -xzf cilium.tar.gz -C /usr/local/bin
+rm -f cilium.tar.gz
+
+# Cilium updater
+tee ${HOME}/.local/bin/update-cilium << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(cilium version --client | grep -o -P '(?<=cilium-cli: ).*(?= compiled)')
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
+  sudo tar -xzf cilium.tar.gz -C /usr/local/bin
+  rm -f cilium.tar.gz
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-cilium
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### Terraform
@@ -393,73 +413,15 @@ sed -i '2 i \ \ update-terraform' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update Terraform' ${HOME}/.zshrc.d/update-all
 
 ################################################
-##### Helm
-################################################
-
-# Install Helm
-LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
-sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
-rm -f helm.tar.gz
-
-# Helm updater
-tee ${HOME}/.local/bin/update-helm << 'EOF'
-LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-INSTALLED_VERSION=$(helm version --template='{{.Version}}')
-
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
-  sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
-  rm -f helm.tar.gz
-fi
-EOF
-
-chmod +x ${HOME}/.local/bin/update-helm
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-helm' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Helm' ${HOME}/.zshrc.d/update-all
-
-################################################
-##### Cilium
-################################################
-
-# Install Cilium
-LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
-sudo tar -xzf cilium.tar.gz -C /usr/local/bin
-rm -f cilium.tar.gz
-
-# Cilium updater
-tee ${HOME}/.local/bin/update-cilium << 'EOF'
-LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-INSTALLED_VERSION=$(cilium version --client | grep -o -P '(?<=cilium-cli: ).*(?= compiled)')
-
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
-  sudo tar -xzf cilium.tar.gz -C /usr/local/bin
-  rm -f cilium.tar.gz
-fi
-EOF
-
-chmod +x ${HOME}/.local/bin/update-cilium
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
-
-################################################
 ##### Bottles
 ################################################
 
 # Install Bottles
 flatpak install -y flathub com.usebottles.bottles
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebottles.bottles -o ${HOME}/.local/share/flatpak/overrides/com.usebottles.bottles
 
-# Allow Bottles to create application shortcuts
-flatpak override --user --filesystem=xdg-data/applications com.usebottles.bottles
-
-# Allow Bottles to access Steam folder
-flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.usebottles.bottles
+# Create directory for Bottles games
+mkdir -p ${HOME}/games/bottles
 
 # Configure MangoHud
 mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
@@ -488,9 +450,6 @@ rm -rf ${HOME}/.mozilla
 
 # Install Firefox from Flathub
 flatpak install -y flathub org.mozilla.firefox
-
-# Enable wayland support
-flatpak override --user --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
 
 # Set Firefox Flatpak as default browser and handler for https(s)
 xdg-settings set default-web-browser org.mozilla.firefox.desktop
@@ -551,34 +510,23 @@ EOF
 # Install make
 sudo dnf install -y make
 
-# Change npm's default directory
-# https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
-mkdir ${HOME}/.npm-global
-npm config set prefix '~/.npm-global'
-tee ${HOME}/.zshrc.d/npm << 'EOF'
-export PATH=~/.npm-global/bin:$PATH
-EOF
-
 # Golang
 sudo dnf install -y golang
 
-mkdir -p ${HOME}/.go
+mkdir -p ${HOME}/.devtools/go
 
 tee ${HOME}/.zshrc.d/go << 'EOF'
-export GOPATH="$HOME/.go"
+export GOPATH="$HOME/.devtools/go"
 EOF
 
 # Create python dev sandbox virtualenv and alias
-mkdir -p ${HOME}/.python
+mkdir -p ${HOME}/.devtools/python
 
-python -m venv ${HOME}/.python/dev
+python -m venv ${HOME}/.devtools/python/dev
 
 tee ${HOME}/.zshrc.d/python << 'EOF'
-alias pydev="source ${HOME}/.python/dev/bin/activate"
+alias pydev="source ${HOME}/.devtools/python/dev/bin/activate"
 EOF
-
-# Install uvicorn (ASGI web server implementation for Python)
-sudo dnf install -y python3-uvicorn+standard
 
 # Install C++ compilers
 sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
@@ -591,18 +539,18 @@ sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
 # https://github.com/nvm-sh/nvm#manual-install
 
 # Install NVM
-git clone https://github.com/nvm-sh/nvm.git ${HOME}/.nvm
-cd ${HOME}/.nvm
+git clone https://github.com/nvm-sh/nvm.git ${HOME}/.devtools/nvm
+cd ${HOME}/.devtools/nvm
 git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
 cd
 
 # Source NVM temporarily
-export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Source NVM permanently
 tee ${HOME}/.zshrc.d/nvm << 'EOF'
-export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 EOF
@@ -612,9 +560,10 @@ tee ${HOME}/.local/bin/update-nvm << 'EOF'
 #!/usr/bin/bash
 
 # Update NVM
-cd ${HOME}/.nvm
+cd ${HOME}/.devtools/nvm
 git fetch --tags origin
 git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+cd
 EOF
 
 chmod +x ${HOME}/.local/bin/update-nvm
@@ -661,7 +610,7 @@ if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
   export VISUAL='vim'
 else
-  export EDITOR='mvim'
+  export EDITOR='nvim'
   export VISUAL='nvim'
 fi
 EOF

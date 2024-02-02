@@ -1,0 +1,2 @@
+[Context]
+filesystems=xdg-data/applications;home/.var/app/com.valvesoftware.Steam/data/Steam;home/games/bottles

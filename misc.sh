@@ -592,6 +592,12 @@ EOF
 ##### Gnome Shell Extensions
 ################################################
 
+# Rounded Window Corners
+# https://extensions.gnome.org/extension/5237/rounded-window-corners/
+curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v11.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
 # AppIndicator and KStatusNotifierItem Support
 # https://extensions.gnome.org/extension/615/appindicator-support/
 # https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
@@ -620,7 +626,7 @@ rm -f *.shell-extension.zip
 gsettings --schemadir ~/.local/share/gnome-shell/extensions/dark-variant@hardpixel.eu/schemas set org.gnome.shell.extensions.dark-variant applications "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.spotify.Client.desktop', 'md.obsidian.Obsidian.desktop', 'org.gimp.GIMP.desktop', 'org.blender.Blender.desktop', 'org.godotengine.Godot.desktop', 'com.valvesoftware.Steam.desktop', 'com.heroicgameslauncher.hgl.desktop', 'org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'app.xemu.xemu.desktop']"
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+gsettings set org.gnome.shell enabled-extensions "['rounded-window-corners@yilozt', 'appindicatorsupport@rgcjonas.gmail.com', 'dark-variant@hardpixel.eu', 'grand-theft-focus@zalckos.github.com', 'gsconnect@andyholmes.github.io', 'rounded-window-corners@yilozt', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
 
 ################################################
 ##### Fonts
@@ -934,3 +940,176 @@ sudo dnf remove -y \
     plasma-discover-offline-updates \
     plasma-discover-packagekit \
     fedora-appstream-metadata
+
+################################################
+##### Gnome VRR
+################################################
+
+# References:
+# https://copr.fedorainfracloud.org/coprs/kylegospo/gnome-vrr/
+
+# Add gnome-vrr Copr
+sudo dnf copr enable -y kylegospo/gnome-vrr
+
+# Avoid upstream changes to mutter
+sudo dnf config-manager --save --setopt="copr:copr.fedorainfracloud.org:kylegospo:gnome-vrr.priority=1"
+
+# Install Mutter VRR
+sudo dnf update -y --refresh
+
+sudo tee -a /etc/environment << 'EOF'
+
+# Gnome VRR
+MUTTER_DEBUG_FORCE_KMS_MODE=simple
+EOF
+
+################################################
+##### npm
+################################################
+
+# Change npm's default directory
+# https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
+mkdir ${HOME}/.npm-global
+npm config set prefix '~/.npm-global'
+tee ${HOME}/.zshrc.d/npm << 'EOF'
+export PATH=~/.npm-global/bin:$PATH
+EOF
+
+################################################
+##### 
+################################################
+################################################
+##### Lutris
+################################################
+################################################
+##### 
+################################################
+
+################################################
+##### Wine GE
+################################################
+
+# https://github.com/GloriousEggroll/wine-ge-custom
+
+LATEST_WINE_GE_VERSION=$(curl -s https://api.github.com/repos/GloriousEggroll/wine-ge-custom/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+LUTRIS_WINE_GE_FOLDER="${HOME}/.var/app/net.lutris.Lutris/data/lutris/runners/wine"
+
+# Create Lutris Wine GE folder
+mkdir -p ${LUTRIS_WINE_GE_FOLDER}
+
+# Download latest Wine GE version
+curl https://github.com/GloriousEggroll/wine-ge-custom/releases/latest/download/wine-lutris-${LATEST_WINE_GE_VERSION}-x86_64.tar.xz -L -O
+
+# Extract Wine GE to Lutris folder
+tar -xf wine-lutris-${LATEST_WINE_GE_VERSION}-x86_64.tar.xz -C ${LUTRIS_WINE_GE_FOLDER}
+
+# Remove downloaded Wine GE tar
+rm -f wine-lutris-${LATEST_WINE_GE_VERSION}-x86_64.tar.xz
+
+################################################
+##### DXVK
+################################################
+
+# https://github.com/doitsujin/dxvk
+
+LATEST_DXVK_VERSION=$(curl -s https://api.github.com/repos/doitsujin/dxvk/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/^.//')
+LUTRIS_DXVK_FOLDER="${HOME}/.var/app/net.lutris.Lutris/data/lutris/runtime/dxvk"
+
+# Create Lutris DXVK folder
+mkdir -p ${LUTRIS_DXVK_FOLDER}
+
+# Download latest DXVK version
+curl https://github.com/doitsujin/dxvk/releases/latest/download/dxvk-${LATEST_DXVK_VERSION}.tar.gz -L -O
+
+# Extract DXVK to Lutris folder
+tar -xzf dxvk-${LATEST_DXVK_VERSION}.tar.gz -C ${LUTRIS_DXVK_FOLDER}
+
+# Rename DXVK folder
+mv ${LUTRIS_DXVK_FOLDER}/dxvk-${LATEST_DXVK_VERSION} ${LUTRIS_DXVK_FOLDER}/v${LATEST_DXVK_VERSION}
+
+# Remove downloaded DXVK tar
+rm -f dxvk-${LATEST_DXVK_VERSION}.tar.gz
+
+################################################
+##### VKD3D
+################################################
+
+# https://github.com/HansKristian-Work/vkd3d-proton
+
+LATEST_VKD3D_VERSION=$(curl -s https://api.github.com/repos/HansKristian-Work/vkd3d-proton/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/^.//')
+LUTRIS_VKD3D_FOLDER="${HOME}/.var/app/net.lutris.Lutris/data/lutris/runtime/vkd3d"
+
+# Create Lutris VKD3D folder
+mkdir -p ${LUTRIS_VKD3D_FOLDER}
+
+# Download latest VKD3D version
+curl https://github.com/HansKristian-Work/vkd3d-proton/releases/latest/download/vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst -L -O
+
+# Extract VKD3D to Lutris folder
+tar -xf vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst -C ${LUTRIS_VKD3D_FOLDER}
+
+# Rename VKD3D folder
+mv ${LUTRIS_VKD3D_FOLDER}/vkd3d-proton-${LATEST_VKD3D_VERSION} ${LUTRIS_VKD3D_FOLDER}/v${LATEST_VKD3D_VERSION}
+
+# Remove downloaded VKD3D tar
+rm -f vkd3d-proton-${LATEST_VKD3D_VERSION}.tar.zst
+
+################################################
+##### Winetricks
+################################################
+
+# https://github.com/Winetricks/winetricks
+
+LATEST_WINETRICKS_VERSION=$(curl -s https://api.github.com/repos/Winetricks/winetricks/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+LUTRIS_WINETRICKS_FOLDER="${HOME}/.var/app/net.lutris.Lutris/data/lutris/runtime/winetricks"
+
+# Create Lutris Winetricks folder
+mkdir -p ${LUTRIS_WINETRICKS_FOLDER}
+
+# Download latest Winetricks version
+curl https://github.com/Winetricks/winetricks/archive/refs/tags/${LATEST_WINETRICKS_VERSION}.tar.gz -L -O
+
+# Extract Winetricks to Lutris folder
+tar -xzf ${LATEST_WINETRICKS_VERSION}.tar.gz -C ${LUTRIS_WINETRICKS_FOLDER} winetricks-${LATEST_WINETRICKS_VERSION}/src/winetricks --strip-components 2
+
+# Remove downloaded Winetricks tar
+rm -f ${LATEST_WINETRICKS_VERSION}.tar.gz
+
+################################################
+##### dgVoodoo2
+################################################
+
+# https://github.com/dege-diosg/dgVoodoo2
+
+LATEST_DGVOODOO2_VERSION_DOTS=$(curl -s https://api.github.com/repos/dege-diosg/dgVoodoo2/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+LATEST_DGVOODOO2_VERSION=$(curl -s https://api.github.com/repos/dege-diosg/dgVoodoo2/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/^.//' | tr '.' '_')
+LUTRIS_DGVOODOO2_FOLDER="${HOME}/.var/app/net.lutris.Lutris/data/lutris/runtime/dgvoodoo2"
+
+# Create Lutris dgVoodoo2 folder
+mkdir -p ${LUTRIS_DGVOODOO2_FOLDER}/${LATEST_DGVOODOO2_VERSION_DOTS}/x32
+
+# Download latest dgVoodoo2 version
+curl https://github.com/dege-diosg/dgVoodoo2/releases/latest/download/dgVoodoo${LATEST_DGVOODOO2_VERSION}.zip -L -O
+
+# Extract dgVoodoo2 to Lutris folder
+unzip -j dgVoodoo2_81_3.zip 3Dfx/x86/Glide* -d ${LUTRIS_DGVOODOO2_FOLDER}/${LATEST_DGVOODOO2_VERSION_DOTS}/x32
+unzip -j dgVoodoo2_81_3.zip MS/x86/* -d ${LUTRIS_DGVOODOO2_FOLDER}/${LATEST_DGVOODOO2_VERSION_DOTS}/x32
+
+# Create dgVoodoo2 config file
+tee ${LUTRIS_DGVOODOO2_FOLDER}/${LATEST_DGVOODOO2_VERSION_DOTS}/dgVoodoo.conf << 'EOF'
+[General]
+
+OutputAPI                            = d3d11_fl11_0
+
+[Glide]
+
+3DfxWatermark                       = false
+3DfxSplashScreen                    = false
+
+[DirectX]
+
+dgVoodooWatermark                   = false
+EOF
+
+# Remove downloaded dgVoodoo2 zip
+rm -f dgVoodoo${LATEST_DGVOODOO2_VERSION}.zip

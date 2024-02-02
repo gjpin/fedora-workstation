@@ -22,9 +22,10 @@ sudo dnf install -y gamemode
 
 # Install Steam
 flatpak install -y flathub com.valvesoftware.Steam
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.valvesoftware.Steam -o ${HOME}/.local/share/flatpak/overrides/com.valvesoftware.Steam
 
-# Allow Steam to access external directory
-flatpak override --user --filesystem=/data/games/steam com.valvesoftware.Steam
+# Create directory for Steam games
+mkdir -p ${HOME}/games/steam
 
 # Steam controllers udev rules
 sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
@@ -56,13 +57,30 @@ EOF
 
 # Install Heroic Games Launcher
 flatpak install -y flathub com.heroicgameslauncher.hgl
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.heroicgameslauncher.hgl -o ${HOME}/.local/share/flatpak/overrides/com.heroicgameslauncher.hgl
 
-# Allow Heroic to access external directory and steam folder
-flatpak override --user --filesystem=/data/games/heroic com.heroicgameslauncher.hgl
-flatpak override --user --filesystem=home/.var/app/com.valvesoftware.Steam/data/Steam com.heroicgameslauncher.hgl
+# Create directory for Heroic games
+mkdir -p ${HOME}/games/heroic
 
-# Deny Heroic access to 'Games' diretory
-flatpak override --user --nofilesystem=home/Games/Heroic com.heroicgameslauncher.hgl
+# Configure Heroic
+mkdir -p ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic
+tee ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic/config.json << EOF
+{
+  "defaultSettings": {
+    "defaultInstallPath": "${HOME}/games/heroic",
+    "defaultSteamPath": "${HOME}/.var/app/com.valvesoftware.Steam/.steam/steam/",
+    "defaultWinePrefix": "${HOME}/games/heroic/prefixes",
+    "winePrefix": "${HOME}/games/heroic/prefixes/default",
+    "enviromentOptions": [
+      {
+        "key": "WINE_LARGE_ADDRESS_AWARE",
+        "value": "0"
+      }
+    ],
+  },
+  "version": "v0"
+}
+EOF
 
 ################################################
 ##### Sunshine
