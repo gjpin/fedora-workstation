@@ -29,6 +29,7 @@ sudo systemctl mask ModemManager.service
 
 # Disable PC/SC Smart Card service
 sudo systemctl mask pcscd.service
+sudo systemctl mask pcscd.socket
 
 # Disable location lookup service
 sudo systemctl mask geoclue.service
