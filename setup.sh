@@ -424,6 +424,18 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 # Create directory for Bottles games
 mkdir -p ${HOME}/games/{epic,gog}
 
+# Create folder for Bottles repos
+mkdir -p ${HOME}/src/bottles
+
+# Clone Bottles dependencies repo
+git clone https://github.com/bottlesdevs/dependencies.git ${HOME}/src/bottles/dependencies
+
+# Alias for bottles with local dependencies
+tee ${HOME}/.zshrc.d/bottles << EOF
+# Set bottles alias
+alias bottles="LOCAL_DEPENDENCIES=${HOME}/src/bottles/dependencies flatpak run com.usebottles.bottles"
+EOF
+
 # Configure MangoHud
 mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
 tee ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud/MangoHud.conf << EOF
