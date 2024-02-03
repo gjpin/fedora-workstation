@@ -422,7 +422,7 @@ flatpak install -y flathub com.usebottles.bottles
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebottles.bottles -o ${HOME}/.local/share/flatpak/overrides/com.usebottles.bottles
 
 # Create directory for Bottles games
-mkdir -p ${HOME}/games/bottles
+mkdir -p ${HOME}/games/{epic,gog}
 
 # Configure MangoHud
 mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
@@ -577,6 +577,10 @@ sed -i '2 i \ \ # Update NVM' ${HOME}/.zshrc.d/update-all
 # Node updater
 tee ${HOME}/.local/bin/update-node << 'EOF'
 #!/usr/bin/bash
+
+# Source NVM
+export NVM_DIR="$HOME/.devtools/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Update node
 nvm install --lts
