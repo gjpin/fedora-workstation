@@ -421,9 +421,6 @@ sed -i '2 i \ \ # Update Terraform' ${HOME}/.zshrc.d/update-all
 flatpak install -y flathub com.usebottles.bottles
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebottles.bottles -o ${HOME}/.local/share/flatpak/overrides/com.usebottles.bottles
 
-# Create directory for Bottles games
-mkdir -p ${HOME}/games/{epic,gog}
-
 # Create folder for Bottles repos
 mkdir -p ${HOME}/src/bottles
 
@@ -712,10 +709,10 @@ systemctl --user enable syncthing.service
 echo 'add_dracutmodules+=" tpm2-tss "' | sudo tee /etc/dracut.conf.d/tpm2.conf
 
 # Enroll TPM2 as LUKS' decryption factor
-sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3
+sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto /dev/nvme0n1p3
 
 # Update crypttab
-sudo sed -i "s|discard|&,tpm2-device=auto,tpm2-pcrs=0+1+2+3+4+5+7+9|" /etc/crypttab
+sudo sed -i "s|discard|&,tpm2-device=auto|" /etc/crypttab
 
 # Regenerate initramfs
 sudo dracut --regenerate-all --force
