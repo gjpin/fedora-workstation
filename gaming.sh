@@ -67,16 +67,47 @@ mkdir -p ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic
 tee ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic/config.json << EOF
 {
   "defaultSettings": {
-    "defaultInstallPath": "${HOME}/games/heroic",
-    "defaultSteamPath": "${HOME}/.var/app/com.valvesoftware.Steam/.steam/steam/",
-    "defaultWinePrefix": "${HOME}/games/heroic/prefixes",
-    "winePrefix": "${HOME}/games/heroic/prefixes/default",
-    "enviromentOptions": [
-      {
-        "key": "WINE_LARGE_ADDRESS_AWARE",
-        "value": "0"
-      }
-    ],
+    "checkUpdatesInterval": 10,
+    "enableUpdates": false,
+    "addDesktopShortcuts": false,
+    "addStartMenuShortcuts": false,
+    "autoInstallDxvk": true,
+    "autoInstallVkd3d": true,
+    "autoInstallDxvkNvapi": false,
+    "addSteamShortcuts": false,
+    "preferSystemLibs": false,
+    "checkForUpdatesOnStartup": false,
+    "autoUpdateGames": true,
+    "customWinePaths": [],
+    "defaultInstallPath": "/home/${USER}/games/heroic",
+    "libraryTopSection": "disabled",
+    "defaultSteamPath": "/home/${USER}/.var/app/com.valvesoftware.Steam/.steam/steam",
+    "defaultWinePrefix": "/home/${USER}/games/heroic/prefixes/default",
+    "hideChangelogsOnStartup": false,
+    "language": "en",
+    "maxWorkers": 0,
+    "minimizeOnLaunch": false,
+    "nvidiaPrime": false,
+    "enviromentOptions": [],
+    "wrapperOptions": [],
+    "showFps": false,
+    "useGameMode": true,
+    "wineCrossoverBottle": "Heroic",
+    "winePrefix": "/home/${USER}/games/heroic/prefixes/default",
+    "wineVersion": {
+      "bin": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/bin/wine",
+      "name": "Wine - Wine-GE-Proton8-26",
+      "type": "wine",
+      "lib": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/lib64",
+      "lib32": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/lib",
+      "wineserver": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/bin/wineserver"
+    },
+    "enableEsync": true,
+    "enableFsync": true,
+    "eacRuntime": true,
+    "battlEyeRuntime": true,
+    "framelessWindow": false,
+    "showMangohud": true
   },
   "version": "v0"
 }
