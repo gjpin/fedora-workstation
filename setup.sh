@@ -266,7 +266,7 @@ flatpak install -y flathub org.libreoffice.LibreOffice
 flatpak install -y flathub rest.insomnia.Insomnia
 flatpak install -y flathub org.gimp.GIMP
 flatpak install -y flathub org.blender.Blender
-flatpak install -y flathub org.chromium.Chromium
+flatpak install -y flathub com.brave.Browser
 flatpak install -y flathub com.github.marhkb.Pods
 
 # Install Obsidian
