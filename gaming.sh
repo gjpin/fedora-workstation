@@ -93,7 +93,7 @@ EOF
 # https://github.com/LizardByte/Sunshine
 
 # Download Sunshine
-curl https://github.com/LizardByte/Sunshine/releases/latest/download/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
+curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
 
 # Install Sunshine
 sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
@@ -144,15 +144,10 @@ fi
 
 # Sunshine updater
 tee ${HOME}/.local/bin/update-sunshine << 'EOF'
-LATEST_VERSION=$(curl -s https://api.github.com/repos/LizardByte/Sunshine/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-INSTALLED_VERSION=$(sunshine --version)
-
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl https://github.com/LizardByte/Sunshine/releases/latest/download/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
-  sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
-  rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
-  systemctl --user restart sunshine.service
-fi
+curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
+sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+systemctl --user restart sunshine.service
 EOF
 
 chmod +x ${HOME}/.local/bin/update-sunshine
