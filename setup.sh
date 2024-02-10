@@ -87,7 +87,8 @@ sudo dnf install -y \
   jq \
   fuse-sshfs \
   fd-find \
-  fzf
+  fzf \
+  libva-utils
 
 # Install fonts
 sudo dnf install -y \
