@@ -113,6 +113,23 @@ tee ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic/config.json << EO
 }
 EOF
 
+# Configure MangoHud for Heroic
+mkdir -p ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud
+tee ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
+
 ################################################
 ##### Sunshine
 ################################################
