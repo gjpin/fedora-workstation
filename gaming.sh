@@ -193,7 +193,7 @@ fi
 # Sunshine updater
 tee ${HOME}/.local/bin/update-sunshine << 'EOF'
 curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
-sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+sudo dnf reinstall -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
 rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
 systemctl --user restart sunshine.service
 EOF
