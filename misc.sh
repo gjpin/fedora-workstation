@@ -1,5 +1,146 @@
 #!/usr/bin/bash
 
+# Install Obsidian
+flatpak install -y flathub md.obsidian.Obsidian
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/md.obsidian.Obsidian -o ${HOME}/.local/share/flatpak/overrides/md.obsidian.Obsidian
+
+# Install OpenLens
+flatpak install -y flathub dev.k8slens.OpenLens
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.k8slens.OpenLens -o ${HOME}/.local/share/flatpak/overrides/dev.k8slens.OpenLens
+
+################################################
+##### Disable unneeded services
+################################################
+
+# Disable tracker services
+systemctl --user mask \
+  tracker-extract-3.service \
+  tracker-miner-fs-control-3.service \
+  tracker-writeback-3.service \
+  tracker-miner-fs-3.service \
+  tracker-miner-rss-3.service \
+  tracker-xdg-portal-3.service
+
+################################################
+##### Bottles
+################################################
+
+# Install Bottles
+flatpak install -y flathub com.usebottles.bottles
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebottles.bottles -o ${HOME}/.local/share/flatpak/overrides/com.usebottles.bottles
+
+# Create folder for Bottles repos
+mkdir -p ${HOME}/src/bottles
+
+# Clone Bottles dependencies repo
+git clone https://github.com/bottlesdevs/dependencies.git ${HOME}/src/bottles/dependencies
+
+# Alias for bottles with local dependencies
+tee ${HOME}/.zshrc.d/bottles << EOF
+# Set bottles alias
+alias bottles="LOCAL_DEPENDENCIES=${HOME}/src/bottles/dependencies flatpak run com.usebottles.bottles"
+EOF
+
+# Configure MangoHud
+mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
+tee ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud/MangoHud.conf << EOF
+legacy_layout=0
+horizontal
+gpu_stats
+cpu_stats
+ram
+fps
+frametime=0
+hud_no_margin
+table_columns=14
+frame_timing=1
+engine_version
+vulkan_driver
+EOF
+
+################################################
+##### Remove unneeded services
+################################################
+
+# Disable ABRT service
+sudo systemctl mask abrtd.service
+
+# Disable mobile broadband modem management service
+sudo systemctl mask ModemManager.service
+
+# Disable PC/SC Smart Card service
+sudo systemctl mask pcscd.service
+sudo systemctl mask pcscd.socket
+
+# Disable location lookup service
+sudo systemctl mask geoclue.service
+
+################################################
+##### Node.js
+################################################
+
+# References:
+# https://github.com/nvm-sh/nvm#manual-install
+
+# Install NVM
+git clone https://github.com/nvm-sh/nvm.git ${HOME}/.devtools/nvm
+cd ${HOME}/.devtools/nvm
+git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+cd
+
+# Source NVM temporarily
+export NVM_DIR="$HOME/.devtools/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Source NVM permanently
+tee ${HOME}/.zshrc.d/nvm << 'EOF'
+export NVM_DIR="$HOME/.devtools/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+EOF
+
+# NVM updater
+tee ${HOME}/.local/bin/update-nvm << 'EOF'
+#!/usr/bin/bash
+
+# Update NVM
+cd ${HOME}/.devtools/nvm
+git fetch --tags origin
+git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+cd
+EOF
+
+chmod +x ${HOME}/.local/bin/update-nvm
+
+# Add nvm updater to updater function
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-nvm' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update NVM' ${HOME}/.zshrc.d/update-all
+
+# Node updater
+tee ${HOME}/.local/bin/update-node << 'EOF'
+#!/usr/bin/bash
+
+# Source NVM
+export NVM_DIR="$HOME/.devtools/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Update node
+nvm install --lts
+nvm install-latest-npm
+EOF
+
+chmod +x ${HOME}/.local/bin/update-node
+
+# Add node updater to updater function
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-node' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Node' ${HOME}/.zshrc.d/update-all
+
+# Install Node LTS and latest supported NPM version
+nvm install --lts
+nvm install-latest-npm
+
 ################################################
 ##### ROCm
 ################################################

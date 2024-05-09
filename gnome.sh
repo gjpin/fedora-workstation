@@ -14,19 +14,11 @@ EOF
 gsettings set org.gnome.software download-updates false
 gsettings set org.gnome.software download-updates-notify false
 
-# Disable Tracker (indexing) and search providers
+# Disable search providers
 gsettings set org.gnome.desktop.search-providers disabled "['org.gnome.Nautilus.desktop', 'org.gnome.Boxes.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Characters.desktop', 'org.gnome.clocks.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Contacts.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Software.desktop']"
 gsettings set org.gnome.desktop.search-providers enabled "@as []"
 gsettings set org.freedesktop.Tracker3.Miner.Files index-single-directories "@as []"
 gsettings set org.freedesktop.Tracker3.Miner.Files index-recursive-directories "@as []"
-
-systemctl --user mask \
-  tracker-extract-3.service \
-  tracker-miner-fs-control-3.service \
-  tracker-writeback-3.service \
-  tracker-miner-fs-3.service \
-  tracker-miner-rss-3.service \
-  tracker-xdg-portal-3.service
 
 ################################################
 ##### Flatpak
