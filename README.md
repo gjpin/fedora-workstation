@@ -10,6 +10,37 @@
 
 # Guides
 
+## How to install Fedora with Btrfs RAID0
+
+```bash
+# References:
+# https://discussion.fedoraproject.org/t/what-is-the-procedure-to-install-fedora-37-in-raid0/79347/5
+
+# Boot into Fedora live ISO
+
+# Wipe partition tables
+sudo parted /dev/nvme0n1 mklabel gpt
+sudo parted /dev/nvme1n1 mklabel gpt
+
+# Reboot into Fedora live ISO
+
+# Installation destination
+- Device Selection > Select all disks
+- Storage Configuration > Custom
+- Done
+
+# Manual Partitioning > New Fedora Installation
+- New mount points will use the following partitioning scheme: Btrfs
+- Encrypt my data
+- Click here to create them automatically
+- SYSTEM > root > Volume > Modify…
+    - Select all volumes
+    - RAID level: RAID0
+    - Size policy: As large as possible
+    - Save
+- Done > Accept Changes
+```
+
 ## Re-enroll TPM2 as LUKS' decryption factor
 
 `sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3`
