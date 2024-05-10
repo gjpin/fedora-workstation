@@ -593,7 +593,12 @@ systemctl --user enable syncthing.service
 echo 'add_dracutmodules+=" tpm2-tss "' | sudo tee /etc/dracut.conf.d/tpm2.conf
 
 # Enroll TPM2 as LUKS' decryption factor
-sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto /dev/nvme0n1p3
+if sudo btrfs filesystem usage / | grep RAID0 > /dev/null; then
+  sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto /dev/nvme0n1p3
+  sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto /dev/nvme1n1p1
+else
+  sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto /dev/nvme0n1p3
+fi
 
 # Update crypttab
 sudo sed -i "s|discard|&,tpm2-device=auto|" /etc/crypttab
