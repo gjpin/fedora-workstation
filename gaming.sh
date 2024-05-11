@@ -204,3 +204,38 @@ chmod +x ${HOME}/.local/bin/update-sunshine
 sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ update-sunshine' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update Sunshine' ${HOME}/.zshrc.d/update-all
+
+################################################
+##### ALVR
+################################################
+
+# References:
+# https://github.com/alvr-org/ALVR/wiki/Flatpak
+
+# Install dependencies
+flatpak install -y flathub org.freedesktop.Sdk//23.08 \
+    org.freedesktop.Sdk.Extension.llvm16//23.08 \
+    org.freedesktop.Sdk.Extension.rust-stable//23.08 \
+    org.freedesktop.Platform.GL.default//23.08-extra \
+    org.freedesktop.Platform.GL32.default//23.08-extra
+
+# Download ALVR
+curl https://github.com/alvr-org/ALVR/releases/latest/download/com.valvesoftware.Steam.Utility.alvr.flatpak -L -O
+
+# Install ALVR
+flatpak --user install -y --bundle com.valvesoftware.Steam.Utility.alvr.flatpak
+
+# Remove ALVR flatpak
+rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
+
+# Allow ALVR in firewall
+sudo firewall-cmd --zone=block --add-service=alvr
+sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
+
+sudo firewall-cmd --permanent --zone=block --add-service=alvr
+sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
+
+# Create ALVR dashboard alias
+tee ${HOME}/.zshrc.d/alvr << 'EOF'
+alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"
+EOF

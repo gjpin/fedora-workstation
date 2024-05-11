@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# Enable VRR
+gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
+
 ################################################
 ##### Disable unneeded services
 ################################################
