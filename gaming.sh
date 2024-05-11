@@ -206,39 +206,20 @@ sed -i '2 i \ \ update-sunshine' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update Sunshine' ${HOME}/.zshrc.d/update-all
 
 ################################################
-##### ALVR
+##### ALVR (Flatpak)
 ################################################
 
 # References:
-# https://github.com/alvr-org/ALVR/blob/master/alvr/xtask/flatpak/com.valvesoftware.Steam.Utility.alvr.desktop
-# https://github.com/alvr-org/ALVR/wiki/Installation-guide#portable-targz
+# https://github.com/alvr-org/ALVR/wiki/Flatpak
 
 # Download ALVR
-curl https://github.com/alvr-org/ALVR/releases/latest/download/alvr_streamer_linux.tar.gz -L -O
+curl https://github.com/alvr-org/ALVR/releases/latest/download/com.valvesoftware.Steam.Utility.alvr.flatpak -L -O
 
-# Extract ALVR
-tar -xzf alvr_streamer_linux.tar.gz
-mv alvr_streamer_linux /home/${USER}/.alvr
+# Install ALVR
+flatpak install -y --bundle com.valvesoftware.Steam.Utility.alvr.flatpak
 
-# Cleanup ALVR.tar.gz
-rm -f alvr_streamer_linux.tar.gz
-
-# Create ALVR shortcut
-tee /home/${USER}/.local/share/applications/alvr.desktop << EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=ALVR
-GenericName=Game
-Comment=ALVR is an open source remote VR display which allows playing SteamVR games on a standalone headset such as Gear VR or Oculus Go/Quest.
-Exec=/home/${USER}/.alvr/bin/alvr_dashboard
-Icon=alvr
-Categories=Game;
-StartupNotify=true
-PrefersNonDefaultGPU=true
-X-KDE-RunOnDiscreteGpu=true
-StartupWMClass=ALVR
-EOF
+# Remove ALVR flatpak file
+rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
 
 # Allow ALVR in firewall
 sudo firewall-cmd --zone=block --add-service=alvr
@@ -246,3 +227,11 @@ sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
 
 sudo firewall-cmd --permanent --zone=block --add-service=alvr
 sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
+
+# Create ALVR dashboard alias
+tee ${HOME}/.zshrc.d/alvr << 'EOF'
+alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"
+EOF
+
+# Create ALVR dashboard desktop entry
+curl https://raw.githubusercontent.com/alvr-org/ALVR/master/alvr/xtask/flatpak/com.valvesoftware.Steam.Utility.alvr.desktop -o ${HOME}/.local/share/applications/com.valvesoftware.Steam.Utility.alvr.desktop

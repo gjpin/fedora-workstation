@@ -238,6 +238,11 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 # Install Flatpak runtimes
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
 flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/23.08
+flatpak install -y flathub org.freedesktop.Sdk//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm16//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
+flatpak install -y flathub org.freedesktop.Platform.GL.default//23.08-extra
+flatpak install -y flathub org.freedesktop.Platform.GL32.default//23.08-extra
 
 if lspci | grep VGA | grep "Intel" > /dev/null; then
   flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/23.08

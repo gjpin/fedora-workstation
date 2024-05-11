@@ -1254,3 +1254,69 @@ EOF
 
 # Remove downloaded dgVoodoo2 zip
 rm -f dgVoodoo${LATEST_DGVOODOO2_VERSION}.zip
+
+################################################
+##### ALVR (native)
+################################################
+
+# References:
+# https://github.com/alvr-org/ALVR/blob/master/alvr/xtask/flatpak/com.valvesoftware.Steam.Utility.alvr.desktop
+# https://github.com/alvr-org/ALVR/wiki/Installation-guide#portable-targz
+
+# Download ALVR
+curl https://github.com/alvr-org/ALVR/releases/latest/download/alvr_streamer_linux.tar.gz -L -O
+
+# Extract ALVR
+tar -xzf alvr_streamer_linux.tar.gz
+mv alvr_streamer_linux /home/${USER}/.alvr
+
+# Cleanup ALVR.tar.gz
+rm -f alvr_streamer_linux.tar.gz
+
+# Create ALVR shortcut
+tee /home/${USER}/.local/share/applications/alvr.desktop << EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ALVR
+GenericName=Game
+Comment=ALVR is an open source remote VR display which allows playing SteamVR games on a standalone headset such as Gear VR or Oculus Go/Quest.
+Exec=/home/${USER}/.alvr/bin/alvr_dashboard
+Icon=alvr
+Categories=Game;
+StartupNotify=true
+PrefersNonDefaultGPU=true
+X-KDE-RunOnDiscreteGpu=true
+StartupWMClass=ALVR
+EOF
+
+# Allow ALVR in firewall
+sudo firewall-cmd --zone=block --add-service=alvr
+sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
+
+sudo firewall-cmd --permanent --zone=block --add-service=alvr
+sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
+
+################################################
+##### Remove unneeded packages and services (KDE Plasma)
+################################################
+
+# Remove media players
+sudo dnf remove -y \
+    dragon \
+    elisa-player \
+    kamoso
+
+# Remove akonadi
+sudo dnf remove -y *akonadi*
+
+# Remove misc applications
+sudo dnf remove -y \
+    dnfdragora \
+    qt5-qdbusviewer \
+    konversation \
+    krdc \
+    krfb \
+    kwrite \
+    plasma-welcome \
+    kmouth
