@@ -1,0 +1,165 @@
+{
+    "env": {
+        "PATH": "$(PATH):$(HOME)\/.local\/bin"
+    },
+    "apps": [
+        {
+            "name": "Steam - 1280x800",
+            "cmd": "flatpak run com.valvesoftware.Steam -bigpicture",
+            "prep-cmd": [
+                {
+                    "do": "\/usr\/bin\/bash -c \"flatpak kill com.valvesoftware.Steam &>\/dev\/null || \/usr\/bin\/true\"",
+                    "undo": ""
+                },
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1280x800 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "exclude-global-prep-cmd": "false"
+        },
+        {
+            "name": "Steam - 1920x1080",
+            "cmd": "flatpak run com.valvesoftware.Steam -bigpicture",
+            "prep-cmd": [
+                {
+                    "do": "\/usr\/bin\/bash -c \"flatpak kill com.valvesoftware.Steam &>\/dev\/null || \/usr\/bin\/true\"",
+                    "undo": ""
+                },
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1920x1080 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "exclude-global-prep-cmd": "false"
+        },
+        {
+            "name": "Desktop - 1280x800",
+            "output": "",
+            "cmd": "",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1280x800 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ]
+        },
+        {
+            "name": "Desktop - 1920x1080",
+            "output": "",
+            "cmd": "",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1920x1080 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ]
+        },
+        {
+            "name": "Remnant II - 1080p",
+            "output": "",
+            "cmd": "xdg-open heroic:\/\/launch\/legendary\/fe214af49d9146de8ee21cc5537cea9c",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "auto-detach": "true",
+            "wait-all": "true",
+            "exit-timeout": "5",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1920x1080 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "image-path": ""
+        },
+        {
+            "name": "Remnant II - 800p",
+            "output": "",
+            "cmd": "xdg-open heroic:\/\/launch\/legendary\/fe214af49d9146de8ee21cc5537cea9c",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "auto-detach": "true",
+            "wait-all": "true",
+            "exit-timeout": "5",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1280x800 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "image-path": ""
+        },
+        {
+            "name": "Lords of the Fallen - 800p",
+            "output": "",
+            "cmd": "xdg-open heroic:\/\/launch\/legendary\/ce98de7d9e9c47ea8d9ba8e46a5063b4",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "auto-detach": "true",
+            "wait-all": "true",
+            "exit-timeout": "5",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1280x800 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "image-path": ""
+        },
+        {
+            "name": "Lords of the Fallen - 1080p",
+            "output": "",
+            "cmd": "xdg-open heroic:\/\/launch\/legendary\/ce98de7d9e9c47ea8d9ba8e46a5063b4",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "auto-detach": "true",
+            "wait-all": "true",
+            "exit-timeout": "5",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1920x1080 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "image-path": ""
+        },
+        {
+            "name": "Witchfire - 800p",
+            "output": "",
+            "cmd": "xdg-open heroic:\/\/launch\/legendary\/8764f82381f5436f99e97172df06af35",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "auto-detach": "true",
+            "wait-all": "true",
+            "exit-timeout": "5",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1280x800 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "image-path": ""
+        },
+        {
+            "name": "Witchfire - 1080p",
+            "output": "",
+            "cmd": "xdg-open heroic:\/\/launch\/legendary\/8764f82381f5436f99e97172df06af35",
+            "exclude-global-prep-cmd": "false",
+            "elevated": "false",
+            "auto-detach": "true",
+            "wait-all": "true",
+            "exit-timeout": "5",
+            "prep-cmd": [
+                {
+                    "do": "gnome-randr --output DP-3 --mode 1920x1080 --rate 60.001",
+                    "undo": "gnome-randr --output DP-3 --mode 3440x1440 --rate 143.923"
+                }
+            ],
+            "image-path": ""
+        }
+    ]
+}

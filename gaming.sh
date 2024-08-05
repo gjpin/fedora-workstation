@@ -4,52 +4,39 @@
 ##### Utilities
 ################################################
 
-# Install ProtonUp-Qt
-flatpak install -y flathub net.davidotek.pupgui2
+# Install MangoHud and Gamescope (native)
+if [ ${STEAM_VERSION} = "native" ]; then
+  sudo dnf install -y mangohud gamescope
+  mkdir -p ${HOME}/.config/MangoHud
+  curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/mangohud/MangoHud.conf -o ${HOME}/.config/MangoHud/MangoHud.conf
+fi
 
-# Install MangoHud
+# Install MangoHud and Gamescope (Flatpak)
 flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
-
-# Install Gamescope
 flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//23.08
-
-# Install Feral Gamemode
-sudo dnf install -y gamemode
 
 ################################################
 ##### Steam
 ################################################
 
-# Install Steam
-flatpak install -y flathub com.valvesoftware.Steam
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.valvesoftware.Steam -o ${HOME}/.local/share/flatpak/overrides/com.valvesoftware.Steam
-
 # Create directory for Steam games
-mkdir -p ${HOME}/games/steam
+mkdir -p ${HOME}/Games/Steam
 
-# Steam controllers udev rules
-sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
-sudo udevadm control --reload-rules
+if [ ${STEAM_VERSION} = "native" ]; then
+  # Install Steam
+  sudo dnf install -y steam
+elif [ ${STEAM_VERSION} = "flatpak" ]; then
+  # Install Steam
+  flatpak install -y flathub com.valvesoftware.Steam
+  curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.valvesoftware.Steam -o ${HOME}/.local/share/flatpak/overrides/com.valvesoftware.Steam
 
-# Allow Steam to open other applications (eg. Heroic)
-flatpak override --user --talk-name=org.freedesktop.Flatpak com.valvesoftware.Steam
+  # Steam controllers udev rules
+  sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
 
-# Configure MangoHud for Steam
-mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud
-tee ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud/MangoHud.conf << EOF
-legacy_layout=0
-horizontal
-gpu_stats
-cpu_stats
-ram
-fps
-frametime=0
-hud_no_margin
-table_columns=14
-frame_timing=1
-engine_version
-vulkan_driver
-EOF
+  # Configure MangoHud for Steam
+  mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud
+  curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/mangohud/MangoHud.conf -o ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud/MangoHud.conf
+fi
 
 ################################################
 ##### Heroic Games Launcher
@@ -60,75 +47,14 @@ flatpak install -y flathub com.heroicgameslauncher.hgl
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.heroicgameslauncher.hgl -o ${HOME}/.local/share/flatpak/overrides/com.heroicgameslauncher.hgl
 
 # Create directory for Heroic games
-mkdir -p ${HOME}/games/heroic
+mkdir -p ${HOME}/Games/Heroic/{Epic,GOG}
 
-# Configure Heroic
-mkdir -p ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic
-tee ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/heroic/config.json << EOF
-{
-  "defaultSettings": {
-    "checkUpdatesInterval": 10,
-    "enableUpdates": false,
-    "addDesktopShortcuts": false,
-    "addStartMenuShortcuts": false,
-    "autoInstallDxvk": true,
-    "autoInstallVkd3d": true,
-    "autoInstallDxvkNvapi": false,
-    "addSteamShortcuts": false,
-    "preferSystemLibs": false,
-    "checkForUpdatesOnStartup": false,
-    "autoUpdateGames": true,
-    "customWinePaths": [],
-    "defaultInstallPath": "/home/${USER}/games/heroic",
-    "libraryTopSection": "disabled",
-    "defaultSteamPath": "/home/${USER}/.var/app/com.valvesoftware.Steam/.steam/steam",
-    "defaultWinePrefix": "/home/${USER}/games/heroic/prefixes/default",
-    "hideChangelogsOnStartup": false,
-    "language": "en",
-    "maxWorkers": 0,
-    "minimizeOnLaunch": false,
-    "nvidiaPrime": false,
-    "enviromentOptions": [],
-    "wrapperOptions": [],
-    "showFps": false,
-    "useGameMode": true,
-    "wineCrossoverBottle": "Heroic",
-    "winePrefix": "/home/${USER}/games/heroic/prefixes/default",
-    "wineVersion": {
-      "bin": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/bin/wine",
-      "name": "Wine - Wine-GE-Proton8-26",
-      "type": "wine",
-      "lib": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/lib64",
-      "lib32": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/lib",
-      "wineserver": "/home/${USER}/.var/app/com.heroicgameslauncher.hgl/config/heroic/tools/wine/Wine-GE-Proton8-26/bin/wineserver"
-    },
-    "enableEsync": true,
-    "enableFsync": true,
-    "eacRuntime": true,
-    "battlEyeRuntime": true,
-    "framelessWindow": false,
-    "showMangohud": true
-  },
-  "version": "v0"
-}
-EOF
+# Create directory for Heroic Prefixes
+mkdir -p ${HOME}/Games/Heroic/Prefixes/{Epic,GOG}
 
 # Configure MangoHud for Heroic
 mkdir -p ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud
-tee ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud/MangoHud.conf << EOF
-legacy_layout=0
-horizontal
-gpu_stats
-cpu_stats
-ram
-fps
-frametime=0
-hud_no_margin
-table_columns=14
-frame_timing=1
-engine_version
-vulkan_driver
-EOF
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/mangohud/MangoHud.conf -o ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud/MangoHud.conf
 
 ################################################
 ##### Sunshine
@@ -185,9 +111,17 @@ mkdir -p ${HOME}/.config/sunshine
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o ${HOME}/.config/sunshine/sunshine.conf
 
 if [ ${DESKTOP_ENVIRONMENT} == "gnome" ]; then
+  if [ ${STEAM_VERSION} = "native" ]; then
     curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o ${HOME}/.config/sunshine/apps.json
+  elif [ ${STEAM_VERSION} = "flatpak" ]; then
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome-flatpak.json -o ${HOME}/.config/sunshine/apps.json
+  fi
 elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
+  if [ ${STEAM_VERSION} = "native" ]; then
     curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o ${HOME}/.config/sunshine/apps.json
+  elif [ ${STEAM_VERSION} = "flatpak" ]; then
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma-flatpak.json -o ${HOME}/.config/sunshine/apps.json
+  fi
 fi
 
 # Sunshine updater
@@ -204,34 +138,3 @@ chmod +x ${HOME}/.local/bin/update-sunshine
 sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ update-sunshine' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update Sunshine' ${HOME}/.zshrc.d/update-all
-
-################################################
-##### ALVR (Flatpak)
-################################################
-
-# References:
-# https://github.com/alvr-org/ALVR/wiki/Flatpak
-
-# Download ALVR
-curl https://github.com/alvr-org/ALVR/releases/latest/download/com.valvesoftware.Steam.Utility.alvr.flatpak -L -O
-
-# Install ALVR
-flatpak install -y --bundle com.valvesoftware.Steam.Utility.alvr.flatpak
-
-# Remove ALVR flatpak file
-rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
-
-# Allow ALVR in firewall
-sudo firewall-cmd --zone=block --add-service=alvr
-sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
-
-sudo firewall-cmd --permanent --zone=block --add-service=alvr
-sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
-
-# Create ALVR dashboard alias
-tee ${HOME}/.zshrc.d/alvr << 'EOF'
-alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"
-EOF
-
-# Create ALVR dashboard desktop entry
-curl https://raw.githubusercontent.com/alvr-org/ALVR/master/alvr/xtask/flatpak/com.valvesoftware.Steam.Utility.alvr.desktop -o ${HOME}/.local/share/applications/com.valvesoftware.Steam.Utility.alvr.desktop

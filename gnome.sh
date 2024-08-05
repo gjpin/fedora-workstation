@@ -256,19 +256,28 @@ gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, '
 mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
 # Grand Theft Focus
-# # https://extensions.gnome.org/extension/5410/grand-theft-focus
-curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v5.shell-extension.zip -O
+# https://extensions.gnome.org/extension/5410/grand-theft-focus
+curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v6.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Legacy (GTK3) Theme Scheme Auto Switcher
 # https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
-curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v7.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v8.shell-extension.zip -O
+gnome-extensions install *.shell-extension.zip
+rm -f *.shell-extension.zip
+
+# AppIndicator and KStatusNotifierItem Support
+# https://extensions.gnome.org/extension/615/appindicator-support/
+# https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
+sudo dnf install -y libappindicator-gtk3
+
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v58.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Enable extensions
-gsettings set org.gnome.shell enabled-extensions "['grand-theft-focus@zalckos.github.com', 'legacyschemeautoswitcher@joshimukul29.gmail.com']"
+gsettings set org.gnome.shell enabled-extensions "['grand-theft-focus@zalckos.github.com', 'legacyschemeautoswitcher@joshimukul29.gmail.com', 'appindicatorsupport@rgcjonas.gmail.com']"
 
 ################################################
 ##### Gnome misc configurations

@@ -7,11 +7,14 @@
 read -p "Hostname: " NEW_HOSTNAME
 export NEW_HOSTNAME
 
+read -p "Desktop environment (gnome / plasma): " DESKTOP_ENVIRONMENT
+export DESKTOP_ENVIRONMENT
+
 read -p "Gaming (yes / no): " GAMING
 export GAMING
 
-read -p "Desktop environment (gnome / plasma): " DESKTOP_ENVIRONMENT
-export DESKTOP_ENVIRONMENT
+read -p "Steam (native / flatpak): " STEAM_VERSION
+export STEAM_VERSION
 
 ################################################
 ##### Remove unneeded packages and services
@@ -75,7 +78,13 @@ sudo dnf install -y \
   fuse-sshfs \
   fd-find \
   fzf \
-  libva-utils
+  libva-utils \
+  bc \
+  ripgrep \
+  yq \
+  procps-ng \
+  gawk \
+  coreutils
 
 # Install fonts
 sudo dnf install -y \
@@ -136,15 +145,101 @@ fi
 sudo mkdir -p /etc/systemd/system.conf.d
 sudo tee /etc/systemd/system.conf.d/default-timeout.conf << EOF
 [Manager]
-DefaultTimeoutStopSec=10s
+DefaultTimeoutStopSec=5s
 EOF
 
 # Configure default timeout to stop user units
 sudo mkdir -p /etc/systemd/user.conf.d
 sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
 [Manager]
-DefaultTimeoutStopSec=10s
+DefaultTimeoutStopSec=5s
 EOF
+
+################################################
+##### Tweaks
+################################################
+
+# References:
+# https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
+# https://wiki.cachyos.org/configuration/general_system_tweaks/
+# https://gitlab.com/cscs/maxperfwiz/-/blob/master/maxperfwiz?ref_type=heads
+# https://wiki.archlinux.org/title/swap#Swappiness
+# https://wiki.archlinux.org/title/Improving_performance#zram_or_zswap
+
+# Sysctl tweaks
+COMPUTER_MEMORY=$(echo $(vmstat -sS M | head -n1 | awk '{print $1;}'))
+MEMORY_BY_CORE=$(echo $(( $(vmstat -s | head -n1 | awk '{print $1;}')/$(nproc) )))
+BEST_KEEP_FREE=$(echo "scale=0; "$MEMORY_BY_CORE"*0.058" | bc | awk '{printf "%.0f\n", $1}')
+
+sudo tee /etc/sysctl.d/99-performance-tweaks.conf << EOF
+vm.page-cluster=0
+vm.swappiness=10
+vm.vfs_cache_pressure=50
+kernel.nmi_watchdog=0
+kernel.split_lock_mitigate=0
+vm.compaction_proactiveness=0
+vm.page_lock_unfairness=1
+$(if [[ ${COMPUTER_MEMORY} > 13900 ]]; then echo "vm.dirty_bytes=419430400"; fi)
+$(if [[ ${COMPUTER_MEMORY} > 13900 ]]; then echo "vm.dirty_background_bytes=209715200"; fi)
+$(if [[ $(cat /sys/block/*/queue/rotational) == 0 ]]; then echo "vm.dirty_expire_centisecs=500"; else echo "vm.dirty_expire_centisecs=3000"; fi)
+$(if [[ $(cat /sys/block/*/queue/rotational) == 0 ]]; then echo "vm.dirty_writeback_centisecs=250"; else echo "vm.dirty_writeback_centisecs=1500"; fi)
+vm.min_free_kbytes=${BEST_KEEP_FREE}
+EOF
+
+# Udev tweaks
+sudo tee /etc/udev/rules.d/99-performance-tweaks.rules << 'EOF'
+ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
+ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler} "mq-deadline"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler} "bfq"
+EOF
+
+# Hugepage Defragmentation - default: 1
+# Transparent Hugepages - default: always
+# Shared Memory in Transparent Hugepages - default: never
+sudo tee /etc/systemd/system/kernel-tweaks.service << 'EOF'
+[Unit]
+Description=Set kernel tweaks
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/usr/bin/bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
+ExecStart=/usr/bin/bash -c 'echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled'
+ExecStart=/usr/bin/bash -c 'echo 0 > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable kernel-tweaks.service
+
+# Disable watchdog timer drivers
+# sudo dmesg | grep -e sp5100 -e iTCO -e wdt -e tco
+sudo tee /etc/modprobe.d/disable-watchdog-drivers.conf << 'EOF'
+blacklist sp5100_tco
+blacklist iTCO_wdt
+blacklist iTCO_vendor_support
+EOF
+
+# Disable broadcast messages
+sudo tee /etc/systemd/system/disable-broadcast-messages.service << 'EOF'
+[Unit]
+Description=Disable broadcast messages
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/usr/bin/busctl set-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager EnableWallMessages b false
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable disable-broadcast-messages.service
 
 ################################################
 ##### ZSH
@@ -153,15 +248,11 @@ EOF
 # Install ZSH and plugins
 sudo dnf install -y zsh zsh-autosuggestions zsh-syntax-highlighting
 
-# Install Oh-My-Zsh
-# https://github.com/ohmyzsh/ohmyzsh#manual-installation
-git clone https://github.com/ohmyzsh/ohmyzsh.git ${HOME}/.oh-my-zsh
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.zshrc -o ${HOME}/.zshrc
+# Configure ZSH
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.zshrc -o ${HOME}/.zshrc
 
-# Install powerlevel10k zsh theme
-# https://github.com/romkatv/powerlevel10k#oh-my-zsh
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${HOME}/.oh-my-zsh/custom/themes/powerlevel10k
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.p10k.zsh -o ${HOME}/.p10k.zsh
+# Configure powerlevel10k zsh theme
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.p10k.zsh -o ${HOME}/.p10k.zsh
 
 # Add ~/.local/bin to the path
 tee ${HOME}/.zshrc.d/local-bin << 'EOF'
@@ -233,7 +324,7 @@ sudo flatpak remote-modify flathub --enable
 
 # Import global Flatpak overrides
 mkdir -p ${HOME}/.local/share/flatpak/overrides
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/global -o ${HOME}/.local/share/flatpak/overrides/global
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/global -o ${HOME}/.local/share/flatpak/overrides/global
 
 # Install Flatpak runtimes
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
@@ -266,57 +357,55 @@ flatpak install -y flathub net.cozic.joplin_desktop
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.cozic.joplin_desktop -o ${HOME}/.local/share/flatpak/overrides/net.cozic.joplin_desktop
 
 ################################################
-##### Kubernetes
+##### Cloud / Kubernetes
 ################################################
 
-# Install kubectl
-curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-chmod +x kubectl
-sudo mv kubectl /usr/local/bin/kubectl
+# References:
+# https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+# https://github.com/ahmetb/kubectx
+# https://github.com/kvaps/kubectl-node-shell
 
-# kubectl updater
-tee ${HOME}/.local/bin/update-kubectl << 'EOF'
-LATEST_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
-INSTALLED_VERSION=$(kubectl version --client --output=json | jq -r .clientVersion.gitVersion)
+# Install OpenTofu
+sudo dnf install -y opentofu
 
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-  chmod +x kubectl
-  sudo mv kubectl /usr/local/bin/kubectl
-fi
+# Install kubectl and helm
+sudo dnf install -y kubernetes-client
+
+# Install helm
+sudo dnf install -y helm
+
+# Install Krew
+mkdir -p /tmp/krew
+curl -sSL https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz -o /tmp/krew/krew.tar.gz
+tar zxvf /tmp/krew/krew.tar.gz -C /tmp/krew
+./tmp/krew/krew-linux_amd64 install krew
+rm -rf /tmp/krew
+
+# Add ~/.krew/bin to the path
+tee ${HOME}/.zshrc.d/krew-bin << 'EOF'
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 EOF
 
-chmod +x ${HOME}/.local/bin/update-kubectl
-
+# Kubectl Krew updater
 sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-kubectl' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update kubectl' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ kubectl krew upgrade' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Krew plugins' ${HOME}/.zshrc.d/update-all
 
-# Install kubectx / kubens
-sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
-sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
-sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+# Source krew temporarily
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
-# kubectx updater
-tee ${HOME}/.local/bin/update-kubectx << 'EOF'
-#!/usr/bin/bash
-
-# Update kubectx
-sudo git -C /opt/kubectx pull
-EOF
-
-chmod +x ${HOME}/.local/bin/update-kubectx
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-kubectx' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update kubectx' ${HOME}/.zshrc.d/update-all
+# Install krew plugins
+kubectl krew install ctx
+kubectl krew install ns
+kubectl krew install node-shell
 
 # Kubernetes aliases and autocompletion
 tee ${HOME}/.zshrc.d/kubectl << 'EOF'
 # Kubectl alias
 alias k="kubectl"
-alias kx="kubectx"
-alias kn="kubens"
+alias kx="kubectl ctx"
+alias kn="kubectl ns"
+alias ks="kubectl node-shell"
 
 # Autocompletion
 autoload -Uz compinit
@@ -324,86 +413,10 @@ compinit
 source <(kubectl completion zsh)
 EOF
 
-# Install Helm
-LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
-sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
-rm -f helm.tar.gz
-
-# Helm updater
-tee ${HOME}/.local/bin/update-helm << 'EOF'
-LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-INSTALLED_VERSION=$(helm version --template='{{.Version}}')
-
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
-  sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
-  rm -f helm.tar.gz
-fi
+# k9s
+tee ${HOME}/.zshrc.d/k9s << 'EOF'
+alias k9s="podman run --rm -it -v ~/.kube/config:/root/.kube/config quay.io/derailed/k9s"
 EOF
-
-chmod +x ${HOME}/.local/bin/update-helm
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-helm' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Helm' ${HOME}/.zshrc.d/update-all
-
-# Install Cilium
-LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
-sudo tar -xzf cilium.tar.gz -C /usr/local/bin
-rm -f cilium.tar.gz
-
-# Cilium updater
-tee ${HOME}/.local/bin/update-cilium << 'EOF'
-LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
-INSTALLED_VERSION=$(cilium version --client | grep -o -P '(?<=cilium-cli: ).*(?= compiled)')
-
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
-  sudo tar -xzf cilium.tar.gz -C /usr/local/bin
-  rm -f cilium.tar.gz
-fi
-EOF
-
-chmod +x ${HOME}/.local/bin/update-cilium
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
-
-################################################
-##### Terraform
-################################################
-
-# Install Terraform
-LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
-curl -s -o terraform.zip https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
-unzip terraform.zip
-sudo mv terraform /usr/local/bin/terraform
-rm -f terraform.zip
-
-# Terraform updater
-tee ${HOME}/.local/bin/update-terraform << 'EOF'
-LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
-INSTALLED_VERSION=$(terraform --version --json | jq -r .terraform_version)
-
-if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
-  curl -s -o terraform.zip https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
-  unzip terraform.zip
-  sudo mv terraform /usr/local/bin/terraform
-  rm -f terraform.zip
-fi
-EOF
-
-chmod +x ${HOME}/.local/bin/update-terraform
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-terraform' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Terraform' ${HOME}/.zshrc.d/update-all
-
-# Cleanup
-rm -f ${HOME}/LICENSE.txt
 
 ################################################
 ##### Firefox
@@ -518,30 +531,6 @@ else
 fi
 EOF
 
-# Install LazyVim
-# https://www.lazyvim.org/installation
-git clone https://github.com/LazyVim/starter ${HOME}/.config/nvim
-rm -rf ${HOME}/.config/nvim/.git
-
-# Install arctic.nvim (Dark Modern) color scheme in neovim
-# https://github.com/rockyzhang24/arctic.nvim/tree/v2
-# https://www.lazyvim.org/plugins/colorscheme
-tee ${HOME}/.config/nvim/lua/plugins/colorscheme.lua << 'EOF'
-return {
-    {
-        "gjpin/arctic.nvim",
-        branch = "v2",
-        dependencies = { "rktjmp/lush.nvim" }
-    },
-    {
-        "LazyVim/LazyVim",
-        opts = {
-            colorscheme = "arctic",
-        }
-    }
-}
-EOF
-
 ################################################
 ##### VSCode (Native)
 ################################################
@@ -585,6 +574,33 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vsc
 # Install syncthing and enable service
 sudo dnf install -y syncthing
 systemctl --user enable syncthing.service
+
+################################################
+##### Power management
+################################################
+
+# References:
+# https://wiki.archlinux.org/title/Power_management
+# https://wiki.archlinux.org/title/CPU_frequency_scaling#cpupower
+# https://gitlab.com/corectrl/corectrl/-/wikis/Setup
+# https://wiki.archlinux.org/title/AMDGPU#Performance_levels
+
+# Apply power managament configurations according to device type
+if [[ $(cat /sys/class/dmi/id/chassis_type) -eq 10 ]]; then
+    # Enable audio power saving features
+    echo 'options snd_hda_intel power_save=1' | sudo tee /etc/modprobe.d/audio_powersave.conf
+
+    # Enable wifi (iwlwifi) power saving features
+    echo 'options iwlwifi power_save=1' | sudo tee /etc/modprobe.d/iwlwifi.conf
+else
+    if lspci | grep "VGA" | grep "AMD" > /dev/null; then
+        # AMD scaling driver
+        sudo grubby --update-kernel=ALL --args=amd_pstate=active
+
+        # Set AMD GPU performance level to High
+        echo 'SUBSYSTEM=="pci", DRIVER=="amdgpu", ATTR{power_dpm_force_performance_level}="high"' | sudo tee /etc/udev/rules.d/30-amdgpu-high-power.rules
+    fi
+fi
 
 ################################################
 ##### Unlock LUKS2 with TPM2 token

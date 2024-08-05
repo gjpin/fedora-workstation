@@ -9,6 +9,173 @@ flatpak install -y flathub dev.k8slens.OpenLens
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.k8slens.OpenLens -o ${HOME}/.local/share/flatpak/overrides/dev.k8slens.OpenLens
 
 ################################################
+##### lazyvim
+################################################
+
+# Install LazyVim
+# https://www.lazyvim.org/installation
+git clone https://github.com/LazyVim/starter ${HOME}/.config/nvim
+rm -rf ${HOME}/.config/nvim/.git
+
+# Install arctic.nvim (Dark Modern) color scheme in neovim
+# https://github.com/rockyzhang24/arctic.nvim/tree/v2
+# https://www.lazyvim.org/plugins/colorscheme
+tee ${HOME}/.config/nvim/lua/plugins/colorscheme.lua << 'EOF'
+return {
+    {
+        "gjpin/arctic.nvim",
+        branch = "v2",
+        dependencies = { "rktjmp/lush.nvim" }
+    },
+    {
+        "LazyVim/LazyVim",
+        opts = {
+            colorscheme = "arctic",
+        }
+    }
+}
+EOF
+
+################################################
+##### Terraform
+################################################
+
+# Install Terraform
+LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
+curl -s -o terraform.zip https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
+unzip terraform.zip
+sudo mv terraform /usr/local/bin/terraform
+rm -f terraform.zip
+
+# Terraform updater
+tee ${HOME}/.local/bin/update-terraform << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
+INSTALLED_VERSION=$(terraform --version --json | jq -r .terraform_version)
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -o terraform.zip https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_linux_amd64.zip
+  unzip terraform.zip
+  sudo mv terraform /usr/local/bin/terraform
+  rm -f terraform.zip
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-terraform
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-terraform' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Terraform' ${HOME}/.zshrc.d/update-all
+
+# Cleanup
+rm -f ${HOME}/LICENSE.txt
+
+################################################
+##### Cloud / Kubernetes
+################################################
+
+# Install kubectl
+curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/kubectl
+
+# kubectl updater
+tee ${HOME}/.local/bin/update-kubectl << 'EOF'
+LATEST_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+INSTALLED_VERSION=$(kubectl version --client --output=json | jq -r .clientVersion.gitVersion)
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  chmod +x kubectl
+  sudo mv kubectl /usr/local/bin/kubectl
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-kubectl
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-kubectl' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update kubectl' ${HOME}/.zshrc.d/update-all
+
+# Install Helm
+LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
+sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
+rm -f helm.tar.gz
+
+# Helm updater
+tee ${HOME}/.local/bin/update-helm << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(helm version --template='{{.Version}}')
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
+  sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 1
+  rm -f helm.tar.gz
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-helm
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-helm' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Helm' ${HOME}/.zshrc.d/update-all
+
+# Install Cilium
+LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
+sudo tar -xzf cilium.tar.gz -C /usr/local/bin
+rm -f cilium.tar.gz
+
+# Cilium updater
+tee ${HOME}/.local/bin/update-cilium << 'EOF'
+LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
+INSTALLED_VERSION=$(cilium version --client | grep -o -P '(?<=cilium-cli: ).*(?= compiled)')
+
+if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
+  curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
+  sudo tar -xzf cilium.tar.gz -C /usr/local/bin
+  rm -f cilium.tar.gz
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-cilium
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
+
+################################################
+##### ALVR (Flatpak)
+################################################
+
+# References:
+# https://github.com/alvr-org/ALVR/wiki/Flatpak
+
+# Download ALVR
+curl https://github.com/alvr-org/ALVR/releases/latest/download/com.valvesoftware.Steam.Utility.alvr.flatpak -L -O
+
+# Install ALVR
+flatpak install -y --bundle com.valvesoftware.Steam.Utility.alvr.flatpak
+
+# Remove ALVR flatpak file
+rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
+
+# Allow ALVR in firewall
+sudo firewall-cmd --zone=block --add-service=alvr
+sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
+
+sudo firewall-cmd --permanent --zone=block --add-service=alvr
+sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
+
+# Create ALVR dashboard alias
+tee ${HOME}/.zshrc.d/alvr << 'EOF'
+alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"
+EOF
+
+# Create ALVR dashboard desktop entry
+curl https://raw.githubusercontent.com/alvr-org/ALVR/master/alvr/xtask/flatpak/com.valvesoftware.Steam.Utility.alvr.desktop -o ${HOME}/.local/share/applications/com.valvesoftware.Steam.Utility.alvr.desktop
+
+################################################
 ##### Disable unneeded services
 ################################################
 
@@ -736,15 +903,6 @@ EOF
 # Rounded Window Corners
 # https://extensions.gnome.org/extension/5237/rounded-window-corners/
 curl -sSL https://extensions.gnome.org/extension-data/rounded-window-cornersyilozt.v11.shell-extension.zip -O
-gnome-extensions install *.shell-extension.zip
-rm -f *.shell-extension.zip
-
-# AppIndicator and KStatusNotifierItem Support
-# https://extensions.gnome.org/extension/615/appindicator-support/
-# https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
-sudo dnf install -y libappindicator-gtk3
-
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v57.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
