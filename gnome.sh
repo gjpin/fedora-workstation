@@ -46,7 +46,7 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 # https://github.com/rafaelmardojai/firefox-gnome-theme
 
 # Set Firefox profile path
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
 
 # Install Firefox Gnome theme
 mkdir -p ${FIREFOX_PROFILE_PATH}/chrome
@@ -59,7 +59,7 @@ tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
 #!/usr/bin/bash
 
 # Update Firefox theme
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
 git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
 EOF
 

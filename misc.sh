@@ -9,6 +9,28 @@ flatpak install -y flathub dev.k8slens.OpenLens
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.k8slens.OpenLens -o ${HOME}/.local/share/flatpak/overrides/dev.k8slens.OpenLens
 
 ################################################
+##### Firefox (Flatpak)
+################################################
+
+# Remove native firefox
+sudo dnf remove -y firefox
+rm -rf ${HOME}/.mozilla
+
+# Install Firefox from Flathub
+flatpak install -y flathub org.mozilla.firefox
+
+# Set Firefox Flatpak as default browser and handler for https(s)
+xdg-settings set default-web-browser org.mozilla.firefox.desktop
+xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/http
+xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/https
+
+# Temporarily open Firefox to create profiles
+timeout 5 flatpak run org.mozilla.firefox --headless
+
+# Set Firefox profile path
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
+
+################################################
 ##### VSCode (Adwaita theme)
 ################################################
 

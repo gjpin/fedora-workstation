@@ -20,10 +20,6 @@ export STEAM_VERSION
 ##### Remove unneeded packages and services
 ################################################
 
-# Remove libreoffice
-sudo dnf group remove -y libreoffice
-sudo dnf remove -y *libreoffice*
-
 # Disable speech dispatcher
 sudo sed -i "s|^# DisableAutoSpawn|DisableAutoSpawn|g" /etc/speech-dispatcher/speechd.conf
 
@@ -345,7 +341,6 @@ flatpak install -y flathub com.belmoussaoui.Authenticator
 flatpak install -y flathub org.keepassxc.KeePassXC
 flatpak install -y flathub com.github.tchx84.Flatseal
 flatpak install -y flathub com.spotify.Client
-flatpak install -y flathub org.libreoffice.LibreOffice
 flatpak install -y flathub rest.insomnia.Insomnia
 flatpak install -y flathub org.gimp.GIMP
 flatpak install -y flathub org.blender.Blender
@@ -381,11 +376,6 @@ tar zxvf /tmp/krew/krew.tar.gz -C /tmp/krew
 ./tmp/krew/krew-linux_amd64 install krew
 rm -rf /tmp/krew
 
-# Add ~/.krew/bin to the path
-tee ${HOME}/.zshrc.d/krew-bin << 'EOF'
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-EOF
-
 # Kubectl Krew updater
 sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ kubectl krew upgrade' ${HOME}/.zshrc.d/update-all
@@ -411,6 +401,9 @@ alias ks="kubectl node-shell"
 autoload -Uz compinit
 compinit
 source <(kubectl completion zsh)
+
+# Krew
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 EOF
 
 # k9s
@@ -422,23 +415,8 @@ EOF
 ##### Firefox
 ################################################
 
-# Remove native firefox
-sudo dnf remove -y firefox
-rm -rf ${HOME}/.mozilla
-
-# Install Firefox from Flathub
-flatpak install -y flathub org.mozilla.firefox
-
-# Set Firefox Flatpak as default browser and handler for https(s)
-xdg-settings set default-web-browser org.mozilla.firefox.desktop
-xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/http
-xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/https
-
-# Temporarily open Firefox to create profiles
-timeout 5 flatpak run org.mozilla.firefox --headless
-
 # Set Firefox profile path
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
 
 # Import extensions
 mkdir -p ${FIREFOX_PROFILE_PATH}/extensions
