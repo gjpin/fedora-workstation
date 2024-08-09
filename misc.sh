@@ -31,6 +31,92 @@ timeout 5 flatpak run org.mozilla.firefox --headless
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
 ################################################
+##### Tweaks
+################################################
+
+# References:
+# https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
+# https://wiki.cachyos.org/configuration/general_system_tweaks/
+# https://gitlab.com/cscs/maxperfwiz/-/blob/master/maxperfwiz?ref_type=heads
+# https://wiki.archlinux.org/title/swap#Swappiness
+# https://wiki.archlinux.org/title/Improving_performance#zram_or_zswap
+
+# Sysctl tweaks
+COMPUTER_MEMORY=$(echo $(vmstat -sS M | head -n1 | awk '{print $1;}'))
+MEMORY_BY_CORE=$(echo $(( $(vmstat -s | head -n1 | awk '{print $1;}')/$(nproc) )))
+BEST_KEEP_FREE=$(echo "scale=0; "$MEMORY_BY_CORE"*0.058" | bc | awk '{printf "%.0f\n", $1}')
+
+sudo tee /etc/sysctl.d/99-performance-tweaks.conf << EOF
+vm.page-cluster=0 # default: 3
+vm.swappiness=10 # default: 60
+vm.vfs_cache_pressure=50 # default: 100
+kernel.nmi_watchdog=0 # default: 0
+kernel.split_lock_mitigate=0 # default: 1
+vm.compaction_proactiveness=0 # default: 20
+vm.page_lock_unfairness=1 # default: 5
+$(if [[ ${COMPUTER_MEMORY} > 13900 ]]; then echo "vm.dirty_bytes=419430400"; fi) # default: 0
+$(if [[ ${COMPUTER_MEMORY} > 13900 ]]; then echo "vm.dirty_background_bytes=209715200"; fi) # default: 0
+$(if [[ $(cat /sys/block/*/queue/rotational) == 0 ]]; then echo "vm.dirty_expire_centisecs=500"; else echo "vm.dirty_expire_centisecs=3000"; fi) # default: 3000
+$(if [[ $(cat /sys/block/*/queue/rotational) == 0 ]]; then echo "vm.dirty_writeback_centisecs=250"; else echo "vm.dirty_writeback_centisecs=1500"; fi) # default: 500
+vm.min_free_kbytes=${BEST_KEEP_FREE} # default: 67584
+EOF
+
+# Udev tweaks
+sudo tee /etc/udev/rules.d/99-performance-tweaks.rules << 'EOF'
+ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
+ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler} "mq-deadline"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler} "bfq"
+EOF
+
+# Hugepage Defragmentation - default: 1
+# Transparent Hugepages - default: always
+# Shared Memory in Transparent Hugepages - default: never
+sudo tee /etc/systemd/system/kernel-tweaks.service << 'EOF'
+[Unit]
+Description=Set kernel tweaks
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/usr/bin/bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
+ExecStart=/usr/bin/bash -c 'echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled'
+ExecStart=/usr/bin/bash -c 'echo 0 > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable kernel-tweaks.service
+
+# Disable watchdog timer drivers
+# sudo dmesg | grep -e sp5100 -e iTCO -e wdt -e tco
+sudo tee /etc/modprobe.d/disable-watchdog-drivers.conf << 'EOF'
+blacklist sp5100_tco
+blacklist iTCO_wdt
+blacklist iTCO_vendor_support
+EOF
+
+# Disable broadcast messages
+sudo tee /etc/systemd/system/disable-broadcast-messages.service << 'EOF'
+[Unit]
+Description=Disable broadcast messages
+After=multi-user.target
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+ExecStart=/usr/bin/busctl set-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager EnableWallMessages b false
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable disable-broadcast-messages.service
+
+################################################
 ##### VSCode (Adwaita theme)
 ################################################
 
@@ -233,6 +319,10 @@ systemctl --user mask \
 flatpak install -y flathub com.usebottles.bottles
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebottles.bottles -o ${HOME}/.local/share/flatpak/overrides/com.usebottles.bottles
 
+# Configure MangoHud
+mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/mangohud/MangoHud.conf -o ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
+
 # Create folder for Bottles repos
 mkdir -p ${HOME}/src/bottles
 
@@ -242,24 +332,7 @@ git clone https://github.com/bottlesdevs/dependencies.git ${HOME}/src/bottles/de
 # Alias for bottles with local dependencies
 tee ${HOME}/.zshrc.d/bottles << EOF
 # Set bottles alias
-alias bottles="LOCAL_DEPENDENCIES=${HOME}/src/bottles/dependencies flatpak run com.usebottles.bottles"
-EOF
-
-# Configure MangoHud
-mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
-tee ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud/MangoHud.conf << EOF
-legacy_layout=0
-horizontal
-gpu_stats
-cpu_stats
-ram
-fps
-frametime=0
-hud_no_margin
-table_columns=14
-frame_timing=1
-engine_version
-vulkan_driver
+alias bottles_local="LOCAL_DEPENDENCIES=${HOME}/src/bottles/dependencies flatpak run com.usebottles.bottles"
 EOF
 
 ################################################

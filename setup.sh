@@ -152,92 +152,6 @@ DefaultTimeoutStopSec=5s
 EOF
 
 ################################################
-##### Tweaks
-################################################
-
-# References:
-# https://github.com/CryoByte33/steam-deck-utilities/blob/main/docs/tweak-explanation.md
-# https://wiki.cachyos.org/configuration/general_system_tweaks/
-# https://gitlab.com/cscs/maxperfwiz/-/blob/master/maxperfwiz?ref_type=heads
-# https://wiki.archlinux.org/title/swap#Swappiness
-# https://wiki.archlinux.org/title/Improving_performance#zram_or_zswap
-
-# Sysctl tweaks
-COMPUTER_MEMORY=$(echo $(vmstat -sS M | head -n1 | awk '{print $1;}'))
-MEMORY_BY_CORE=$(echo $(( $(vmstat -s | head -n1 | awk '{print $1;}')/$(nproc) )))
-BEST_KEEP_FREE=$(echo "scale=0; "$MEMORY_BY_CORE"*0.058" | bc | awk '{printf "%.0f\n", $1}')
-
-sudo tee /etc/sysctl.d/99-performance-tweaks.conf << EOF
-vm.page-cluster=0
-vm.swappiness=10
-vm.vfs_cache_pressure=50
-kernel.nmi_watchdog=0
-kernel.split_lock_mitigate=0
-vm.compaction_proactiveness=0
-vm.page_lock_unfairness=1
-$(if [[ ${COMPUTER_MEMORY} > 13900 ]]; then echo "vm.dirty_bytes=419430400"; fi)
-$(if [[ ${COMPUTER_MEMORY} > 13900 ]]; then echo "vm.dirty_background_bytes=209715200"; fi)
-$(if [[ $(cat /sys/block/*/queue/rotational) == 0 ]]; then echo "vm.dirty_expire_centisecs=500"; else echo "vm.dirty_expire_centisecs=3000"; fi)
-$(if [[ $(cat /sys/block/*/queue/rotational) == 0 ]]; then echo "vm.dirty_writeback_centisecs=250"; else echo "vm.dirty_writeback_centisecs=1500"; fi)
-vm.min_free_kbytes=${BEST_KEEP_FREE}
-EOF
-
-# Udev tweaks
-sudo tee /etc/udev/rules.d/99-performance-tweaks.rules << 'EOF'
-ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
-ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler} "mq-deadline"
-ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler} "bfq"
-EOF
-
-# Hugepage Defragmentation - default: 1
-# Transparent Hugepages - default: always
-# Shared Memory in Transparent Hugepages - default: never
-sudo tee /etc/systemd/system/kernel-tweaks.service << 'EOF'
-[Unit]
-Description=Set kernel tweaks
-After=multi-user.target
-StartLimitBurst=0
-
-[Service]
-Type=oneshot
-Restart=on-failure
-ExecStart=/usr/bin/bash -c 'echo always > /sys/kernel/mm/transparent_hugepage/enabled'
-ExecStart=/usr/bin/bash -c 'echo advise > /sys/kernel/mm/transparent_hugepage/shmem_enabled'
-ExecStart=/usr/bin/bash -c 'echo 0 > /sys/kernel/mm/transparent_hugepage/khugepaged/defrag'
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl enable kernel-tweaks.service
-
-# Disable watchdog timer drivers
-# sudo dmesg | grep -e sp5100 -e iTCO -e wdt -e tco
-sudo tee /etc/modprobe.d/disable-watchdog-drivers.conf << 'EOF'
-blacklist sp5100_tco
-blacklist iTCO_wdt
-blacklist iTCO_vendor_support
-EOF
-
-# Disable broadcast messages
-sudo tee /etc/systemd/system/disable-broadcast-messages.service << 'EOF'
-[Unit]
-Description=Disable broadcast messages
-After=multi-user.target
-StartLimitBurst=0
-
-[Service]
-Type=oneshot
-Restart=on-failure
-ExecStart=/usr/bin/busctl set-property org.freedesktop.login1 /org/freedesktop/login1 org.freedesktop.login1.Manager EnableWallMessages b false
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl enable disable-broadcast-messages.service
-
-################################################
 ##### ZSH
 ################################################
 
@@ -326,7 +240,7 @@ curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/config
 flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
 flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/23.08
 flatpak install -y flathub org.freedesktop.Sdk//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm16//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
 flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
 flatpak install -y flathub org.freedesktop.Platform.GL.default//23.08-extra
 flatpak install -y flathub org.freedesktop.Platform.GL32.default//23.08-extra
@@ -341,15 +255,31 @@ flatpak install -y flathub com.belmoussaoui.Authenticator
 flatpak install -y flathub org.keepassxc.KeePassXC
 flatpak install -y flathub com.github.tchx84.Flatseal
 flatpak install -y flathub com.spotify.Client
-flatpak install -y flathub rest.insomnia.Insomnia
 flatpak install -y flathub org.gimp.GIMP
 flatpak install -y flathub org.blender.Blender
 flatpak install -y flathub com.brave.Browser
-flatpak install -y flathub com.github.marhkb.Pods
+flatpak install -y flathub info.febvre.Komikku
 
-# Install Joplin
+# Development
+flatpak install -y flathub com.usebruno.Bruno
+flatpak install -y flathub com.github.marhkb.Pods
+flatpak install -y flathub dev.skynomads.Seabird
+
+# Joplin
 flatpak install -y flathub net.cozic.joplin_desktop
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.cozic.joplin_desktop -o ${HOME}/.local/share/flatpak/overrides/net.cozic.joplin_desktop
+
+################################################
+##### Bottles
+################################################
+
+# Install Bottles
+flatpak install -y flathub com.usebottles.bottles
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebottles.bottles -o ${HOME}/.local/share/flatpak/overrides/com.usebottles.bottles
+
+# Configure MangoHud
+mkdir -p ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/mangohud/MangoHud.conf -o ${HOME}/.var/app/com.usebottles.bottles/config/MangoHud
 
 ################################################
 ##### Cloud / Kubernetes
