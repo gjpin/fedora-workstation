@@ -268,37 +268,6 @@ sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
 
 ################################################
-##### ALVR (Flatpak)
-################################################
-
-# References:
-# https://github.com/alvr-org/ALVR/wiki/Flatpak
-
-# Download ALVR
-curl https://github.com/alvr-org/ALVR/releases/latest/download/com.valvesoftware.Steam.Utility.alvr.flatpak -L -O
-
-# Install ALVR
-flatpak install -y --bundle com.valvesoftware.Steam.Utility.alvr.flatpak
-
-# Remove ALVR flatpak file
-rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
-
-# Allow ALVR in firewall
-sudo firewall-cmd --zone=block --add-service=alvr
-sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
-
-sudo firewall-cmd --permanent --zone=block --add-service=alvr
-sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
-
-# Create ALVR dashboard alias
-tee ${HOME}/.zshrc.d/alvr << 'EOF'
-alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"
-EOF
-
-# Create ALVR dashboard desktop entry
-curl https://raw.githubusercontent.com/alvr-org/ALVR/master/alvr/xtask/flatpak/com.valvesoftware.Steam.Utility.alvr.desktop -o ${HOME}/.local/share/applications/com.valvesoftware.Steam.Utility.alvr.desktop
-
-################################################
 ##### Disable unneeded services
 ################################################
 

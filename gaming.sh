@@ -30,8 +30,9 @@ elif [ ${STEAM_VERSION} = "flatpak" ]; then
   flatpak install -y flathub com.valvesoftware.Steam
   curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.valvesoftware.Steam -o ${HOME}/.local/share/flatpak/overrides/com.valvesoftware.Steam
 
-  # Steam controllers udev rules
+  # Steam devices udev rules
   sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-input.rules -o /etc/udev/rules.d/60-steam-input.rules
+  sudo curl -sSL https://raw.githubusercontent.com/ValveSoftware/steam-devices/master/60-steam-vr.rules -o /etc/udev/rules.d/60-steam-vr.rules
 
   # Configure MangoHud for Steam
   mkdir -p ${HOME}/.var/app/com.valvesoftware.Steam/config/MangoHud
@@ -138,3 +139,34 @@ chmod +x ${HOME}/.local/bin/update-sunshine
 sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ update-sunshine' ${HOME}/.zshrc.d/update-all
 sed -i '2 i \ \ # Update Sunshine' ${HOME}/.zshrc.d/update-all
+
+################################################
+##### ALVR
+################################################
+
+# References:
+# https://github.com/alvr-org/ALVR/wiki/Flatpak
+
+if [ ${STEAM_VERSION} = "flatpak" ]; then
+  # Download ALVR
+  curl https://github.com/alvr-org/ALVR/releases/latest/download/com.valvesoftware.Steam.Utility.alvr.flatpak -L -O
+
+  # Install ALVR
+  flatpak install -y --bundle com.valvesoftware.Steam.Utility.alvr.flatpak
+
+  # Remove ALVR flatpak file
+  rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
+
+  # Allow ALVR in firewall
+  sudo firewall-cmd --zone=block --add-service=alvr
+  sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
+
+  sudo firewall-cmd --permanent --zone=block --add-service=alvr
+  sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
+
+  # Create ALVR dashboard alias
+  echo 'alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"' > ${HOME}/.zshrc.d/alvr
+
+  # Create ALVR dashboard desktop entry
+  curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/alvr/com.valvesoftware.Steam.Utility.alvr.desktop -o ${HOME}/.local/share/applications/com.valvesoftware.Steam.Utility.alvr.desktop
+fi

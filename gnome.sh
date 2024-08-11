@@ -4,7 +4,7 @@
 gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
 
 ################################################
-##### Disable unneeded services
+##### Configure Gnome applications
 ################################################
 
 # Disable Gnome Software autostart
