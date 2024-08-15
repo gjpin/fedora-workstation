@@ -237,13 +237,21 @@ mkdir -p ${HOME}/.local/share/flatpak/overrides
 curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/global -o ${HOME}/.local/share/flatpak/overrides/global
 
 # Install Flatpak runtimes
-flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full/x86_64/23.08
-flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi/x86_64/23.08
-flatpak install -y flathub org.freedesktop.Sdk//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
+flatpak install -y flathub org.freedesktop.Platform.ffmpeg-full//23.08
+flatpak install -y flathub org.freedesktop.Platform.GStreamer.gstreamer-vaapi//23.08
 flatpak install -y flathub org.freedesktop.Platform.GL.default//23.08-extra
 flatpak install -y flathub org.freedesktop.Platform.GL32.default//23.08-extra
+
+# Install Flatpak development runtimes
+flatpak install -y flathub org.freedesktop.Sdk//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.golang//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.node20//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.typescript//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk//23.08
 
 if lspci | grep VGA | grep "Intel" > /dev/null; then
   flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel/x86_64/23.08
@@ -268,6 +276,44 @@ flatpak install -y flathub dev.skynomads.Seabird
 # Joplin
 flatpak install -y flathub net.cozic.joplin_desktop
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.cozic.joplin_desktop -o ${HOME}/.local/share/flatpak/overrides/net.cozic.joplin_desktop
+
+################################################
+##### Android Studio
+################################################
+
+# References:
+# https://github.com/flathub/com.google.AndroidStudio/issues/81
+# https://issuetracker.google.com/issues/117641628
+
+# Install Android Studio
+flatpak install -y flathub com.google.AndroidStudio
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.google.AndroidStudio -o ${HOME}/.local/share/flatpak/overrides/com.google.AndroidStudio
+
+# Workaround for incompatibility with BTRFS copy-on-write (see issue in references)
+mkdir -p ${HOME}/.android
+tee ${HOME}/.android/advancedFeatures.ini << EOF
+QuickbootFileBacked = off
+EOF
+
+################################################
+##### Java - OpenJDK
+################################################
+
+# References:
+# https://docs.fedoraproject.org/en-US/quick-docs/installing-java/
+
+# Install OpenJDK 17
+sudo dnf install -y \
+  java-17-openjdk \
+  java-17-openjdk-devel
+
+# Install OpenJDK 21
+sudo dnf install -y \
+  java-21-openjdk \
+  java-21-openjdk-devel
+
+# Set default Java version to 21
+sudo alternatives --set java java-21-openjdk.x86_64
 
 ################################################
 ##### Bottles
