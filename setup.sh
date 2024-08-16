@@ -278,22 +278,118 @@ flatpak install -y flathub net.cozic.joplin_desktop
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.cozic.joplin_desktop -o ${HOME}/.local/share/flatpak/overrides/net.cozic.joplin_desktop
 
 ################################################
-##### Android Studio
+##### Android udev rules
 ################################################
 
 # References:
-# https://github.com/flathub/com.google.AndroidStudio/issues/81
-# https://issuetracker.google.com/issues/117641628
+# https://github.com/M0Rf30/android-udev-rules
 
-# Install Android Studio
-flatpak install -y flathub com.google.AndroidStudio
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.google.AndroidStudio -o ${HOME}/.local/share/flatpak/overrides/com.google.AndroidStudio
+# Create Android SDK directory
+mkdir -p ${HOME}/.devtools/android
 
-# Workaround for incompatibility with BTRFS copy-on-write (see issue in references)
-mkdir -p ${HOME}/.android
-tee ${HOME}/.android/advancedFeatures.ini << EOF
-QuickbootFileBacked = off
+# Android udev rules
+git clone https://github.com/M0Rf30/android-udev-rules.git ${HOME}/.devtools/android/udev-rules
+
+# Install udev rules
+sudo ln -sf ${HOME}/.devtools/android/udev-rules/51-android.rules /etc/udev/rules.d/51-android.rules
+sudo chmod a+r /etc/udev/rules.d/51-android.rules
+
+# Create adbusers group
+sudo groupadd adbusers
+
+# Add user to the adbusers group
+sudo gpasswd -a ${USER} adbusers
+
+# Android udev rules updater
+tee ${HOME}/.local/bin/update-android-udev-rules << 'EOF'
+#!/usr/bin/bash
+
+# Update Android udev rules
+git -C ${HOME}/.devtools/android/udev-rules pull
 EOF
+
+chmod +x ${HOME}/.local/bin/update-android-udev-rules
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-android-udev-rules' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Android udev rules' ${HOME}/.zshrc.d/update-all
+
+################################################
+##### Android SDK tools
+################################################
+
+# https://developer.android.com/tools/variables
+# https://developer.android.com/tools
+# https://developer.android.com/studio/emulator_archive
+# https://dl.google.com/android/repository/repository2-1.xml
+
+# Create Android SDK directory
+mkdir -p ${HOME}/.devtools/android
+
+# Install Android SDK command line tools
+CMDLINE_TOOLS_LATEST_VERSION=$(curl -s https://formulae.brew.sh/api/cask/android-commandlinetools.json | jq -r .version)
+curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-${CMDLINE_TOOLS_LATEST_VERSION}_latest.zip -O
+unzip commandlinetools-linux-*_latest.zip -d ${HOME}/.devtools/android
+rm -f commandlinetools-linux-*.zip
+echo ${CMDLINE_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/cmdline_tools_installed_version
+
+# Accept sdkmanager licenses
+yes | ${HOME}/.devtools/android/cmdline-tools/bin/sdkmanager --sdk_root=${HOME}/.devtools/android --licenses
+
+# Install Android SDK platform tools
+PLATFORM_TOOLS_LATEST_VERSION=$(curl -s https://formulae.brew.sh/api/cask/android-platform-tools.json | jq -r .version)
+curl -sSL https://dl.google.com/android/repository/platform-tools_r${PLATFORM_TOOLS_LATEST_VERSION}-linux.zip -O
+unzip platform-tools_r*-linux.zip -d ${HOME}/.devtools/android
+rm -f platform-tools_r*-linux.zip
+echo ${PLATFORM_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/platform_tools_installed_version
+
+# Set env vars and paths
+tee ${HOME}/.zshrc.d/android << EOF
+# Android env vars
+export ANDROID_HOME='${HOME}/.devtools/android'
+export ANDROID_SDK_ROOT='${HOME}/.devtools/android'
+
+# Add tools to path
+export PATH="\${PATH}:\${ANDROID_HOME}/platform-tools"
+export PATH="\${PATH}:\${ANDROID_HOME}/cmdline-tools/bin"
+EOF
+
+# Android tools updater
+tee ${HOME}/.local/bin/update-android-tools << 'EOF'
+#!/usr/bin/bash
+
+# cmdline tools versions
+INSTALLED_CMDLINE_TOOLS_VERSION=$(cat ${HOME}/.devtools/android/cmdline_tools_installed_version)
+CMDLINE_TOOLS_LATEST_VERSION=$(curl -s https://formulae.brew.sh/api/cask/android-commandlinetools.json | jq -r .version)
+
+# platform tools versions
+INSTALLED_PLATFORM_TOOLS_VERSION=$(cat ${HOME}/.devtools/android/platform_tools_installed_version)
+PLATFORM_TOOLS_LATEST_VERSION=$(curl -s https://formulae.brew.sh/api/cask/android-platform-tools.json | jq -r .version)
+
+# Update cmdline tools
+if [[ "${INSTALLED_CMDLINE_TOOLS_VERSION}" != "${CMDLINE_TOOLS_LATEST_VERSION}" ]]; then
+  curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-${CMDLINE_TOOLS_LATEST_VERSION}_latest.zip -O
+  rm -rf ${HOME}/.devtools/android/cmdline-tools
+  unzip commandlinetools-linux-*_latest.zip -d ${HOME}/.devtools/android
+  rm -f commandlinetools-linux-*.zip
+  echo ${CMDLINE_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/cmdline_tools_installed_version
+fi
+
+# Update platform tools
+if [[ "${INSTALLED_PLATFORM_TOOLS_VERSION}" != "${PLATFORM_TOOLS_LATEST_VERSION}" ]]; then
+  curl -sSL https://dl.google.com/android/repository/platform-tools_r${PLATFORM_TOOLS_LATEST_VERSION}-linux.zip -O
+  rm -rf ${HOME}/.devtools/android/platform-tools
+  unzip platform-tools_r*-linux.zip -d ${HOME}/.devtools/android
+  rm -f platform-tools_r*-linux.zip
+  echo ${PLATFORM_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/platform_tools_installed_version
+fi
+EOF
+
+chmod +x ${HOME}/.local/bin/update-android-tools
+
+sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ update-android-tools' ${HOME}/.zshrc.d/update-all
+sed -i '2 i \ \ # Update Android tools' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### Java - OpenJDK

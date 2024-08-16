@@ -104,9 +104,8 @@ gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 ################################################
 
 # Install gnome-randr
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/apps/gnome-randr.py -O
-chmod +x gnome-randr.py
-sudo mv gnome-randr.py /usr/local/bin/gnome-randr
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/apps/gnome-randr.py -o ${HOME}/.local/bin/gnome-randr
+chmod +x ${HOME}/.local/bin/gnome-randr
 
 ################################################
 ##### Gnome shortcuts

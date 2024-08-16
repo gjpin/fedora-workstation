@@ -692,36 +692,10 @@ flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=openjdk,openjdk17' com.jet
 
 # Install Android Studio
 flatpak install -y flathub com.google.AndroidStudio
-
-# Create required folders
-mkdir -p \
-  ${HOME}/Android \
-  ${HOME}/.android \
-  ${HOME}/.m2 \
-  ${HOME}/.java \
-  ${HOME}/.gradle
-
-# Allow Android Studio access to required folders
-flatpak override --user --filesystem=home/Android com.google.AndroidStudio
-flatpak override --user --filesystem=home/AndroidStudioProjects com.google.AndroidStudio
-flatpak override --user --filesystem=home/.android com.google.AndroidStudio
-flatpak override --user --filesystem=home/.m2 com.google.AndroidStudio
-flatpak override --user --filesystem=home/.java com.google.AndroidStudio
-flatpak override --user --filesystem=home/.gradle com.google.AndroidStudio
-
-# Allow Android Studio access to src folder
-flatpak override --user --filesystem=home/src com.google.AndroidStudio
-
-# Allow Android Studio access to .ssh folder
-flatpak override --user --filesystem=home/.ssh:ro com.google.AndroidStudio
-
-# Allow Android Studio access to .gitconfig file
-flatpak override --user --filesystem=home/.gitconfig:ro com.google.AndroidStudio
-
-# Allow Android Studio to read /etc (/etc/shells is required)
-flatpak override --user --filesystem=host-etc:ro com.google.AndroidStudio
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.google.AndroidStudio -o ${HOME}/.local/share/flatpak/overrides/com.google.AndroidStudio
 
 # Workaround for incompatibility with BTRFS copy-on-write (see issue in references)
+mkdir -p ${HOME}/.android
 tee ${HOME}/.android/advancedFeatures.ini << EOF
 QuickbootFileBacked = off
 EOF
@@ -762,7 +736,7 @@ LATEST_PLATFORM_TOOLS_VERSION=$(curl -s https://formulae.brew.sh/api/cask/androi
 wget https://dl.google.com/android/repository/platform-tools_r${LATEST_PLATFORM_TOOLS_VERSION}-linux.zip
 
 unzip platform-tools_r*-linux.zip -d ${ANDROID_SDK_PATH}
-rm -f build-tools_r*-linux.zip
+rm -f platform-tools_r*-linux.zip
 
 # Android emulator
 wget https://dl.google.com/android/repository/emulator-linux_x64-11150993.zip
