@@ -4,54 +4,6 @@
     },
     "apps": [
         {
-            "name": "Steam 800p",
-            "image-path": "",
-            "cmd": "/usr/bin/steam-runtime -gamepadui",
-            "prep-cmd": [
-                {
-                    "do": "killall -q -HUP steam || /bin/true",
-                    "undo": ""
-                },
-                {
-                    "do": "kscreen-doctor output.DP-2.mode.1280x800@60",
-                    "undo": "kscreen-doctor output.DP-2.mode.3440x1440@144"
-                }
-            ],
-            "exclude-global-prep-cmd": "false"
-        },
-        {
-            "name": "Steam 1080p",
-            "image-path": "",
-            "cmd": "/usr/bin/steam-runtime -gamepadui",
-            "prep-cmd": [
-                {
-                    "do": "killall -q -HUP steam || /bin/true",
-                    "undo": ""
-                },
-                {
-                    "do": "kscreen-doctor output.DP-2.mode.1920x1080@60",
-                    "undo": "kscreen-doctor output.DP-2.mode.3440x1440@144"
-                }
-            ],
-            "exclude-global-prep-cmd": "false"
-        },
-        {
-            "name": "Steam 1440p",
-            "image-path": "",
-            "cmd": "/usr/bin/steam-runtime -gamepadui",
-            "prep-cmd": [
-                {
-                    "do": "killall -q -HUP steam || /bin/true",
-                    "undo": ""
-                },
-                {
-                    "do": "kscreen-doctor output.DP-2.mode.2560x1440@60",
-                    "undo": "kscreen-doctor output.DP-2.mode.3440x1440@144"
-                }
-            ],
-            "exclude-global-prep-cmd": "false"
-        },
-        {
             "name": "Desktop",
             "output": "",
             "cmd": "",

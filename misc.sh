@@ -1,12 +1,89 @@
 #!/usr/bin/bash
 
-# Install Obsidian
-flatpak install -y flathub md.obsidian.Obsidian
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/md.obsidian.Obsidian -o ${HOME}/.local/share/flatpak/overrides/md.obsidian.Obsidian
+################################################
+##### Applications
+################################################
+
+# Joplin
+flatpak install -y flathub net.cozic.joplin_desktop
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.cozic.joplin_desktop -o ${HOME}/.local/share/flatpak/overrides/net.cozic.joplin_desktop
 
 # Install OpenLens
 flatpak install -y flathub dev.k8slens.OpenLens
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.k8slens.OpenLens -o ${HOME}/.local/share/flatpak/overrides/dev.k8slens.OpenLens
+
+################################################
+##### Sunshine (Native)
+################################################
+
+# References:
+# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/installation.html#rpm-package
+# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/usage.html#linux
+# https://github.com/LizardByte/Sunshine/blob/master/sunshine.service.in
+# https://github.com/LizardByte/Sunshine
+
+# Download Sunshine
+curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
+
+# Install Sunshine
+sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+
+# Clean rpm
+rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+
+# Allow Sunshine Virtual Input
+echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/85-sunshine-input.rules
+
+# Create Sunshine service
+tee ${HOME}/.config/systemd/user/sunshine.service << EOF
+[Unit]
+Description=Sunshine self-hosted game stream host for Moonlight.
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+ExecStart=/usr/bin/sunshine
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=graphical-session.target
+EOF
+
+# Fix Sunshine service in Gnome
+if [ ${DESKTOP_ENVIRONMENT} = "gnome" ]; then
+  sed -i '3 i After=gnome-session-wayland@gnome.target' ${HOME}/.config/systemd/user/sunshine.service
+fi
+
+# Enable Sunshine service
+systemctl --user enable sunshine.service
+
+# Allow Sunshine to use KMS
+sudo setcap cap_sys_admin+p $(readlink -f $(which sunshine))
+
+# Import configs
+mkdir -p ${HOME}/.config/sunshine
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o ${HOME}/.config/sunshine/sunshine.conf
+
+if [ ${DESKTOP_ENVIRONMENT} == "gnome" ]; then
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o ${HOME}/.config/sunshine/apps.json
+elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o ${HOME}/.config/sunshine/apps.json
+fi
+
+# Sunshine updater
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+################################################
+##### Sunshine
+################################################
+
+# Update Sunshine
+curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
+sudo dnf reinstall -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+systemctl --user restart sunshine.service
+EOF
 
 ################################################
 ##### Firefox (Flatpak)

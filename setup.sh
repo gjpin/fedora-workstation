@@ -80,7 +80,8 @@ sudo dnf install -y \
   yq \
   procps-ng \
   gawk \
-  coreutils
+  coreutils \
+  pulseaudio-utils
 
 # Install fonts
 sudo dnf install -y \
@@ -181,16 +182,24 @@ chsh -s $(which zsh)
 tee ${HOME}/.local/bin/update-all << EOF
 #!/usr/bin/bash
 
+################################################
+##### System and firmware
+################################################
+
 # Update system
 sudo dnf upgrade -y --refresh
-
-# Update Flatpak apps
-flatpak update -y
-flatpak uninstall -y --unused
 
 # Update firmware
 sudo fwupdmgr refresh
 sudo fwupdmgr update
+
+################################################
+##### Flatpaks
+################################################
+
+# Update Flatpak apps
+flatpak update -y
+flatpak uninstall -y --unused
 EOF
 
 chmod +x ${HOME}/.local/bin/update-all
@@ -275,9 +284,9 @@ flatpak install -y flathub com.usebruno.Bruno
 flatpak install -y flathub com.github.marhkb.Pods
 flatpak install -y flathub dev.skynomads.Seabird
 
-# Joplin
-flatpak install -y flathub net.cozic.joplin_desktop
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.cozic.joplin_desktop -o ${HOME}/.local/share/flatpak/overrides/net.cozic.joplin_desktop
+# Obsidian
+flatpak install -y flathub md.obsidian.Obsidian
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/md.obsidian.Obsidian -o ${HOME}/.local/share/flatpak/overrides/md.obsidian.Obsidian
 
 ################################################
 ##### Android udev rules
@@ -303,18 +312,14 @@ sudo groupadd adbusers
 sudo gpasswd -a ${USER} adbusers
 
 # Android udev rules updater
-tee ${HOME}/.local/bin/update-android-udev-rules << 'EOF'
-#!/usr/bin/bash
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+################################################
+##### Android udev rules
+################################################
 
 # Update Android udev rules
 git -C ${HOME}/.devtools/android/udev-rules pull
-EOF
-
-# Add Android udev rules updater to main updater
-tee -a ${HOME}/.local/bin/update-all << EOF
-
-# Update Android udev rules
-update-android-udev-rules
 EOF
 
 ################################################
@@ -358,8 +363,11 @@ export PATH="\${PATH}:\${ANDROID_HOME}/cmdline-tools/bin"
 EOF
 
 # Android tools updater
-tee ${HOME}/.local/bin/update-android-tools << 'EOF'
-#!/usr/bin/bash
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+################################################
+##### Android SDK tools
+################################################
 
 # cmdline tools versions
 INSTALLED_CMDLINE_TOOLS_VERSION=$(cat ${HOME}/.devtools/android/cmdline_tools_installed_version)
@@ -386,13 +394,6 @@ if [[ "${INSTALLED_PLATFORM_TOOLS_VERSION}" != "${PLATFORM_TOOLS_LATEST_VERSION}
   rm -f platform-tools_r*-linux.zip
   echo ${PLATFORM_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/platform_tools_installed_version
 fi
-EOF
-
-# Add Android tools updater to main updater
-tee -a ${HOME}/.local/bin/update-all << EOF
-
-# Update Android tools
-update-android-tools
 EOF
 
 ################################################
@@ -455,6 +456,10 @@ rm -rf /tmp/krew
 # Add Kubectl Krew updater to main updater
 tee -a ${HOME}/.local/bin/update-all << EOF
 
+################################################
+##### Kubectl Krew plugins
+################################################
+
 # Update Kubectl Krew plugins
 kubectl krew upgrade
 EOF
@@ -468,7 +473,7 @@ kubectl krew install ns
 kubectl krew install node-shell
 
 # Kubernetes aliases and autocompletion
-tee ${HOME}/.zshrc.d/kubectl << 'EOF'
+tee ${HOME}/.zshrc.d/kubernetes << 'EOF'
 # Kubectl alias
 alias k="kubectl"
 alias kx="kubectl ctx"
@@ -485,7 +490,9 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 EOF
 
 # k9s
-tee ${HOME}/.zshrc.d/k9s << 'EOF'
+tee -a ${HOME}/.zshrc.d/kubernetes << 'EOF'
+
+# k9s
 alias k9s="podman run --rm -it -v ~/.kube/config:/root/.kube/config quay.io/derailed/k9s"
 EOF
 

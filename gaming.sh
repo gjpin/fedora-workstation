@@ -58,82 +58,34 @@ mkdir -p ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud
 curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/mangohud/MangoHud.conf -o ${HOME}/.var/app/com.heroicgameslauncher.hgl/config/MangoHud/MangoHud.conf
 
 ################################################
-##### Sunshine
+##### Sunshine (Flatpak)
 ################################################
 
 # References:
-# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/installation.html#rpm-package
-# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/usage.html#linux
-# https://github.com/LizardByte/Sunshine/blob/master/sunshine.service.in
 # https://github.com/LizardByte/Sunshine
-
-# Download Sunshine
-curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
+# https://github.com/flathub/dev.lizardbyte.app.Sunshine/blob/master/dev.lizardbyte.app.Sunshine.metainfo.xml
 
 # Install Sunshine
-sudo dnf install -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
-
-# Clean rpm
-rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
+flatpak install -y flathub dev.lizardbyte.app.Sunshine
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.lizardbyte.app.Sunshine -o ${HOME}/.local/share/flatpak/overrides/dev.lizardbyte.app.Sunshine
 
 # Allow Sunshine Virtual Input
 echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/85-sunshine-input.rules
 
-# Create Sunshine service
-tee ${HOME}/.config/systemd/user/sunshine.service << EOF
-[Unit]
-Description=Sunshine self-hosted game stream host for Moonlight.
-StartLimitIntervalSec=500
-StartLimitBurst=5
-
-[Service]
-ExecStart=/usr/bin/sunshine
-Restart=on-failure
-RestartSec=5s
-
-[Install]
-WantedBy=graphical-session.target
+# Create Sunshine alias
+tee ${HOME}/.zshrc.d/sunshine << 'EOF'
+alias sunshine="sudo -i PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run dev.lizardbyte.app.Sunshine"
 EOF
-
-# Fix Sunshine service in Gnome
-if [ ${DESKTOP_ENVIRONMENT} = "gnome" ]; then
-  sed -i '3 i After=gnome-session-wayland@gnome.target' ${HOME}/.config/systemd/user/sunshine.service
-fi
-
-# Enable Sunshine service
-systemctl --user enable sunshine.service
-
-# Allow Sunshine to use KMS
-sudo setcap cap_sys_admin+p $(readlink -f $(which sunshine))
 
 # Import configs
-mkdir -p ${HOME}/.config/sunshine
-
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o ${HOME}/.config/sunshine/sunshine.conf
+mkdir -p ${HOME}/.var/app/dev.lizardbyte.app.Sunshine/config/sunshine
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/sunshine.conf -o ${HOME}/.var/app/dev.lizardbyte.app.Sunshine/config/sunshine/sunshine.conf
 
 if [ ${DESKTOP_ENVIRONMENT} == "gnome" ]; then
-  if [ ${STEAM_VERSION} = "native" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o ${HOME}/.config/sunshine/apps.json
-  elif [ ${STEAM_VERSION} = "flatpak" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome-flatpak.json -o ${HOME}/.config/sunshine/apps.json
-  fi
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-gnome.json -o ${HOME}/.var/app/dev.lizardbyte.app.Sunshine/config/sunshine/apps.json
 elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
-  if [ ${STEAM_VERSION} = "native" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o ${HOME}/.config/sunshine/apps.json
-  elif [ ${STEAM_VERSION} = "flatpak" ]; then
-    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma-flatpak.json -o ${HOME}/.config/sunshine/apps.json
-  fi
+    curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o ${HOME}/.var/app/dev.lizardbyte.app.Sunshine/config/sunshine/apps.json
 fi
-
-# Sunshine updater
-tee -a ${HOME}/.local/bin/update-all << 'EOF'
-
-# Update Sunshine
-curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
-sudo dnf reinstall -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
-rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
-systemctl --user restart sunshine.service
-EOF
 
 ################################################
 ##### ALVR

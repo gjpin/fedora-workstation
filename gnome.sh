@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # Enable VRR
-gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
+# gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
 
 ################################################
 ##### Configure Gnome applications
@@ -56,6 +56,10 @@ echo '@import "firefox-gnome-theme/userContent.css"' > ${FIREFOX_PROFILE_PATH}/c
 
 # Firefox theme updater
 tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+################################################
+##### Firefox
+################################################
 
 # Update Firefox theme
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
