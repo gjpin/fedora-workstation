@@ -1,2 +1,2 @@
 [Context]
-filesystems=xdg-data/applications;home/Games/Epic;home/Games/GOG;home/src/bottles/dependencies;
+filesystems=!home;!host;xdg-data/applications;home/Games;home/src/bottles/dependencies;

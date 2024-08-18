@@ -29,12 +29,20 @@ gsettings set org.freedesktop.Tracker3.Miner.Files index-recursive-directories "
 
 # Install applications
 flatpak install -y flathub com.mattjakeman.ExtensionManager
-flatpak install -y flathub io.github.celluloid_player.Celluloid
-flatpak install -y flathub org.gaphor.Gaphor
-flatpak install -y flathub com.github.flxzt.rnote
-flatpak install -y flathub com.github.finefindus.eyedropper
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.mattjakeman.ExtensionManager -o ${HOME}/.local/share/flatpak/overrides/com.mattjakeman.ExtensionManager
 
-# Install gitg
+flatpak install -y flathub io.github.celluloid_player.Celluloid
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/io.github.celluloid_player.Celluloid -o ${HOME}/.local/share/flatpak/overrides/io.github.celluloid_player.Celluloid
+
+flatpak install -y flathub org.gaphor.Gaphor
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gaphor.Gaphor -o ${HOME}/.local/share/flatpak/overrides/org.gaphor.Gaphor
+
+flatpak install -y flathub com.github.flxzt.rnote
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.flxzt.rnote -o ${HOME}/.local/share/flatpak/overrides/com.github.flxzt.rnote
+
+flatpak install -y flathub com.github.finefindus.eyedropper
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.finefindus.eyedropper -o ${HOME}/.local/share/flatpak/overrides/com.github.finefindus.eyedropper
+
 flatpak install -y flathub org.gnome.gitg
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gnome.gitg -o ${HOME}/.local/share/flatpak/overrides/org.gnome.gitg
 

@@ -1,2 +1,2 @@
 [Context]
-filesystems=!home;home/.local/bin:ro;
+filesystems=!home;!host;home/.local/bin:ro;

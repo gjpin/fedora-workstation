@@ -242,24 +242,41 @@ flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//23.08
 flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//23.08
 
 # Install applications
-flatpak install -y flathub com.bitwarden.desktop
-flatpak install -y flathub com.belmoussaoui.Authenticator
-flatpak install -y flathub org.keepassxc.KeePassXC
 flatpak install -y flathub com.github.tchx84.Flatseal
+
+flatpak install -y flathub com.bitwarden.desktop
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.bitwarden.desktop -o ${HOME}/.local/share/flatpak/overrides/com.bitwarden.desktop
+
+flatpak install -y flathub com.belmoussaoui.Authenticator
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.belmoussaoui.Authenticator -o ${HOME}/.local/share/flatpak/overrides/com.belmoussaoui.Authenticator
+
+flatpak install -y flathub org.keepassxc.KeePassXC
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.keepassxc.KeePassXC -o ${HOME}/.local/share/flatpak/overrides/org.keepassxc.KeePassXC
+
 flatpak install -y flathub com.spotify.Client
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.spotify.Client -o ${HOME}/.local/share/flatpak/overrides/com.spotify.Client
+
 flatpak install -y flathub org.gimp.GIMP
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gimp.GIMP -o ${HOME}/.local/share/flatpak/overrides/org.gimp.GIMP
+
 flatpak install -y flathub org.blender.Blender
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.blender.Blender -o ${HOME}/.local/share/flatpak/overrides/org.blender.Blender
+
 flatpak install -y flathub com.brave.Browser
-flatpak install -y flathub info.febvre.Komikku
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.brave.Browser -o ${HOME}/.local/share/flatpak/overrides/com.brave.Browser
+
+flatpak install -y flathub md.obsidian.Obsidian
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/md.obsidian.Obsidian -o ${HOME}/.local/share/flatpak/overrides/md.obsidian.Obsidian
 
 # Development
 flatpak install -y flathub com.usebruno.Bruno
-flatpak install -y flathub com.github.marhkb.Pods
-flatpak install -y flathub dev.skynomads.Seabird
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.usebruno.Bruno -o ${HOME}/.local/share/flatpak/overrides/com.usebruno.Bruno
 
-# Obsidian
-flatpak install -y flathub md.obsidian.Obsidian
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/md.obsidian.Obsidian -o ${HOME}/.local/share/flatpak/overrides/md.obsidian.Obsidian
+flatpak install -y flathub com.github.marhkb.Pods
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.marhkb.Pods -o ${HOME}/.local/share/flatpak/overrides/com.github.marhkb.Pods
+
+flatpak install -y flathub dev.skynomads.Seabird
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.skynomads.Seabird -o ${HOME}/.local/share/flatpak/overrides/dev.skynomads.Seabird
 
 ################################################
 ##### Android udev rules
