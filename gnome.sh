@@ -55,20 +55,12 @@ echo '@import "firefox-gnome-theme/userChrome.css"' > ${FIREFOX_PROFILE_PATH}/ch
 echo '@import "firefox-gnome-theme/userContent.css"' > ${FIREFOX_PROFILE_PATH}/chrome/userContent.css
 
 # Firefox theme updater
-tee ${HOME}/.local/bin/update-firefox-theme << 'EOF'
-#!/usr/bin/bash
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
 
 # Update Firefox theme
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
 git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
 EOF
-
-chmod +x ${HOME}/.local/bin/update-firefox-theme
-
-# Add Firefox theme updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-firefox-theme' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Firefox theme' ${HOME}/.zshrc.d/update-all
 
 # Gnome specific configurations
 tee -a ${FIREFOX_PROFILE_PATH}/user.js << 'EOF'

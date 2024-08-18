@@ -171,7 +171,9 @@ sudo mv terraform /usr/local/bin/terraform
 rm -f terraform.zip
 
 # Terraform updater
-tee ${HOME}/.local/bin/update-terraform << 'EOF'
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+# Update Terraform
 LATEST_VERSION=$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}' | sed 's/[^0-9.]*//g')
 INSTALLED_VERSION=$(terraform --version --json | jq -r .terraform_version)
 
@@ -182,12 +184,6 @@ if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
   rm -f terraform.zip
 fi
 EOF
-
-chmod +x ${HOME}/.local/bin/update-terraform
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-terraform' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Terraform' ${HOME}/.zshrc.d/update-all
 
 # Cleanup
 rm -f ${HOME}/LICENSE.txt
@@ -202,7 +198,9 @@ chmod +x kubectl
 sudo mv kubectl /usr/local/bin/kubectl
 
 # kubectl updater
-tee ${HOME}/.local/bin/update-kubectl << 'EOF'
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+# Update kubectl
 LATEST_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
 INSTALLED_VERSION=$(kubectl version --client --output=json | jq -r .clientVersion.gitVersion)
 
@@ -213,12 +211,6 @@ if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
 fi
 EOF
 
-chmod +x ${HOME}/.local/bin/update-kubectl
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-kubectl' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update kubectl' ${HOME}/.zshrc.d/update-all
-
 # Install Helm
 LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
 curl -s -Lo helm.tar.gz https://get.helm.sh/helm-${LATEST_VERSION}-linux-amd64.tar.gz
@@ -226,7 +218,9 @@ sudo tar -xzf helm.tar.gz -C /usr/local/bin linux-amd64/helm --strip-components 
 rm -f helm.tar.gz
 
 # Helm updater
-tee ${HOME}/.local/bin/update-helm << 'EOF'
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+# Update Helm
 LATEST_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
 INSTALLED_VERSION=$(helm version --template='{{.Version}}')
 
@@ -237,12 +231,6 @@ if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
 fi
 EOF
 
-chmod +x ${HOME}/.local/bin/update-helm
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-helm' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Helm' ${HOME}/.zshrc.d/update-all
-
 # Install Cilium
 LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
 curl -s -Lo cilium.tar.gz https://github.com/cilium/cilium-cli/releases/download/${LATEST_VERSION}/cilium-linux-amd64.tar.gz
@@ -250,7 +238,9 @@ sudo tar -xzf cilium.tar.gz -C /usr/local/bin
 rm -f cilium.tar.gz
 
 # Cilium updater
-tee ${HOME}/.local/bin/update-cilium << 'EOF'
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+# Update Cilium
 LATEST_VERSION=$(curl -s https://api.github.com/repos/cilium/cilium-cli/releases/latest | awk -F\" '/tag_name/{print $(NF-1)}')
 INSTALLED_VERSION=$(cilium version --client | grep -o -P '(?<=cilium-cli: ).*(?= compiled)')
 
@@ -260,12 +250,6 @@ if [[ "${INSTALLED_VERSION}" != *"${LATEST_VERSION}"* ]]; then
   rm -f cilium.tar.gz
 fi
 EOF
-
-chmod +x ${HOME}/.local/bin/update-cilium
-
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-cilium' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Cilium' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### Disable unneeded services
@@ -346,8 +330,7 @@ export NVM_DIR="$HOME/.devtools/nvm"
 EOF
 
 # NVM updater
-tee ${HOME}/.local/bin/update-nvm << 'EOF'
-#!/usr/bin/bash
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
 
 # Update NVM
 cd ${HOME}/.devtools/nvm
@@ -356,32 +339,17 @@ git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --
 cd
 EOF
 
-chmod +x ${HOME}/.local/bin/update-nvm
-
-# Add nvm updater to updater function
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-nvm' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update NVM' ${HOME}/.zshrc.d/update-all
-
 # Node updater
-tee ${HOME}/.local/bin/update-node << 'EOF'
-#!/usr/bin/bash
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
 
-# Source NVM
+# Source NVM and update Node
 export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-# Update node
 nvm install --lts
 nvm install-latest-npm
 EOF
 
-chmod +x ${HOME}/.local/bin/update-node
-
-# Add node updater to updater function
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-node' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Node' ${HOME}/.zshrc.d/update-all
 
 # Install Node LTS and latest supported NPM version
 nvm install --lts
@@ -522,8 +490,7 @@ xdg-desktop-menu forceupdate
 gsettings set org.gnome.desktop.interface icon-theme 'MoreWaita'
 
 # MoreWaita icon theme updater
-tee ${HOME}/.local/bin/update-morewaita-icon-theme << 'EOF'
-#!/usr/bin/bash
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
 
 # Update MoreWaita icon theme
 git -C ${HOME}/.local/share/icons/MoreWaita pull
@@ -532,13 +499,6 @@ git -C ${HOME}/.local/share/icons/MoreWaita pull
 gtk-update-icon-cache -f -t ${HOME}/.local/share/icons/MoreWaita
 xdg-desktop-menu forceupdate
 EOF
-
-chmod +x ${HOME}/.local/bin/update-morewaita-icon-theme
-
-# Add MoreWaita icon theme updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-morewaita-icon-theme' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update MoreWaita icon theme' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### VSCode (Flatpak)
@@ -768,11 +728,13 @@ tee ${HOME}/.zshrc.d/deno << 'EOF'
 export DENO_INSTALL=${HOME}/.deno
 export PATH="$PATH:$DENO_INSTALL/bin"
 EOF
-  
-# Add Deno updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ deno upgrade' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Deno' ${HOME}/.zshrc.d/update-all
+
+# Add Deno updater to main updater
+tee -a ${HOME}/.local/bin/update-all << EOF
+
+# Update Deno
+deno upgrade
+EOF
 
 # Install Deno VSCode extension
 code --install-extension denoland.vscode-deno

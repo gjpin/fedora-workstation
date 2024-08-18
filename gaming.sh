@@ -126,19 +126,14 @@ elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
 fi
 
 # Sunshine updater
-tee ${HOME}/.local/bin/update-sunshine << 'EOF'
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+# Update Sunshine
 curl https://github.com/LizardByte/Sunshine/releases/download/nightly-dev/sunshine-fedora-$(rpm -E %fedora)-amd64.rpm -L -O
 sudo dnf reinstall -y sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
 rm -f sunshine-fedora-$(rpm -E %fedora)-amd64.rpm
 systemctl --user restart sunshine.service
 EOF
-
-chmod +x ${HOME}/.local/bin/update-sunshine
-
-# Add Sunshine updater to bash updater function
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-sunshine' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Sunshine' ${HOME}/.zshrc.d/update-all
 
 ################################################
 ##### ALVR

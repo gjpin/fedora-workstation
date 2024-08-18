@@ -177,21 +177,23 @@ EOF
 # Change user default shell to ZSH
 chsh -s $(which zsh)
 
-# Updater zsh function
-tee ${HOME}/.zshrc.d/update-all << EOF
-update-all() {
-  # Update system
-  sudo dnf upgrade -y --refresh
+# Updater helper
+tee ${HOME}/.local/bin/update-all << EOF
+#!/usr/bin/bash
 
-  # Update Flatpak apps
-  flatpak update -y
-  flatpak uninstall -y --unused
+# Update system
+sudo dnf upgrade -y --refresh
 
-  # Update firmware
-  sudo fwupdmgr refresh
-  sudo fwupdmgr update
-}
+# Update Flatpak apps
+flatpak update -y
+flatpak uninstall -y --unused
+
+# Update firmware
+sudo fwupdmgr refresh
+sudo fwupdmgr update
 EOF
+
+chmod +x ${HOME}/.local/bin/update-all
 
 # Create aliases
 tee ${HOME}/.zshrc.d/selinux << EOF
@@ -308,11 +310,12 @@ tee ${HOME}/.local/bin/update-android-udev-rules << 'EOF'
 git -C ${HOME}/.devtools/android/udev-rules pull
 EOF
 
-chmod +x ${HOME}/.local/bin/update-android-udev-rules
+# Add Android udev rules updater to main updater
+tee -a ${HOME}/.local/bin/update-all << EOF
 
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-android-udev-rules' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Android udev rules' ${HOME}/.zshrc.d/update-all
+# Update Android udev rules
+update-android-udev-rules
+EOF
 
 ################################################
 ##### Android SDK tools
@@ -385,11 +388,12 @@ if [[ "${INSTALLED_PLATFORM_TOOLS_VERSION}" != "${PLATFORM_TOOLS_LATEST_VERSION}
 fi
 EOF
 
-chmod +x ${HOME}/.local/bin/update-android-tools
+# Add Android tools updater to main updater
+tee -a ${HOME}/.local/bin/update-all << EOF
 
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ update-android-tools' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Android tools' ${HOME}/.zshrc.d/update-all
+# Update Android tools
+update-android-tools
+EOF
 
 ################################################
 ##### Java - OpenJDK
@@ -448,10 +452,12 @@ tar zxvf /tmp/krew/krew.tar.gz -C /tmp/krew
 ./tmp/krew/krew-linux_amd64 install krew
 rm -rf /tmp/krew
 
-# Kubectl Krew updater
-sed -i '2 i \ ' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ kubectl krew upgrade' ${HOME}/.zshrc.d/update-all
-sed -i '2 i \ \ # Update Krew plugins' ${HOME}/.zshrc.d/update-all
+# Add Kubectl Krew updater to main updater
+tee -a ${HOME}/.local/bin/update-all << EOF
+
+# Update Kubectl Krew plugins
+kubectl krew upgrade
+EOF
 
 # Source krew temporarily
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
