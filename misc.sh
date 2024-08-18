@@ -360,7 +360,7 @@ mkdir -p ${HOME}/src/bottles
 git clone https://github.com/bottlesdevs/dependencies.git ${HOME}/src/bottles/dependencies
 
 # Alias for bottles with local dependencies
-tee ${HOME}/.zshrc.d/bottles << EOF
+tee ${HOME}/.bashrc.d/bottles << EOF
 # Set bottles alias
 alias bottles_local="LOCAL_DEPENDENCIES=${HOME}/src/bottles/dependencies flatpak run com.usebottles.bottles"
 EOF
@@ -400,7 +400,7 @@ export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Source NVM permanently
-tee ${HOME}/.zshrc.d/nvm << 'EOF'
+tee ${HOME}/.bashrc.d/nvm << 'EOF'
 export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
@@ -448,7 +448,7 @@ sudo dnf install -y \
   rocm-smi rocm-smi-devel \
   rocm-cmake rocm-comgr rocm-comgr-devel rocm-device-libs
 
-tee ${HOME}/.zshrc.d/rocm << EOF
+tee ${HOME}/.bashrc.d/rocm << EOF
 # Confirm "Node:" of GPU with rocminfo
 export HIP_VISIBLE_DEVICES=1
 
@@ -474,7 +474,7 @@ sudo dnf install -y python3.11
 # Create venv for pytorch
 python3.11 -m venv ${HOME}/.python/pytorch
 
-tee -a ${HOME}/.zshrc.d/python << 'EOF'
+tee -a ${HOME}/.bashrc.d/python << 'EOF'
 alias pytorch="source ${HOME}/.python/pytorch/bin/activate"
 EOF
 
@@ -520,7 +520,7 @@ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
 
-tee ${HOME}/.zshrc.d/kind << 'EOF'
+tee ${HOME}/.bashrc.d/kind << 'EOF'
 # Enable podman backend in Kind
 KIND_EXPERIMENTAL_PROVIDER=podman
 
@@ -529,7 +529,7 @@ alias kind-single-node="kind create cluster --name single-node"
 alias kind-multi-node="kind create cluster --name multi-node --config ${HOME}/.kind/kind-multi-node.yaml"
 EOF
 
-echo "source <(kind completion bash)" >> ${HOME}/.zshrc.d/kind
+echo "source <(kind completion bash)" >> ${HOME}/.bashrc.d/kind
 
 mkdir -p ${HOME}/.kind
 tee ${HOME}/.kind/kind-multi-node.yaml << 'EOF'
@@ -638,7 +638,7 @@ sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
       },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 # Create alias
-tee ${HOME}/.zshrc.d/vscode << EOF
+tee ${HOME}/.bashrc.d/vscode << EOF
 alias code="flatpak run com.visualstudio.code"
 EOF
 
@@ -677,7 +677,7 @@ sudo dnf install -y golang-github-cloudflare-cfssl
 # mitmproxy
 mkdir -p ${HOME}/.mitmproxy
 
-tee ${HOME}/.zshrc.d/mitmproxy << 'EOF'
+tee ${HOME}/.bashrc.d/mitmproxy << 'EOF'
 alias mitmproxy='podman run -it --rm --name=mitmproxy -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest'
 alias mitmdump='podman run -it --rm --name=mitmdump -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest mitmdump'
 alias mitmweb='podman run -it --rm --name=mitmweb -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 -p 127.0.0.1:8081:8081 docker.io/mitmproxy/mitmproxy:latest mitmweb --web-host 0.0.0.0'
@@ -782,7 +782,7 @@ unzip emulator-linux_x64-*.zip -d ${ANDROID_SDK_PATH}
 rm -f emulator-linux_x64-*.zip
 
 # Set env vars
-tee ${HOME}/.zshrc.d/android << EOF
+tee ${HOME}/.bashrc.d/android << EOF
 export ANDROID_HOME='${ANDROID_SDK_PATH}'
 export PATH="\${PATH}:\${ANDROID_HOME}/build-tools/latest"
 export PATH="\${PATH}:\${ANDROID_HOME}/cmdline-tools/latest/bin"
@@ -801,7 +801,7 @@ unzip -o deno-x86_64-unknown-linux-gnu.zip -d ${HOME}/.deno/bin
 rm -f deno-x86_64-unknown-linux-gnu.zip
 
 # Add Deno to path
-tee ${HOME}/.zshrc.d/deno << 'EOF'
+tee ${HOME}/.bashrc.d/deno << 'EOF'
 export DENO_INSTALL=${HOME}/.deno
 export PATH="$PATH:$DENO_INSTALL/bin"
 EOF
@@ -874,7 +874,7 @@ flatpak override --user --unshare=network org.winehq.Wine
 flatpak override --user --env='WINEDLLOVERRIDES=mscoree=d;mshtml=d' org.winehq.Wine
 
 # Set wine alias
-tee ${HOME}/.zshrc.d/wine << 'EOF'
+tee ${HOME}/.bashrc.d/wine << 'EOF'
 alias wine="flatpak run org.winehq.Wine"
 alias wineuninstaller="flatpak run org.winehq.Wine uninstaller"
 alias winecfg="flatpak run --command=winecfg org.winehq.Wine"
@@ -1177,14 +1177,14 @@ chmod +x ${HOME}/.local/bin/dotnet-install.sh
 dotnet-install.sh --channel STS
 
 # Export dotnet to path
-tee ${HOME}/.zshrc.d/dotnet << EOF
+tee ${HOME}/.bashrc.d/dotnet << EOF
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
 export DOTNET_ROOT=${HOME}/.dotnet
 export PATH=\$PATH:${HOME}/.dotnet
 EOF
 
 # Enable tab autocomplete for the .NET CLI
-tee -a ${HOME}/.zshrc.d/dotnet << 'EOF'
+tee -a ${HOME}/.bashrc.d/dotnet << 'EOF'
 
 # bash parameter completion for the dotnet CLI
 function _dotnet_bash_complete()
@@ -1291,7 +1291,7 @@ sudo unzip VSCode_Theme-*-signed.zip -d /opt/android-studio/plugins
 rm -f VSCode_Theme-*-signed.zip
 
 # Set environment
-tee ${HOME}/.zshrc.d/android << EOF
+tee ${HOME}/.bashrc.d/android << EOF
 export ANDROID_HOME=${HOME}/Android/Sdk
 export ANDROID_USER_HOME=${HOME}/.android
 export PATH=\$PATH:${HOME}/Android/Sdk/platform-tools
@@ -1362,7 +1362,7 @@ EOF
 # https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
 mkdir ${HOME}/.npm-global
 npm config set prefix '~/.npm-global'
-tee ${HOME}/.zshrc.d/npm << 'EOF'
+tee ${HOME}/.bashrc.d/npm << 'EOF'
 export PATH=~/.npm-global/bin:$PATH
 EOF
 

@@ -73,7 +73,7 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 echo 'KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/85-sunshine-input.rules
 
 # Create Sunshine alias
-tee ${HOME}/.zshrc.d/sunshine << 'EOF'
+tee ${HOME}/.bashrc.d/sunshine << 'EOF'
 alias sunshine="sudo -i PULSE_SERVER=unix:$(pactl info | awk '/Server String/{print$3}') flatpak run dev.lizardbyte.app.Sunshine"
 EOF
 
@@ -112,7 +112,7 @@ if [ ${STEAM_VERSION} = "flatpak" ]; then
   sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
 
   # Create ALVR dashboard alias
-  echo 'alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"' > ${HOME}/.zshrc.d/alvr
+  echo 'alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"' > ${HOME}/.bashrc.d/alvr
 
   # Create ALVR dashboard desktop entry
   curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/alvr/com.valvesoftware.Steam.Utility.alvr.desktop -o ${HOME}/.local/share/applications/com.valvesoftware.Steam.Utility.alvr.desktop

@@ -37,7 +37,7 @@ mkdir -p \
   ${HOME}/.local/share/icons \
   ${HOME}/.local/share/themes \
   ${HOME}/.local/share/fonts \
-  ${HOME}/.zshrc.d \
+  ${HOME}/.bashrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart \
   ${HOME}/.config/systemd/user \
@@ -100,6 +100,38 @@ rm -f Noto.tar.xz
 
 fc-cache -f
 
+# Updater helper
+tee ${HOME}/.local/bin/update-all << EOF
+#!/usr/bin/bash
+
+################################################
+##### System and firmware
+################################################
+
+# Update system
+sudo dnf upgrade -y --refresh
+
+# Update firmware
+sudo fwupdmgr refresh
+sudo fwupdmgr update
+
+################################################
+##### Flatpaks
+################################################
+
+# Update Flatpak apps
+flatpak update -y
+flatpak uninstall -y --unused
+EOF
+
+chmod +x ${HOME}/.local/bin/update-all
+
+# Create aliases
+tee ${HOME}/.bashrc.d/selinux << EOF
+alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
+alias selogs="sudo journalctl -t setroubleshoot"
+EOF
+
 ################################################
 ##### RPM Fusion
 ################################################
@@ -150,64 +182,6 @@ sudo mkdir -p /etc/systemd/user.conf.d
 sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
 [Manager]
 DefaultTimeoutStopSec=5s
-EOF
-
-################################################
-##### ZSH
-################################################
-
-# Install ZSH and plugins
-sudo dnf install -y zsh zsh-autosuggestions zsh-syntax-highlighting
-
-# Configure ZSH
-curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.zshrc -o ${HOME}/.zshrc
-
-# Configure powerlevel10k zsh theme
-curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.p10k.zsh -o ${HOME}/.p10k.zsh
-
-# Add ~/.local/bin to the path
-tee ${HOME}/.zshrc.d/local-bin << 'EOF'
-# User specific environment
-if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
-then
-    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
-fi
-export PATH
-EOF
-
-# Change user default shell to ZSH
-chsh -s $(which zsh)
-
-# Updater helper
-tee ${HOME}/.local/bin/update-all << EOF
-#!/usr/bin/bash
-
-################################################
-##### System and firmware
-################################################
-
-# Update system
-sudo dnf upgrade -y --refresh
-
-# Update firmware
-sudo fwupdmgr refresh
-sudo fwupdmgr update
-
-################################################
-##### Flatpaks
-################################################
-
-# Update Flatpak apps
-flatpak update -y
-flatpak uninstall -y --unused
-EOF
-
-chmod +x ${HOME}/.local/bin/update-all
-
-# Create aliases
-tee ${HOME}/.zshrc.d/selinux << EOF
-alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
-alias selogs="sudo journalctl -t setroubleshoot"
 EOF
 
 ################################################
@@ -352,7 +326,7 @@ rm -f platform-tools_r*-linux.zip
 echo ${PLATFORM_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/platform_tools_installed_version
 
 # Set env vars and paths
-tee ${HOME}/.zshrc.d/android << EOF
+tee ${HOME}/.bashrc.d/android << EOF
 # Android env vars
 export ANDROID_HOME='${HOME}/.devtools/android'
 export ANDROID_SDK_ROOT='${HOME}/.devtools/android'
@@ -473,7 +447,7 @@ kubectl krew install ns
 kubectl krew install node-shell
 
 # Kubernetes aliases and autocompletion
-tee ${HOME}/.zshrc.d/kubernetes << 'EOF'
+tee ${HOME}/.bashrc.d/kubernetes << 'EOF'
 # Kubectl alias
 alias k="kubectl"
 alias kx="kubectl ctx"
@@ -483,14 +457,14 @@ alias ks="kubectl node-shell"
 # Autocompletion
 autoload -Uz compinit
 compinit
-source <(kubectl completion zsh)
+source <(kubectl completion bash)
 
 # Krew
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 EOF
 
 # k9s
-tee -a ${HOME}/.zshrc.d/kubernetes << 'EOF'
+tee -a ${HOME}/.bashrc.d/kubernetes << 'EOF'
 
 # k9s
 alias k9s="podman run --rm -it -v ~/.kube/config:/root/.kube/config quay.io/derailed/k9s"
@@ -544,7 +518,7 @@ sudo usermod -a -G libvirt ${USER}
 git config --global init.defaultBranch main
 
 # Set podman alias
-tee ${HOME}/.zshrc.d/podman << EOF
+tee ${HOME}/.bashrc.d/podman << EOF
 alias docker="podman"
 EOF
 
@@ -556,7 +530,7 @@ sudo dnf install -y golang
 
 mkdir -p ${HOME}/.devtools/go
 
-tee ${HOME}/.zshrc.d/go << 'EOF'
+tee ${HOME}/.bashrc.d/go << 'EOF'
 export GOPATH="$HOME/.devtools/go"
 EOF
 
@@ -565,7 +539,7 @@ mkdir -p ${HOME}/.devtools/python
 
 python -m venv ${HOME}/.devtools/python/dev
 
-tee ${HOME}/.zshrc.d/python << 'EOF'
+tee ${HOME}/.bashrc.d/python << 'EOF'
 alias pydev="source ${HOME}/.devtools/python/dev/bin/activate"
 EOF
 
@@ -579,7 +553,7 @@ sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
 # Install Neovim and set as default editor
 sudo dnf install -y neovim
 
-tee ${HOME}/.zshrc.d/neovim << 'EOF'
+tee ${HOME}/.bashrc.d/neovim << 'EOF'
 # Set neovim alias
 alias vi=nvim
 alias vim=nvim
