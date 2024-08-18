@@ -30,7 +30,7 @@ flatpak install -y flathub org.videolan.VLC
 ################################################
 
 # Set Firefox profile path
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
 # KDE specific configurations
 tee -a ${FIREFOX_PROFILE_PATH}/user.js << 'EOF'

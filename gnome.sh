@@ -24,7 +24,7 @@ gsettings set org.freedesktop.Tracker3.Miner.Files index-single-directories "@as
 gsettings set org.freedesktop.Tracker3.Miner.Files index-recursive-directories "@as []"
 
 ################################################
-##### Flatpak
+##### Flatpak applications
 ################################################
 
 # Install applications
@@ -34,17 +34,8 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 flatpak install -y flathub io.github.celluloid_player.Celluloid
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/io.github.celluloid_player.Celluloid -o ${HOME}/.local/share/flatpak/overrides/io.github.celluloid_player.Celluloid
 
-flatpak install -y flathub org.gaphor.Gaphor
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gaphor.Gaphor -o ${HOME}/.local/share/flatpak/overrides/org.gaphor.Gaphor
-
-flatpak install -y flathub com.github.flxzt.rnote
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.flxzt.rnote -o ${HOME}/.local/share/flatpak/overrides/com.github.flxzt.rnote
-
 flatpak install -y flathub com.github.finefindus.eyedropper
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.finefindus.eyedropper -o ${HOME}/.local/share/flatpak/overrides/com.github.finefindus.eyedropper
-
-flatpak install -y flathub org.gnome.gitg
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gnome.gitg -o ${HOME}/.local/share/flatpak/overrides/org.gnome.gitg
 
 ################################################
 ##### Firefox
@@ -54,7 +45,7 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 # https://github.com/rafaelmardojai/firefox-gnome-theme
 
 # Set Firefox profile path
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
 # Install Firefox Gnome theme
 mkdir -p ${FIREFOX_PROFILE_PATH}/chrome
@@ -70,7 +61,7 @@ tee -a ${HOME}/.local/bin/update-all << 'EOF'
 ################################################
 
 # Update Firefox theme
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
 EOF
 
@@ -211,7 +202,7 @@ gsettings set org.gnome.TextEditor custom-font 'NotoSansM Nerd Font Mono Medium 
 gsettings set org.gnome.desktop.app-folders folder-children "['Dev', 'Emulators', 'Gaming', 'Gnome', 'Media', 'Office', 'Security', 'System']"
 
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ name 'Dev'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ apps "['code.desktop', 'com.visualstudio.code.desktop', 'rest.insomnia.Insomnia.desktop', 'com.github.marhkb.Pods.desktop', 'org.gaphor.Gaphor.desktop', 'org.gnome.gitg.desktop', 'org.gnome.Boxes.desktop', 'nvim.desktop', 'org.chromium.Chromium.desktop', 'org.gnome.Connections.desktop', 'qemu.desktop', 'remote-viewer.desktop', 'com.google.Chrome.desktop', 'virt-manager.desktop']"
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Dev/ apps "['code.desktop', 'com.visualstudio.code.desktop', 'org.godotengine.Godot', 'com.usebruno.Bruno', 'rest.insomnia.Insomnia.desktop', 'com.github.marhkb.Pods.desktop', 'org.gnome.gitg.desktop', 'org.gnome.Boxes.desktop', 'nvim.desktop', 'org.chromium.Chromium.desktop', 'org.gnome.Connections.desktop', 'qemu.desktop', 'remote-viewer.desktop', 'com.google.Chrome.desktop', 'virt-manager.desktop', 'com.brave.Browser', 'com.google.AndroidStudio', 'dev.k8slens.OpenLens', 'dev.skynomads.Seabird']"
 
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ name 'Emulators'
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Emulators/ apps "['org.duckstation.DuckStation.desktop', 'net.pcsx2.PCSX2.desktop', 'org.ppsspp.PPSSPP.desktop', 'org.DolphinEmu.dolphin-emu.desktop', 'org.yuzu_emu.yuzu.desktop', 'org.citra_emu.citra.desktop', 'org.flycast.Flycast.desktop', 'app.xemu.xemu.desktop', 'com.snes9x.Snes9x.desktop', 'net.kuribo64.melonDS.desktop', 'net.rpcs3.RPCS3.desktop', 'io.mgba.mGBA.desktop']"
@@ -223,10 +214,10 @@ gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folder
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Gnome/ apps "['org.gnome.Weather.desktop', 'org.gnome.Maps.desktop', 'org.gnome.Tour.desktop', 'org.gnome.Cheese.desktop', 'yelp.desktop']"
 
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ name 'Media'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ apps "['io.github.celluloid_player.Celluloid.desktop', 'io.github.seadve.Kooha.desktop', 'com.spotify.Client.desktop', 'org.blender.Blender.desktop', 'org.gimp.GIMP.desktop', 'org.gnome.eog.desktop', 'org.gnome.Totem.desktop', 'org.gnome.Rhythmbox3.desktop', 'org.gnome.Photos.desktop']"
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Media/ apps "['com.github.finefindus.eyedropper', 'io.github.celluloid_player.Celluloid.desktop', 'io.github.seadve.Kooha.desktop', 'com.spotify.Client.desktop', 'org.blender.Blender.desktop', 'org.gimp.GIMP.desktop', 'org.gnome.eog.desktop', 'org.gnome.Totem.desktop', 'org.gnome.Rhythmbox3.desktop', 'org.gnome.Photos.desktop']"
 
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ name 'Office'
-gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ apps "['com.github.flxzt.rnote.desktop', 'org.gnome.Evince.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.clocks.desktop', 'md.obsidian.Obsidian.desktop', 'simple-scan.desktop', 'org.gnome.Contacts.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.draw.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.math.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'libreoffice-calc.desktop', 'libreoffice-impress.desktop', 'libreoffice-writer.desktop']"
+gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Office/ apps "['org.gaphor.Gaphor.desktop', 'com.github.flxzt.rnote.desktop', 'org.gnome.Evince.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.clocks.desktop', 'md.obsidian.Obsidian.desktop', 'simple-scan.desktop', 'org.gnome.Contacts.desktop', 'org.libreoffice.LibreOffice.desktop', 'org.libreoffice.LibreOffice.base.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.libreoffice.LibreOffice.draw.desktop', 'org.libreoffice.LibreOffice.impress.desktop', 'org.libreoffice.LibreOffice.math.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'libreoffice-calc.desktop', 'libreoffice-impress.desktop', 'libreoffice-writer.desktop']"
 
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Security/ name 'Security'
 gsettings set org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Security/ apps "['com.belmoussaoui.Authenticator.desktop', 'com.bitwarden.desktop.desktop', 'org.keepassxc.KeePassXC.desktop', 'com.github.tchx84.Flatseal.desktop', 'firewall-config.desktop']"

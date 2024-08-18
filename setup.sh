@@ -140,27 +140,29 @@ EOF
 # https://rpmfusion.org/Configuration/
 # https://rpmfusion.org/Howto/Multimedia
 
-# Enable free and nonfree repositories
-sudo dnf install -y \
-    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+if [ ${STEAM_VERSION} = "native" ]; then
+  # Enable free and nonfree repositories
+  sudo dnf install -y \
+      https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+      https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-# Switch to full ffmpeg
-sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
+  # Switch to full ffmpeg
+  sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
 
-# Install additional codecs
-sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
-sudo dnf groupupdate -y sound-and-video
+  # Install additional codecs
+  sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+  sudo dnf groupupdate -y sound-and-video
 
-# Install Intel hardware accelerated codecs
-if lspci | grep VGA | grep "Intel" > /dev/null; then
-  sudo dnf install -y intel-media-driver
-fi
+  # Install Intel hardware accelerated codecs
+  if lspci | grep VGA | grep "Intel" > /dev/null; then
+    sudo dnf install -y intel-media-driver
+  fi
 
-# Install AMD hardware accelerated codecs
-if lspci | grep VGA | grep "AMD" > /dev/null; then
-  sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld
-  sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
+  # Install AMD hardware accelerated codecs
+  if lspci | grep VGA | grep "AMD" > /dev/null; then
+    sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld
+    sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
+  fi
 fi
 
 ################################################
@@ -487,11 +489,47 @@ alias k9s="podman run --rm -it -v ~/.kube/config:/root/.kube/config quay.io/dera
 EOF
 
 ################################################
+##### Office / Documents
+################################################
+
+# Remove LibreOffice (native)
+sudo dnf group remove -y libreoffice
+sudo dnf remove -y *libreoffice*
+
+# Install LibreOffice (Flatpak)
+flatpak install -y flathub org.libreoffice.LibreOffice
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.libreoffice.LibreOffice -o ${HOME}/.local/share/flatpak/overrides/org.libreoffice.LibreOffice
+
+# Install Gaphor
+flatpak install -y flathub org.gaphor.Gaphor
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gaphor.Gaphor -o ${HOME}/.local/share/flatpak/overrides/org.gaphor.Gaphor
+
+# Install Rnote
+flatpak install -y flathub com.github.flxzt.rnote
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.flxzt.rnote -o ${HOME}/.local/share/flatpak/overrides/com.github.flxzt.rnote
+
+################################################
 ##### Firefox
 ################################################
 
+# Remove native firefox
+sudo dnf remove -y firefox
+rm -rf ${HOME}/.mozilla
+
+# Install Firefox from Flathub
+flatpak install -y flathub org.mozilla.firefox
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.mozilla.firefox -o ${HOME}/.local/share/flatpak/overrides/org.mozilla.firefox
+
+# Set Firefox Flatpak as default browser and handler for https(s)
+xdg-settings set default-web-browser org.mozilla.firefox.desktop
+xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/http
+xdg-mime default org.mozilla.firefox.desktop x-scheme-handler/https
+
+# Temporarily open Firefox to create profiles
+timeout 5 flatpak run org.mozilla.firefox --headless
+
 # Set Firefox profile path
-FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.mozilla/firefox/*.default-release)
+FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
 # Import extensions
 mkdir -p ${FIREFOX_PROFILE_PATH}/extensions
@@ -533,6 +571,36 @@ EOF
 systemctl --user enable podman.socket
 
 ################################################
+##### Toolbx
+################################################
+
+# References:
+# https://docs.fedoraproject.org/en-US/fedora-silverblue/toolbox/#toolbox-commands
+
+# Create toolbox
+toolbox create -y
+
+# Update toolbox packages
+toolbox run sudo dnf upgrade -y --refresh
+
+# Install bind-utils (dig, etc)
+toolbox run sudo dnf install -y bind-utils
+
+# Install DNF plugins
+toolbox run sudo dnf install -y dnf-plugins-core
+
+# Android udev rules updater
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+################################################
+##### Toolbx
+################################################
+
+# Update toolbox packages
+toolbox run sudo dnf upgrade -y --refresh
+EOF
+
+################################################
 ##### Development
 ################################################
 
@@ -542,19 +610,30 @@ systemctl --user enable podman.socket
 # https://developer.fedoraproject.org/tech/languages/c/cpp_installation.html
 # https://pytorch.org/get-started/locally/
 
+# Install gitg
+flatpak install -y flathub org.gnome.gitg
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.gnome.gitg -o ${HOME}/.local/share/flatpak/overrides/org.gnome.gitg
+
 # Set git configurations
 git config --global init.defaultBranch main
 
-# Install make
-sudo dnf install -y make
+# Install nodejs
+toolbox run sudo dnf install -y nodejs npm
 
-# Golang
-sudo dnf install -y golang
+# Install cfssl
+toolbox run sudo dnf install -y golang-github-cloudflare-cfssl
+
+# Install make
+toolbox run sudo dnf install -y make
+
+# Install go
+toolbox run sudo dnf install -y golang
 
 mkdir -p ${HOME}/.devtools/go
 
 tee ${HOME}/.bashrc.d/go << 'EOF'
 export GOPATH="$HOME/.devtools/go"
+export PATH="$GOPATH/bin:$PATH"
 EOF
 
 # Create python dev sandbox virtualenv and alias
@@ -567,7 +646,7 @@ alias pydev="source ${HOME}/.devtools/python/dev/bin/activate"
 EOF
 
 # Install C++ compilers
-sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+toolbox run sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
 
 ################################################
 ##### Neovim
