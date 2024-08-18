@@ -578,37 +578,61 @@ xdg-desktop-menu forceupdate
 EOF
 
 ################################################
+##### VSCode (Native)
+################################################
+
+# References:
+# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+
+# Import Microsoft key
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Add VSCode repository
+sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
+
+# Install VSCode
+dnf check-update
+sudo dnf install -y code
+
+# Install extensions
+code --install-extension golang.Go
+code --install-extension ms-python.python
+code --install-extension redhat.vscode-yaml
+code --install-extension esbenp.prettier-vscode
+code --install-extension dbaeumer.vscode-eslint
+code --install-extension hashicorp.terraform
+
+# Configure VSCode
+mkdir -p ${HOME}/.config/Code/User
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
+
+################################################
 ##### VSCode (Flatpak)
 ################################################
 
-# Install support for additional languages in Flatpak
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk17/x86_64/23.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.openjdk17/x86_64/22.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.dotnet7/x86_64/23.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.dotnet7/x86_64/22.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/22.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.node18/x86_64/23.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/22.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.typescript/x86_64/23.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/22.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.golang/x86_64/23.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.rust-stable/x86_64/22.08
-flatpak install -y flathub runtime/org.freedesktop.Sdk.Extension.rust-stable/x86_64/23.08
+# References:
+# https://github.com/David-VTUK/turing-pi-ansible/blob/main/.devcontainer/devcontainer.json#L19
+
+# Install Flatpak development runtimes
+flatpak install -y flathub org.freedesktop.Sdk//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.golang//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.node20//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.typescript//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//23.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//23.08
 
 # Install VSCode
 flatpak install -y flathub com.visualstudio.code
-
-# Allow VSCode access to src folder
-flatpak override --user --filesystem=home/src com.visualstudio.code
-
-# Allow VSCode access to .ssh folder
-flatpak override --user --filesystem=home/.ssh:ro com.visualstudio.code
-
-# Allow VSCode access to .gitconfig file
-flatpak override --user --filesystem=home/.gitconfig:ro com.visualstudio.code
-
-# Allow VSCode to read /etc (/etc/shells is required)
-flatpak override --user --filesystem=host-etc:ro com.visualstudio.code
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.visualstudio.code -o ${HOME}/.local/share/flatpak/overrides/com.visualstudio.code
 
 # Install extensions
 flatpak run com.visualstudio.code --install-extension golang.Go
@@ -616,13 +640,16 @@ flatpak run com.visualstudio.code --install-extension ms-python.python
 flatpak run com.visualstudio.code --install-extension redhat.vscode-yaml
 flatpak run com.visualstudio.code --install-extension esbenp.prettier-vscode
 flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
-
-# Enable support for additional languages
-flatpak override --user --env='FLATPAK_ENABLE_SDK_EXT=node18,typescript,golang,openjdk17,dotnet7,rust-stable' com.visualstudio.code
+flatpak run com.visualstudio.code --install-extension hashicorp.terraform
 
 # Configure VSCode
 mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+
+# Create alias
+tee ${HOME}/.bashrc.d/vscode << EOF
+alias code="flatpak run com.visualstudio.code"
+EOF
 
 # Add Flatpak specific configurations
 sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
@@ -636,11 +663,6 @@ sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
           "overrideName": true\
         }\
       },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
-
-# Create alias
-tee ${HOME}/.bashrc.d/vscode << EOF
-alias code="flatpak run com.visualstudio.code"
-EOF
 
 # Install VSCode Gnome theme
 flatpak run com.visualstudio.code --install-extension piousdeer.adwaita-theme

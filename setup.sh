@@ -240,7 +240,6 @@ flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
 flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
 flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//23.08
 flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk//23.08
 
 # Install applications
 flatpak install -y flathub com.bitwarden.desktop
@@ -505,6 +504,18 @@ sudo systemctl enable libvirtd
 sudo usermod -a -G libvirt ${USER}
 
 ################################################
+##### Podman
+################################################
+
+# Set podman alias
+tee ${HOME}/.bashrc.d/podman << EOF
+alias docker="podman"
+EOF
+
+# Enable Podman socket
+systemctl --user enable podman.socket
+
+################################################
 ##### Development
 ################################################
 
@@ -516,11 +527,6 @@ sudo usermod -a -G libvirt ${USER}
 
 # Set git configurations
 git config --global init.defaultBranch main
-
-# Set podman alias
-tee ${HOME}/.bashrc.d/podman << EOF
-alias docker="podman"
-EOF
 
 # Install make
 sudo dnf install -y make
@@ -569,40 +575,55 @@ fi
 EOF
 
 ################################################
-##### VSCode (Native)
+##### VSCode (Flatpak)
 ################################################
 
 # References:
-# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
-
-# Import Microsoft key
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# Add VSCode repository
-sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
-[code]
-name=Visual Studio Code
-baseurl=https://packages.microsoft.com/yumrepos/vscode
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
+# https://github.com/David-VTUK/turing-pi-ansible/blob/main/.devcontainer/devcontainer.json#L19
 
 # Install VSCode
-dnf check-update
-sudo dnf install -y code
+flatpak install -y flathub com.visualstudio.code
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.visualstudio.code -o ${HOME}/.local/share/flatpak/overrides/com.visualstudio.code
 
 # Install extensions
-code --install-extension golang.Go
-code --install-extension ms-python.python
-code --install-extension redhat.vscode-yaml
-code --install-extension esbenp.prettier-vscode
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension hashicorp.terraform
+flatpak run com.visualstudio.code --install-extension golang.Go
+flatpak run com.visualstudio.code --install-extension ms-python.python
+flatpak run com.visualstudio.code --install-extension redhat.vscode-yaml
+flatpak run com.visualstudio.code --install-extension esbenp.prettier-vscode
+flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
+flatpak run com.visualstudio.code --install-extension hashicorp.terraform
 
 # Configure VSCode
-mkdir -p ${HOME}/.config/Code/User
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
+mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
+
+# Create alias
+tee ${HOME}/.bashrc.d/vscode << EOF
+alias code="flatpak run com.visualstudio.code"
+EOF
+
+################################################
+##### Godot (Flatpak)
+################################################
+
+# References:
+# https://github.com/flathub/org.godotengine.Godot
+
+# Install Godot
+flatpak install -y flathub org.godotengine.Godot
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.godotengine.Godot -o ${HOME}/.local/share/flatpak/overrides/org.godotengine.Godot
+
+# Blender wrapper
+tee ${HOME}/.local/bin/blender-flatpak-wrapper << 'EOF'
+#!/usr/bin/bash
+
+flatpak-spawn --host flatpak run org.blender.Blender "$@"
+EOF
+
+chmod +x ${HOME}/.local/bin/blender-flatpak-wrapper
+
+# Pin Godot version
+flatpak mask org.godotengine.Godot
 
 ################################################
 ##### Syncthing

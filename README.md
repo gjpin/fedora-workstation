@@ -46,6 +46,23 @@ sudo parted /dev/nvme1n1 mklabel gpt
 
 `sudo systemd-cryptenroll --wipe-slot=tpm2 --tpm2-device auto --tpm2-pcrs "0+1+2+3+4+5+7+9" /dev/nvme0n1p3`
 
+## Godot Engine
+
+### Using Blender
+
+- `Filesystem > Import > Blender > Blender 3 Path`
+  - Set to `${HOME}/.local/bin/blender-flatpak-wrapper`
+
+### Using an external script editor
+
+- `Editor > Editor Settings > Text Editor > External`
+  - Exec Path: `flatpak-spawn`
+  - Exec Flags: `--host flatpak run com.visualstudio.code --reuse-window {project} --goto {file}:{line}:{col}`
+
+### Android/XR export
+
+- Official docs: [HERE](https://docs.godotengine.org/en/stable/tutorials/xr/deploying_to_android.html) and [HERE](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_android.html#doc-exporting-for-android)
+
 ## How to revert to a previous Flatpak commit
 
 ```bash
