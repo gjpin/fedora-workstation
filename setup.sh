@@ -571,36 +571,6 @@ EOF
 systemctl --user enable podman.socket
 
 ################################################
-##### Toolbx
-################################################
-
-# References:
-# https://docs.fedoraproject.org/en-US/fedora-silverblue/toolbox/#toolbox-commands
-
-# Create toolbox
-toolbox create -y
-
-# Update toolbox packages
-toolbox run sudo dnf upgrade -y --refresh
-
-# Install bind-utils (dig, etc)
-toolbox run sudo dnf install -y bind-utils
-
-# Install DNF plugins
-toolbox run sudo dnf install -y dnf-plugins-core
-
-# Android udev rules updater
-tee -a ${HOME}/.local/bin/update-all << 'EOF'
-
-################################################
-##### Toolbx
-################################################
-
-# Update toolbox packages
-toolbox run sudo dnf upgrade -y --refresh
-EOF
-
-################################################
 ##### Development
 ################################################
 
@@ -618,16 +588,16 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 git config --global init.defaultBranch main
 
 # Install nodejs
-toolbox run sudo dnf install -y nodejs npm
+sudo dnf install -y nodejs npm
 
 # Install cfssl
-toolbox run sudo dnf install -y golang-github-cloudflare-cfssl
+sudo dnf install -y golang-github-cloudflare-cfssl
 
 # Install make
-toolbox run sudo dnf install -y make
+sudo dnf install -y make
 
 # Install go
-toolbox run sudo dnf install -y golang
+sudo dnf install -y golang
 
 mkdir -p ${HOME}/.devtools/go
 
@@ -646,7 +616,7 @@ alias pydev="source ${HOME}/.devtools/python/dev/bin/activate"
 EOF
 
 # Install C++ compilers
-toolbox run sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
 
 ################################################
 ##### Neovim

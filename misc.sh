@@ -1,6 +1,36 @@
 #!/usr/bin/bash
 
 ################################################
+##### Toolbx
+################################################
+
+# References:
+# https://docs.fedoraproject.org/en-US/fedora-silverblue/toolbox/#toolbox-commands
+
+# Create toolbox
+toolbox create -y
+
+# Update toolbox packages
+toolbox run sudo dnf upgrade -y --refresh
+
+# Install bind-utils (dig, etc)
+toolbox run sudo dnf install -y bind-utils
+
+# Install DNF plugins
+toolbox run sudo dnf install -y dnf-plugins-core
+
+# Android udev rules updater
+tee -a ${HOME}/.local/bin/update-all << 'EOF'
+
+################################################
+##### Toolbx
+################################################
+
+# Update toolbox packages
+toolbox run sudo dnf upgrade -y --refresh
+EOF
+
+################################################
 ##### Applications
 ################################################
 
