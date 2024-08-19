@@ -23,6 +23,9 @@ export STEAM_VERSION
 # Disable speech dispatcher
 sudo sed -i "s|^# DisableAutoSpawn|DisableAutoSpawn|g" /etc/speech-dispatcher/speechd.conf
 
+# Mask NetworkManager-wait-online service
+sudo systemctl mask NetworkManager-wait-online.service
+
 ################################################
 ##### General
 ################################################
@@ -54,6 +57,7 @@ sudo tee -a /etc/dnf/dnf.conf << EOF
 fastestmirror=True
 max_parallel_downloads=10
 keepcache=True
+clean_requirements_on_remove=True
 EOF
 
 # Update system
@@ -74,6 +78,7 @@ sudo dnf install -y \
   fuse-sshfs \
   fd-find \
   fzf \
+  libva \
   libva-utils \
   bc \
   ripgrep \
@@ -112,7 +117,7 @@ tee ${HOME}/.local/bin/update-all << EOF
 sudo dnf upgrade -y --refresh
 
 # Update firmware
-sudo fwupdmgr refresh
+sudo fwupdmgr refresh --force
 sudo fwupdmgr update
 
 ################################################
