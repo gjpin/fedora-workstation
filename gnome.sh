@@ -103,6 +103,19 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/apps/gnome-
 chmod +x ${HOME}/.local/bin/gnome-randr
 
 ################################################
+##### Ptyxis terminal
+################################################
+
+# Install Ptyxis
+sudo dnf install -y ptyxis
+
+# Configure ptyxis shortcuts
+gsettings set org.gnome.Ptyxis.Shortcuts move-next-tab '<Control>Tab'
+gsettings set org.gnome.Ptyxis.Shortcuts move-previous-tab '<Shift><Control>Tab'
+gsettings set org.gnome.Ptyxis.Shortcuts close-tab '<Control>w'
+gsettings set org.gnome.Ptyxis.Shortcuts undo-close-tab '<Shift><Alt>t'
+
+################################################
 ##### Gnome shortcuts
 ################################################
 
@@ -118,8 +131,8 @@ gsettings set org.gnome.shell.keybindings show-screenshot-ui "['<Shift><Super>s'
 # Applications
 gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/']"
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Super>Return'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'gnome-terminal'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'gnome-terminal'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'ptyxis'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'ptyxis'
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ binding '<Super>E'
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ command 'nautilus'
@@ -156,7 +169,7 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Su
 ################################################
 
 # Set dash applications
-gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.TextEditor.desktop', 'com.visualstudio.code.desktop']"
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.TextEditor.desktop', 'com.visualstudio.code.desktop']"
 
 # Volume
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent true
