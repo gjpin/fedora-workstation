@@ -132,11 +132,18 @@ EOF
 
 chmod +x ${HOME}/.local/bin/update-all
 
+################################################
+##### SELinux
+################################################
+
 # Create aliases
 tee ${HOME}/.bashrc.d/selinux << EOF
 alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
 alias selogs="sudo journalctl -t setroubleshoot"
 EOF
+
+# Install setroubleshoot
+sudo dnf install -y setroubleshoot
 
 ################################################
 ##### Toolbx
