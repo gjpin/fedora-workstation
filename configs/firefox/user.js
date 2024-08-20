@@ -255,3 +255,6 @@ user_pref("media.webspeech.synth.enabled", false);
 
 // Enable auto scroll (middle button)
 user_pref("general.autoScroll", true);
+
+// Use PipeWire for camera handling
+user_pref("media.webrtc.camera.allow-pipewire", true);
