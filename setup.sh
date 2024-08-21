@@ -152,6 +152,9 @@ sudo dnf install -y setroubleshoot
 # References:
 # https://docs.fedoraproject.org/en-US/fedora-silverblue/toolbox/#toolbox-commands
 
+# Install toolbox
+sudo dnf install -y toolbox
+
 # Create toolbox
 toolbox create -y
 
