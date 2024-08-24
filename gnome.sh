@@ -37,6 +37,9 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 flatpak install -y flathub com.github.finefindus.eyedropper
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.finefindus.eyedropper -o ${HOME}/.local/share/flatpak/overrides/com.github.finefindus.eyedropper
 
+flatpak install -y flathub net.nokyan.Resources
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.nokyan.Resources -o ${HOME}/.local/share/flatpak/overrides/net.nokyan.Resources
+
 ################################################
 ##### Firefox
 ################################################
@@ -139,8 +142,8 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/or
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/ name 'nautilus'
 
 gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ binding '<Shift><Control>Escape'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ command 'gnome-system-monitor'
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ name 'gnome-system-monitor'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ command 'flatpak run net.nokyan.Resources'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/ name 'net.nokyan.Resources'
 
 # Change alt+tab behaviour
 gsettings set org.gnome.desktop.wm.keybindings switch-applications "@as []"
