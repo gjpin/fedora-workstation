@@ -64,6 +64,7 @@ curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/config
 # References:
 # https://github.com/LizardByte/Sunshine
 # https://github.com/flathub/dev.lizardbyte.app.Sunshine/blob/master/dev.lizardbyte.app.Sunshine.metainfo.xml
+# https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
 
 # Install Sunshine
 flatpak install -y flathub dev.lizardbyte.app.Sunshine
@@ -87,6 +88,12 @@ elif [ ${DESKTOP_ENVIRONMENT} == "plasma" ]; then
     curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/sunshine/apps-plasma.json -o ${HOME}/.var/app/dev.lizardbyte.app.Sunshine/config/sunshine/apps.json
 fi
 
+# Allow Sunshine in firewall
+sudo firewall-cmd --zone=FedoraWorkstation --add-port=48010/tcp --permanent
+sudo firewall-cmd --zone=FedoraWorkstation --add-port=47998/udp --permanent
+sudo firewall-cmd --zone=FedoraWorkstation --add-port=47999/udp --permanent
+sudo firewall-cmd --zone=FedoraWorkstation --add-port=48000/udp --permanent
+
 ################################################
 ##### ALVR
 ################################################
@@ -105,11 +112,10 @@ if [ ${STEAM_VERSION} = "flatpak" ]; then
   rm -f com.valvesoftware.Steam.Utility.alvr.flatpak
 
   # Allow ALVR in firewall
-  sudo firewall-cmd --zone=block --add-service=alvr
-  sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
-
-  sudo firewall-cmd --permanent --zone=block --add-service=alvr
-  sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
+  sudo firewall-cmd --zone=FedoraWorkstation --add-port=9943/tcp --permanent
+  sudo firewall-cmd --zone=FedoraWorkstation --add-port=9944/tcp --permanent
+  sudo firewall-cmd --zone=FedoraWorkstation --add-port=9943/udp --permanent
+  sudo firewall-cmd --zone=FedoraWorkstation --add-port=9944/udp --permanent
 
   # Create ALVR dashboard alias
   echo 'alias alvr="flatpak run --command=alvr_dashboard com.valvesoftware.Steam"' > ${HOME}/.bashrc.d/alvr

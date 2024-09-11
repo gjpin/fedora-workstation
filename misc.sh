@@ -1563,10 +1563,6 @@ StartupWMClass=ALVR
 EOF
 
 # Allow ALVR in firewall
-sudo firewall-cmd --zone=block --add-service=alvr
-sudo firewall-cmd --zone=FedoraWorkstation --add-service=alvr
-
-sudo firewall-cmd --permanent --zone=block --add-service=alvr
 sudo firewall-cmd --permanent --zone=FedoraWorkstation --add-service=alvr
 
 ################################################

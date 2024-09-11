@@ -88,6 +88,9 @@ sudo dnf install -y \
   coreutils \
   pulseaudio-utils
 
+# Install firewalld GUI
+sudo dnf install -y firewall-config
+
 # Install fonts
 sudo dnf install -y \
   source-foundry-hack-fonts
@@ -167,7 +170,7 @@ toolbox run sudo dnf install -y bind-utils
 # Install DNF plugins
 toolbox run sudo dnf install -y dnf-plugins-core
 
-# Android udev rules updater
+# Toolbox updater
 tee -a ${HOME}/.local/bin/update-all << 'EOF'
 
 ################################################
@@ -231,16 +234,6 @@ sudo tee /etc/systemd/user.conf.d/default-timeout.conf << EOF
 [Manager]
 DefaultTimeoutStopSec=5s
 EOF
-
-################################################
-##### Firewalld
-################################################
-
-# Set default firewall zone
-sudo firewall-cmd --set-default-zone=block
-
-# Install firewalld GUI
-sudo dnf install -y firewall-config
 
 ################################################
 ##### WireGuard
