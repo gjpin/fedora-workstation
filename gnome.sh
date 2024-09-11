@@ -116,7 +116,8 @@ sudo dnf install -y ptyxis
 gsettings set org.gnome.Ptyxis.Shortcuts move-next-tab '<Control>Tab'
 gsettings set org.gnome.Ptyxis.Shortcuts move-previous-tab '<Shift><Control>Tab'
 gsettings set org.gnome.Ptyxis.Shortcuts close-tab '<Control>w'
-gsettings set org.gnome.Ptyxis.Shortcuts undo-close-tab '<Shift><Alt>t'
+gsettings set org.gnome.Ptyxis.Shortcuts new-tab '<Control>t'
+gsettings set org.gnome.Ptyxis.Shortcuts undo-close-tab '<Control><Shift>t'
 
 ################################################
 ##### Gnome shortcuts
