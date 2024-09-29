@@ -33,8 +33,6 @@ zinit light Aloxaf/fzf-tab
 zinit snippet OMZP::git
 zinit snippet OMZP::sudo
 zinit snippet OMZP::dnf
-zinit snippet OMZP::node
-zinit snippet OMZP::npm
 zinit snippet OMZP::golang
 zinit snippet OMZP::python
 zinit snippet OMZP::kubectl
@@ -83,6 +81,9 @@ setopt NO_NOMATCH          # Do not raise an error if a glob does not match any 
 setopt GLOB_SUBST          # Perform substitutions in globs
 setopt NO_GLOB_DOTS        # Do not match leading dots with wildcards
 unsetopt EXTENDED_GLOB     # Disable extended globbing
+
+# Enable comments in interactive sessions
+setopt INTERACTIVE_COMMENTS
 
 # Aliases
 alias ls='ls --color'

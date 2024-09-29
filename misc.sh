@@ -360,7 +360,7 @@ mkdir -p ${HOME}/src/bottles
 git clone https://github.com/bottlesdevs/dependencies.git ${HOME}/src/bottles/dependencies
 
 # Alias for bottles with local dependencies
-tee ${HOME}/.bashrc.d/bottles << EOF
+tee ${HOME}/.zshrc.d/bottles << EOF
 # Set bottles alias
 alias bottles_local="LOCAL_DEPENDENCIES=${HOME}/src/bottles/dependencies flatpak run com.usebottles.bottles"
 EOF
@@ -400,7 +400,7 @@ export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Source NVM permanently
-tee ${HOME}/.bashrc.d/nvm << 'EOF'
+tee ${HOME}/.zshrc.d/nvm << 'EOF'
 export NVM_DIR="$HOME/.devtools/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
@@ -448,7 +448,7 @@ sudo dnf install -y \
   rocm-smi rocm-smi-devel \
   rocm-cmake rocm-comgr rocm-comgr-devel rocm-device-libs
 
-tee ${HOME}/.bashrc.d/rocm << EOF
+tee ${HOME}/.zshrc.d/rocm << EOF
 # Confirm "Node:" of GPU with rocminfo
 export HIP_VISIBLE_DEVICES=1
 
@@ -474,7 +474,7 @@ sudo dnf install -y python3.11
 # Create venv for pytorch
 python3.11 -m venv ${HOME}/.python/pytorch
 
-tee -a ${HOME}/.bashrc.d/python << 'EOF'
+tee -a ${HOME}/.zshrc.d/python << 'EOF'
 alias pytorch="source ${HOME}/.python/pytorch/bin/activate"
 EOF
 
@@ -520,7 +520,7 @@ curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
 
-tee ${HOME}/.bashrc.d/kind << 'EOF'
+tee ${HOME}/.zshrc.d/kind << 'EOF'
 # Enable podman backend in Kind
 KIND_EXPERIMENTAL_PROVIDER=podman
 
@@ -529,7 +529,7 @@ alias kind-single-node="kind create cluster --name single-node"
 alias kind-multi-node="kind create cluster --name multi-node --config ${HOME}/.kind/kind-multi-node.yaml"
 EOF
 
-echo "source <(kind completion bash)" >> ${HOME}/.bashrc.d/kind
+echo "source <(kind completion bash)" >> ${HOME}/.zshrc.d/kind
 
 mkdir -p ${HOME}/.kind
 tee ${HOME}/.kind/kind-multi-node.yaml << 'EOF'
@@ -577,41 +577,6 @@ gtk-update-icon-cache -f -t ${HOME}/.local/share/icons/MoreWaita
 xdg-desktop-menu forceupdate
 EOF
 
-################################################
-##### VSCode (Native)
-################################################
-
-# References:
-# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
-
-# Import Microsoft key
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# Add VSCode repository
-sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
-[code]
-name=Visual Studio Code
-baseurl=https://packages.microsoft.com/yumrepos/vscode
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
-
-# Install VSCode
-dnf check-update
-sudo dnf install -y code
-
-# Install extensions
-code --install-extension golang.Go
-code --install-extension ms-python.python
-code --install-extension redhat.vscode-yaml
-code --install-extension esbenp.prettier-vscode
-code --install-extension dbaeumer.vscode-eslint
-code --install-extension hashicorp.terraform
-
-# Configure VSCode
-mkdir -p ${HOME}/.config/Code/User
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
 
 ################################################
 ##### VSCode (Flatpak)
@@ -638,8 +603,6 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 flatpak run com.visualstudio.code --install-extension golang.Go
 flatpak run com.visualstudio.code --install-extension ms-python.python
 flatpak run com.visualstudio.code --install-extension redhat.vscode-yaml
-flatpak run com.visualstudio.code --install-extension esbenp.prettier-vscode
-flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
 flatpak run com.visualstudio.code --install-extension hashicorp.terraform
 
 # Configure VSCode
@@ -647,30 +610,9 @@ mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 # Create alias
-tee ${HOME}/.bashrc.d/vscode << EOF
+tee ${HOME}/.zshrc.d/vscode << EOF
 alias code="flatpak run com.visualstudio.code"
 EOF
-
-# Add Flatpak specific configurations
-sed -i '2 i \ \ \ \ "terminal.integrated.env.linux": {\
-        "LD_PRELOAD": null,\
-    },\
-    "terminal.integrated.defaultProfile.linux": "bash",\
-    "terminal.integrated.profiles.linux": {\
-        "bash": {\
-          "path": "/usr/bin/bash",\
-          "icon": "terminal-bash",\
-          "overrideName": true\
-        }\
-      },' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
-
-# Install VSCode Gnome theme
-flatpak run com.visualstudio.code --install-extension piousdeer.adwaita-theme
-
-# Change VSCode config to use theme
-sed -i '2 i \ \ \ \ "workbench.preferredDarkColorTheme": "Adwaita Dark",' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
-sed -i '2 i \ \ \ \ "workbench.preferredLightColorTheme": "Adwaita Light",' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
-sed -i '2 i \ \ \ \ "workbench.colorTheme": "Adwaita Dark & default syntax highlighting",' ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
 
 ################################################
 ##### Cockpit
@@ -699,7 +641,7 @@ sudo dnf install -y golang-github-cloudflare-cfssl
 # mitmproxy
 mkdir -p ${HOME}/.mitmproxy
 
-tee ${HOME}/.bashrc.d/mitmproxy << 'EOF'
+tee ${HOME}/.zshrc.d/mitmproxy << 'EOF'
 alias mitmproxy='podman run -it --rm --name=mitmproxy -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest'
 alias mitmdump='podman run -it --rm --name=mitmdump -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 docker.io/mitmproxy/mitmproxy:latest mitmdump'
 alias mitmweb='podman run -it --rm --name=mitmweb -v "$HOME"/.mitmproxy:/home/mitmproxy/.mitmproxy:Z -p 8080:8080 -p 127.0.0.1:8081:8081 docker.io/mitmproxy/mitmproxy:latest mitmweb --web-host 0.0.0.0'
@@ -804,7 +746,7 @@ unzip emulator-linux_x64-*.zip -d ${ANDROID_SDK_PATH}
 rm -f emulator-linux_x64-*.zip
 
 # Set env vars
-tee ${HOME}/.bashrc.d/android << EOF
+tee ${HOME}/.zshrc.d/android << EOF
 export ANDROID_HOME='${ANDROID_SDK_PATH}'
 export PATH="\${PATH}:\${ANDROID_HOME}/build-tools/latest"
 export PATH="\${PATH}:\${ANDROID_HOME}/cmdline-tools/latest/bin"
@@ -823,7 +765,7 @@ unzip -o deno-x86_64-unknown-linux-gnu.zip -d ${HOME}/.deno/bin
 rm -f deno-x86_64-unknown-linux-gnu.zip
 
 # Add Deno to path
-tee ${HOME}/.bashrc.d/deno << 'EOF'
+tee ${HOME}/.zshrc.d/deno << 'EOF'
 export DENO_INSTALL=${HOME}/.deno
 export PATH="$PATH:$DENO_INSTALL/bin"
 EOF
@@ -896,7 +838,7 @@ flatpak override --user --unshare=network org.winehq.Wine
 flatpak override --user --env='WINEDLLOVERRIDES=mscoree=d;mshtml=d' org.winehq.Wine
 
 # Set wine alias
-tee ${HOME}/.bashrc.d/wine << 'EOF'
+tee ${HOME}/.zshrc.d/wine << 'EOF'
 alias wine="flatpak run org.winehq.Wine"
 alias wineuninstaller="flatpak run org.winehq.Wine uninstaller"
 alias winecfg="flatpak run --command=winecfg org.winehq.Wine"
@@ -1199,14 +1141,14 @@ chmod +x ${HOME}/.local/bin/dotnet-install.sh
 dotnet-install.sh --channel STS
 
 # Export dotnet to path
-tee ${HOME}/.bashrc.d/dotnet << EOF
+tee ${HOME}/.zshrc.d/dotnet << EOF
 export DOTNET_CLI_TELEMETRY_OPTOUT=true
 export DOTNET_ROOT=${HOME}/.dotnet
 export PATH=\$PATH:${HOME}/.dotnet
 EOF
 
 # Enable tab autocomplete for the .NET CLI
-tee -a ${HOME}/.bashrc.d/dotnet << 'EOF'
+tee -a ${HOME}/.zshrc.d/dotnet << 'EOF'
 
 # bash parameter completion for the dotnet CLI
 function _dotnet_bash_complete()
@@ -1313,7 +1255,7 @@ sudo unzip VSCode_Theme-*-signed.zip -d /opt/android-studio/plugins
 rm -f VSCode_Theme-*-signed.zip
 
 # Set environment
-tee ${HOME}/.bashrc.d/android << EOF
+tee ${HOME}/.zshrc.d/android << EOF
 export ANDROID_HOME=${HOME}/Android/Sdk
 export ANDROID_USER_HOME=${HOME}/.android
 export PATH=\$PATH:${HOME}/Android/Sdk/platform-tools
@@ -1384,7 +1326,7 @@ EOF
 # https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally
 mkdir ${HOME}/.npm-global
 npm config set prefix '~/.npm-global'
-tee ${HOME}/.bashrc.d/npm << 'EOF'
+tee ${HOME}/.zshrc.d/npm << 'EOF'
 export PATH=~/.npm-global/bin:$PATH
 EOF
 

@@ -19,16 +19,9 @@
         "*.service": "ini"
     },
     "extensions.ignoreRecommendations": true,
-    "editor.formatOnSave": true,
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "git.autofetch": true,
-    "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
     "workbench.colorCustomizations": {
         "[Default Dark Modern]": {
             "editor.background": "#181818"

@@ -33,13 +33,7 @@ flatpak install -y flathub org.videolan.VLC
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
 # KDE specific configurations
-tee -a ${FIREFOX_PROFILE_PATH}/user.js << 'EOF'
-
-// KDE integration
-// https://wiki.archlinux.org/title/firefox#KDE_integration
-user_pref("widget.use-xdg-desktop-portal.mime-handler", 1);
-user_pref("widget.use-xdg-desktop-portal.file-picker", 1);
-EOF
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox/plasma.js >> ${FIREFOX_PROFILE_PATH}/user.js
 
 ################################################
 ##### SSH

@@ -55,6 +55,7 @@ mkdir -p ${FIREFOX_PROFILE_PATH}/chrome
 git clone https://github.com/rafaelmardojai/firefox-gnome-theme.git ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme
 echo '@import "firefox-gnome-theme/userChrome.css"' > ${FIREFOX_PROFILE_PATH}/chrome/userChrome.css
 echo '@import "firefox-gnome-theme/userContent.css"' > ${FIREFOX_PROFILE_PATH}/chrome/userContent.css
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox/gnome.js >> ${FIREFOX_PROFILE_PATH}/user.js
 
 # Firefox theme updater
 tee -a ${HOME}/.local/bin/update-all << 'EOF'
@@ -66,17 +67,6 @@ tee -a ${HOME}/.local/bin/update-all << 'EOF'
 # Update Firefox theme
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
-EOF
-
-# Gnome specific configurations
-tee -a ${FIREFOX_PROFILE_PATH}/user.js << 'EOF'
-
-// Firefox Gnome theme
-user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-user_pref("browser.uidensity", 0);
-user_pref("svg.context-properties.content.enabled", true);
-user_pref("browser.theme.dark-private-windows", false);
-user_pref("gnomeTheme.activeTabContrast", true);
 EOF
 
 ################################################
@@ -253,13 +243,13 @@ mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
 # Grand Theft Focus
 # https://extensions.gnome.org/extension/5410/grand-theft-focus
-curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v6.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/grand-theft-focuszalckos.github.com.v7.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
 # Legacy (GTK3) Theme Scheme Auto Switcher
 # https://extensions.gnome.org/extension/4998/legacy-gtk3-theme-scheme-auto-switcher/
-curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v8.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/legacyschemeautoswitcherjoshimukul29.gmail.com.v9.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 
@@ -268,7 +258,7 @@ rm -f *.shell-extension.zip
 # https://src.fedoraproject.org/rpms/gnome-shell-extension-appindicator/blob/rawhide/f/gnome-shell-extension-appindicator.spec
 sudo dnf install -y libappindicator-gtk3
 
-curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v58.shell-extension.zip -O
+curl -sSL https://extensions.gnome.org/extension-data/appindicatorsupportrgcjonas.gmail.com.v59.shell-extension.zip -O
 gnome-extensions install *.shell-extension.zip
 rm -f *.shell-extension.zip
 

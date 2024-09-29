@@ -16,6 +16,9 @@ export GAMING
 read -p "Steam (native / flatpak): " STEAM_VERSION
 export STEAM_VERSION
 
+read -p "RPM Fusion (yes / no): " RPM_FUSION
+export RPM_FUSION
+
 ################################################
 ##### Remove unneeded packages and services
 ################################################
@@ -40,7 +43,7 @@ mkdir -p \
   ${HOME}/.local/share/icons \
   ${HOME}/.local/share/themes \
   ${HOME}/.local/share/fonts \
-  ${HOME}/.bashrc.d \
+  ${HOME}/.zshrc.d \
   ${HOME}/.local/bin \
   ${HOME}/.config/autostart \
   ${HOME}/.config/systemd/user \
@@ -136,11 +139,37 @@ EOF
 chmod +x ${HOME}/.local/bin/update-all
 
 ################################################
+##### ZSH
+################################################
+
+# Install ZSH
+sudo dnf install -y zsh
+
+# Configure ZSH
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.zshrc -o ${HOME}/.zshrc
+
+# Configure powerlevel10k zsh theme
+curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/zsh/.p10k.zsh -o ${HOME}/.p10k.zsh
+
+# Add ~/.local/bin to the path
+tee ${HOME}/.zshrc.d/local-bin << 'EOF'
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+EOF
+
+# Change user default shell to ZSH
+chsh -s $(which zsh)
+
+################################################
 ##### SELinux
 ################################################
 
 # Create aliases
-tee ${HOME}/.bashrc.d/selinux << EOF
+tee ${HOME}/.zshrc.d/selinux << EOF
 alias sedenials="sudo ausearch -m AVC,USER_AVC -ts recent"
 alias selogs="sudo journalctl -t setroubleshoot"
 EOF
@@ -158,17 +187,14 @@ sudo dnf install -y setroubleshoot
 # Install toolbox
 sudo dnf install -y toolbox
 
-# Create toolbox
-toolbox create -y
+# Create archlinux toolbox
+toolbox create -y --distro arch
 
-# Update toolbox packages
-toolbox run sudo dnf upgrade -y --refresh
+# Update arch packages
+toolbox run sudo pacman -Syu
 
-# Install bind-utils (dig, etc)
-toolbox run sudo dnf install -y bind-utils
-
-# Install DNF plugins
-toolbox run sudo dnf install -y dnf-plugins-core
+# Install packages
+toolbox run sudo pacman -S --noconfirm bind talosctl k9s
 
 # Toolbox updater
 tee -a ${HOME}/.local/bin/update-all << 'EOF'
@@ -178,7 +204,7 @@ tee -a ${HOME}/.local/bin/update-all << 'EOF'
 ################################################
 
 # Update toolbox packages
-toolbox run sudo dnf upgrade -y --refresh
+toolbox run sudo pacman -Syu --noconfirm
 EOF
 
 ################################################
@@ -189,7 +215,7 @@ EOF
 # https://rpmfusion.org/Configuration/
 # https://rpmfusion.org/Howto/Multimedia
 
-if [ ${STEAM_VERSION} = "native" ]; then
+if [ ${RPM_FUSION} = "yes" ]; then
   # Enable free and nonfree repositories
   sudo dnf install -y \
       https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
@@ -272,16 +298,6 @@ if lspci | grep VGA | grep "Intel" > /dev/null; then
   flatpak install -y flathub org.freedesktop.Platform.VAAPI.Intel//23.08
 fi
 
-# Install Flatpak development runtimes
-flatpak install -y flathub org.freedesktop.Sdk//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.golang//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.node20//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.typescript//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//23.08
-
 # Install applications
 flatpak install -y flathub com.github.tchx84.Flatseal
 
@@ -318,6 +334,12 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 
 flatpak install -y flathub dev.skynomads.Seabird
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/dev.skynomads.Seabird -o ${HOME}/.local/share/flatpak/overrides/dev.skynomads.Seabird
+
+flatpak install -y org.sqlitebrowser.sqlitebrowser
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/org.sqlitebrowser.sqlitebrowser -o ${HOME}/.local/share/flatpak/overrides/org.sqlitebrowser.sqlitebrowser
+
+flatpak install -y flathub io.beekeeperstudio.Studio
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/io.beekeeperstudio.Studio -o ${HOME}/.local/share/flatpak/overrides/io.beekeeperstudio.Studio
 
 ################################################
 ##### Android udev rules
@@ -383,7 +405,7 @@ rm -f platform-tools_r*-linux.zip
 echo ${PLATFORM_TOOLS_LATEST_VERSION} > ${HOME}/.devtools/android/platform_tools_installed_version
 
 # Set env vars and paths
-tee ${HOME}/.bashrc.d/android << EOF
+tee ${HOME}/.zshrc.d/android << EOF
 # Android env vars
 export ANDROID_HOME='${HOME}/.devtools/android'
 export ANDROID_SDK_ROOT='${HOME}/.devtools/android'
@@ -504,7 +526,7 @@ kubectl krew install ns
 kubectl krew install node-shell
 
 # Kubernetes aliases and autocompletion
-tee ${HOME}/.bashrc.d/kubernetes << 'EOF'
+tee ${HOME}/.zshrc.d/kubernetes << 'EOF'
 # Kubectl alias
 alias k="kubectl"
 alias kx="kubectl ctx"
@@ -514,14 +536,10 @@ alias ks="kubectl node-shell"
 # Autocompletion
 autoload -Uz compinit
 compinit
-source <(kubectl completion bash)
+source <(kubectl completion zsh)
 
 # Krew
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
-EOF
-
-# k9s
-tee -a ${HOME}/.bashrc.d/kubernetes << 'EOF'
 
 # k9s
 alias k9s="podman run --rm -it -v ~/.kube/config:/root/.kube/config quay.io/derailed/k9s"
@@ -602,7 +620,7 @@ sudo usermod -a -G libvirt ${USER}
 ################################################
 
 # Set podman alias
-tee ${HOME}/.bashrc.d/podman << EOF
+tee ${HOME}/.zshrc.d/podman << EOF
 alias docker="podman"
 EOF
 
@@ -626,36 +644,30 @@ curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/fla
 # Set git configurations
 git config --global init.defaultBranch main
 
-# Install nodejs
-sudo dnf install -y nodejs npm
-
-# Install cfssl
-sudo dnf install -y golang-github-cloudflare-cfssl
-
 # Install make
 sudo dnf install -y make
 
 # Install go
 sudo dnf install -y golang
 
-mkdir -p ${HOME}/.devtools/go
+mkdir -p ${HOME}/.go
 
-tee ${HOME}/.bashrc.d/go << 'EOF'
-export GOPATH="$HOME/.devtools/go"
+tee ${HOME}/.zshrc.d/go << 'EOF'
+export GOPATH="$HOME/.go"
 export PATH="$GOPATH/bin:$PATH"
-EOF
-
-# Create python dev sandbox virtualenv and alias
-mkdir -p ${HOME}/.devtools/python
-
-python -m venv ${HOME}/.devtools/python/dev
-
-tee ${HOME}/.bashrc.d/python << 'EOF'
-alias pydev="source ${HOME}/.devtools/python/dev/bin/activate"
 EOF
 
 # Install C++ compilers
 sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
+
+# Install Python uv
+sudo dnf install -y uv
+
+tee ${HOME}/.zshrc.d/python << 'EOF'
+# uv shell autocompletion
+eval "$(uv generate-shell-completion zsh)"
+eval "$(uvx --generate-shell-completion zsh)"
+EOF
 
 ################################################
 ##### Neovim
@@ -664,7 +676,7 @@ sudo dnf install -y gcc-c++ clang clang-tools-extra llvm
 # Install Neovim and set as default editor
 sudo dnf install -y neovim
 
-tee ${HOME}/.bashrc.d/neovim << 'EOF'
+tee ${HOME}/.zshrc.d/neovim << 'EOF'
 # Set neovim alias
 alias vi=nvim
 alias vim=nvim
@@ -680,32 +692,38 @@ fi
 EOF
 
 ################################################
-##### VSCode (Flatpak)
+##### VSCode (Native)
 ################################################
 
 # References:
-# https://github.com/David-VTUK/turing-pi-ansible/blob/main/.devcontainer/devcontainer.json#L19
+# https://code.visualstudio.com/docs/setup/linux#_rhel-fedora-and-centos-based-distributions
+
+# Import Microsoft key
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Add VSCode repository
+sudo tee /etc/yum.repos.d/vscode.repo << 'EOF'
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+EOF
 
 # Install VSCode
-flatpak install -y flathub com.visualstudio.code
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.visualstudio.code -o ${HOME}/.local/share/flatpak/overrides/com.visualstudio.code
+dnf check-update
+sudo dnf install -y code
 
 # Install extensions
-flatpak run com.visualstudio.code --install-extension golang.Go
-flatpak run com.visualstudio.code --install-extension ms-python.python
-flatpak run com.visualstudio.code --install-extension redhat.vscode-yaml
-flatpak run com.visualstudio.code --install-extension esbenp.prettier-vscode
-flatpak run com.visualstudio.code --install-extension dbaeumer.vscode-eslint
-flatpak run com.visualstudio.code --install-extension hashicorp.terraform
+code --install-extension golang.Go
+code --install-extension ms-python.python
+code --install-extension redhat.vscode-yaml
+code --install-extension hashicorp.terraform
 
 # Configure VSCode
-mkdir -p ${HOME}/.var/app/com.visualstudio.code/config/Code/User
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.var/app/com.visualstudio.code/config/Code/User/settings.json
-
-# Create alias
-tee ${HOME}/.bashrc.d/vscode << EOF
-alias code="flatpak run com.visualstudio.code"
-EOF
+mkdir -p ${HOME}/.config/Code/User
+curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/vscode/settings.json -o ${HOME}/.config/Code/User/settings.json
 
 ################################################
 ##### Godot (Flatpak)
