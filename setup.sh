@@ -284,6 +284,10 @@ sudo chmod 700 /etc/wireguard/
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 sudo flatpak remote-modify flathub --enable
 
+# Remove Fedora flatpak's repo
+flatpak install --reinstall flathub $(flatpak list --app-runtime=org.fedoraproject.Platform --columns=application | tail -n +1 )
+sudo flatpak remote-delete fedora
+
 # Import global Flatpak overrides
 mkdir -p ${HOME}/.local/share/flatpak/overrides
 curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/global -o ${HOME}/.local/share/flatpak/overrides/global
