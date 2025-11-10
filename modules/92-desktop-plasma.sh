@@ -1,8 +1,14 @@
 #!/usr/bin/bash
 
 ################################################
+##### KDE Plasma Desktop Configuration
+################################################
+
+################################################
 ##### Remove unneeded packages and services
 ################################################
+
+print_info "Removing unneeded packages"
 
 # Remove games
 sudo dnf remove -y \
@@ -19,6 +25,8 @@ balooctl purge
 ##### Flatpak
 ################################################
 
+print_info "Installing Plasma-specific Flatpak applications"
+
 # Install Breeze-GTK flatpak theme
 flatpak install -y flathub org.gtk.Gtk3theme.Breeze
 
@@ -29,6 +37,8 @@ flatpak install -y flathub org.videolan.VLC
 ##### Firefox
 ################################################
 
+print_info "Configuring Firefox for Plasma"
+
 # Set Firefox profile path
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 
@@ -38,6 +48,8 @@ curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/config
 ################################################
 ##### SSH
 ################################################
+
+print_info "Configuring SSH for Plasma"
 
 # Install Plasma related packages
 sudo dnf install -y \
@@ -62,6 +74,8 @@ EOF
 ################################################
 ##### Plasma shortcuts
 ################################################
+
+print_info "Configuring Plasma shortcuts"
 
 kwriteconfig6 --file kglobalshortcutsrc --group plasmashell --key "activate task manager entry 1" "none,none,Activate Task Manager Entry 1"
 kwriteconfig6 --file kglobalshortcutsrc --group plasmashell --key "activate task manager entry 2" "none,none,Activate Task Manager Entry 2"
@@ -99,6 +113,8 @@ kwriteconfig6 --file kglobalshortcutsrc --group kwin --key "Window to Desktop 10
 ################################################
 ##### Plasma UI / UX changes
 ################################################
+
+print_info "Configuring Plasma UI/UX"
 
 # Import Plasma color schemes
 mkdir -p ${HOME}/.local/share/color-schemes
@@ -234,3 +250,5 @@ kwriteconfig6 --file kwinrulesrc --group 10 --key wmclassmatch 1
 
 kwriteconfig6 --file kwinrulesrc --group General --key count 10
 kwriteconfig6 --file kwinrulesrc --group General --key rules "1,2,3,4,5,6,7,8,9,10"
+
+print_info "Plasma desktop configuration completed"

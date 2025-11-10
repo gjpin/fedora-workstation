@@ -586,14 +586,14 @@ EOF
 # https://github.com/David-VTUK/turing-pi-ansible/blob/main/.devcontainer/devcontainer.json#L19
 
 # Install Flatpak development runtimes
-flatpak install -y flathub org.freedesktop.Sdk//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.golang//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.node20//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.typescript//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//23.08
-flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//23.08
+flatpak install -y flathub org.freedesktop.Sdk//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.golang//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.node20//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.typescript//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.llvm18//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.rust-stable//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk17//24.08
+flatpak install -y flathub org.freedesktop.Sdk.Extension.openjdk21//24.08
 
 # Install VSCode
 flatpak install -y flathub com.visualstudio.code
@@ -827,9 +827,9 @@ EOF
 # https://github.com/Matoking/protontricks
 
 # Install Wine and dependencies
-flatpak install -y flathub app/org.winehq.Wine/x86_64/stable-23.08
-flatpak install -y flathub runtime/org.winehq.Wine.gecko/x86_64/stable-23.08
-flatpak install -y flathub runtime/org.winehq.Wine.mono/x86_64/stable-23.08
+flatpak install -y flathub app/org.winehq.Wine/x86_64/stable-24.08
+flatpak install -y flathub runtime/org.winehq.Wine.gecko/x86_64/stable-24.08
+flatpak install -y flathub runtime/org.winehq.Wine.mono/x86_64/stable-24.08
 
 # Deny Wine internet access
 flatpak override --user --unshare=network org.winehq.Wine
@@ -889,8 +889,8 @@ flatpak run org.winehq.Wine reg add 'HKEY_CURRENT_USER\Software\Wine\DllOverride
 sleep 5
 
 # Install and configure MangoHud and Gamescope
-flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
-flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//23.08
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//24.08
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//24.08
 flatpak override --user --env='PATH=/app/bin:/usr/bin:/usr/lib/extensions/vulkan/MangoHud/bin:/usr/lib/extensions/vulkan/gamescope/bin' org.winehq.Wine
 
 mkdir -p ${HOME}/.var/app/org.winehq.Wine/config/MangoHud
@@ -1018,8 +1018,8 @@ sudo flatpak remote-add --if-not-exists flathub-beta https://flathub.org/beta-re
 sudo flatpak remote-modify flathub-beta --enable
 
 # Install Mesa git
-flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git//23.08
-flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git//23.08
+flatpak install -y flathub-beta org.freedesktop.Platform.GL.mesa-git//24.08
+flatpak install -y flathub-beta org.freedesktop.Platform.GL32.mesa-git//24.08
 
 # Make Steam use mesa-git
 flatpak override --user --env=FLATPAK_GL_DRIVERS=mesa-git com.valvesoftware.Steam

@@ -1,11 +1,17 @@
 #!/usr/bin/bash
 
+################################################
+##### GNOME Desktop Configuration
+################################################
+
 # Enable VRR
 # gsettings set org.gnome.mutter experimental-features "['variable-refresh-rate']"
 
 ################################################
 ##### Configure Gnome applications
 ################################################
+
+print_info "Configuring GNOME applications"
 
 # Disable Gnome Software autostart
 cp /etc/xdg/autostart/org.gnome.Software.desktop ${HOME}/.config/autostart/org.gnome.Software.desktop
@@ -27,25 +33,19 @@ gsettings set org.freedesktop.Tracker3.Miner.Files index-recursive-directories "
 ##### Flatpak applications
 ################################################
 
+print_info "Installing GNOME-specific Flatpak applications"
+
 # Install applications
-flatpak install -y flathub com.mattjakeman.ExtensionManager
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.mattjakeman.ExtensionManager -o ${HOME}/.local/share/flatpak/overrides/com.mattjakeman.ExtensionManager
-
-flatpak install -y flathub io.github.celluloid_player.Celluloid
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/io.github.celluloid_player.Celluloid -o ${HOME}/.local/share/flatpak/overrides/io.github.celluloid_player.Celluloid
-
-flatpak install -y flathub com.github.finefindus.eyedropper
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/com.github.finefindus.eyedropper -o ${HOME}/.local/share/flatpak/overrides/com.github.finefindus.eyedropper
-
-flatpak install -y flathub net.nokyan.Resources
-curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/flatpak/net.nokyan.Resources -o ${HOME}/.local/share/flatpak/overrides/net.nokyan.Resources
+install_flatpak_app "com.mattjakeman.ExtensionManager"
+install_flatpak_app "io.github.celluloid_player.Celluloid"
+install_flatpak_app "com.github.finefindus.eyedropper"
+install_flatpak_app "net.nokyan.Resources"
 
 ################################################
 ##### Firefox
 ################################################
 
-# References:
-# https://github.com/rafaelmardojai/firefox-gnome-theme
+print_info "Configuring Firefox for GNOME"
 
 # Set Firefox profile path
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
@@ -58,8 +58,7 @@ echo '@import "firefox-gnome-theme/userContent.css"' > ${FIREFOX_PROFILE_PATH}/c
 curl -sSL https://raw.githubusercontent.com/gjpin/fedora-workstation/main/configs/firefox/gnome.js >> ${FIREFOX_PROFILE_PATH}/user.js
 
 # Firefox theme updater
-tee -a ${HOME}/.local/bin/update-all << 'EOF'
-
+append_to_updater '
 ################################################
 ##### Firefox
 ################################################
@@ -67,14 +66,13 @@ tee -a ${HOME}/.local/bin/update-all << 'EOF'
 # Update Firefox theme
 FIREFOX_PROFILE_PATH=$(realpath ${HOME}/.var/app/org.mozilla.firefox/.mozilla/firefox/*.default-release)
 git -C ${FIREFOX_PROFILE_PATH}/chrome/firefox-gnome-theme pull
-EOF
+'
 
 ################################################
 ##### GTK theme
 ################################################
 
-# References:
-# https://github.com/lassekongo83/adw-gtk3
+print_info "Installing GTK theme"
 
 # Install adw-gtk3 flatpak
 flatpak install -y flathub org.gtk.Gtk3theme.adw-gtk3
@@ -91,6 +89,8 @@ gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 ##### Utilities
 ################################################
 
+print_info "Installing GNOME utilities"
+
 # Install gnome-randr
 curl https://raw.githubusercontent.com/gjpin/fedora-workstation/main/apps/gnome-randr.py -o ${HOME}/.local/bin/gnome-randr
 chmod +x ${HOME}/.local/bin/gnome-randr
@@ -98,6 +98,8 @@ chmod +x ${HOME}/.local/bin/gnome-randr
 ################################################
 ##### Ptyxis terminal
 ################################################
+
+print_info "Configuring Ptyxis terminal"
 
 # Install Ptyxis
 sudo dnf install -y ptyxis
@@ -112,6 +114,8 @@ gsettings set org.gnome.Ptyxis.Shortcuts undo-close-tab '<Control><Shift>t'
 ################################################
 ##### Gnome shortcuts
 ################################################
+
+print_info "Configuring GNOME shortcuts"
 
 # Terminal
 gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/ next-tab '<Primary>Tab'
@@ -162,6 +166,8 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-4 "['<Shift><Su
 ##### Gnome UI / UX changes
 ################################################
 
+print_info "Configuring GNOME UI/UX"
+
 # Set dash applications
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'org.mozilla.firefox.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.TextEditor.desktop', 'com.visualstudio.code.desktop']"
 
@@ -179,10 +185,10 @@ gsettings set org.gtk.Settings.FileChooser sort-directories-first true
 gsettings set org.gnome.nautilus.icon-view default-zoom-level 'small-plus'
 
 # Laptop specific
-if cat /sys/class/dmi/id/chassis_type | grep 10 > /dev/null; then
-  gsettings set org.gnome.desktop.interface show-battery-percentage true
-  gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
-  gsettings set org.gnome.desktop.peripherals.touchpad disable-while-typing false
+if is_laptop; then
+    gsettings set org.gnome.desktop.interface show-battery-percentage true
+    gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
+    gsettings set org.gnome.desktop.peripherals.touchpad disable-while-typing false
 fi
 
 # Configure terminal color scheme
@@ -238,6 +244,8 @@ gsettings set org.gnome.shell app-picker-layout "[{'Dev': <{'position': <0>}>, '
 ##### Gnome Shell Extensions
 ################################################
 
+print_info "Installing GNOME Shell extensions"
+
 # Create Gnome shell extensions folder
 mkdir -p ${HOME}/.local/share/gnome-shell/extensions
 
@@ -269,6 +277,8 @@ gsettings set org.gnome.shell enabled-extensions "['grand-theft-focus@zalckos.gi
 ##### Gnome misc configurations
 ################################################
 
+print_info "Applying miscellaneous GNOME configurations"
+
 # Hide applications from Gnome overview
 APPLICATIONS=('htop' 'lpf-cleartype-fonts' 'lpf' 'lpf-gui' 'lpf-ms-core-fonts' 'lpf-notify' 'lpf-mscore-tahoma-fonts' 'syncthing-start' 'syncthing-ui')
 for APPLICATION in "${APPLICATIONS[@]}"
@@ -282,3 +292,5 @@ do
         echo "NotShowIn=KDE;GNOME;" >> ${HOME}/.local/share/applications/${APPLICATION}.desktop
     fi
 done
+
+print_info "GNOME desktop configuration completed"

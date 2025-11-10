@@ -12,8 +12,8 @@ if [ ${STEAM_VERSION} = "native" ]; then
 fi
 
 # Install MangoHud and Gamescope (Flatpak)
-flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//23.08
-flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//23.08
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.MangoHud//24.08
+flatpak install -y flathub org.freedesktop.Platform.VulkanLayer.gamescope//24.08
 
 ################################################
 ##### Steam
